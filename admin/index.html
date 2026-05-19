@@ -33,6 +33,9 @@
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Custom Styles -->
     <style>
@@ -140,6 +143,14 @@
                         <!-- Populated by JS -->
                     </div>
                 </div>
+
+                <!-- Analytics Chart -->
+                <div class="glass-card rounded-2xl p-4 mt-6">
+                    <h3 class="font-bold text-white mb-4">Platform Analytics (Clicks & Visits)</h3>
+                    <div class="w-full h-64 relative">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div id="view-payments" class="view-section p-4 max-w-7xl mx-auto hidden">
@@ -163,6 +174,19 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admin-astrologers-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Users & Customers View -->
+            <div id="view-users" class="view-section p-4 max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-center mb-6 pt-2">
+                    <h2 class="text-xl font-bold text-white">Customers & Users</h2>
+                    <div class="bg-cosmic-800 text-xs px-3 py-1.5 rounded-lg border border-white/10 text-cosmic-light/70 shadow-inner">
+                        Total Users: <span id="stat-total-users" class="font-bold text-white ml-1">0</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admin-users-grid">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -223,6 +247,10 @@
                     <i class="fa-solid fa-user-astronaut text-lg mb-1"></i>
                     <span class="text-[10px] font-medium">Astros</span>
                 </button>
+                <button onclick="switchTab('users')" id="nav-users" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
+                    <i class="fa-solid fa-users text-lg mb-1"></i>
+                    <span class="text-[10px] font-medium">Users</span>
+                </button>
                 <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
                     <i class="fa-solid fa-gear text-lg mb-1"></i>
                     <span class="text-[10px] font-medium">Settings</span>
@@ -241,6 +269,9 @@
             </button>
             <button onclick="switchTab('astrologers')" id="desk-nav-astrologers" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
                 <i class="fa-solid fa-user-astronaut w-5"></i> Astrologers
+            </button>
+            <button onclick="switchTab('users')" id="desk-nav-users" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <i class="fa-solid fa-users w-5"></i> Customers
             </button>
             <button onclick="switchTab('settings')" id="desk-nav-settings" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
                 <i class="fa-solid fa-gear w-5"></i> Settings
@@ -280,8 +311,19 @@
                             <input type="number" id="astro-price" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="20">
                         </div>
                         <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Compare Price (Strike-through)</label>
+                            <input type="number" id="astro-compare-price" class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="50 (Optional)">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
                             <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Experience (Yrs)</label>
                             <input type="number" id="astro-exp" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="5">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Total Contacts/Orders</label>
+                            <input type="number" id="astro-orders" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="100">
                         </div>
                     </div>
 
@@ -316,6 +358,31 @@
                 <button type="submit" form="astro-form" id="save-astro-btn" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-cosmic-accent/20">
                     Save Astrologer
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Balance Modal -->
+    <div id="user-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center backdrop-blur-sm px-4">
+        <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-sm flex flex-col shadow-2xl relative animate-slide-up sm:animate-none">
+            <div class="flex justify-between items-center p-4 border-b border-white/10">
+                <h3 class="text-lg font-bold text-white">Manage User Balance</h3>
+                <button onclick="closeUserModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-cosmic-light/70 hover:bg-white/10 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <p class="text-xs text-cosmic-light/70 mb-4">Editing wallet balance for: <span id="user-modal-email" class="font-bold text-white"></span></p>
+                <form id="user-form" onsubmit="saveUserBalance(event)">
+                    <input type="hidden" id="user-modal-id" value="">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Current Wallet Balance (₹)</label>
+                        <input type="number" id="user-modal-balance" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-4 py-3 text-white text-lg font-bold focus:border-cosmic-accent focus:outline-none" placeholder="0">
+                    </div>
+                    <button type="submit" id="save-user-btn" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl mt-6 transition-all active:scale-95 shadow-lg shadow-green-500/20">
+                        Update Balance
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -357,6 +424,8 @@
         let currentPayments = [];
         let appSettings = {};
         let currentView = 'dashboard';
+        let currentUsers = [];
+        let analyticsChart = null;
 
         // --- Auth Management ---
         onAuthStateChanged(auth, (user) => {
@@ -475,6 +544,19 @@
                 if(currentView === 'payments') renderPayments();
                 renderRecentPayments(); // Always update dashboard recent list
             });
+            
+            // 4. Sync Users (Customers)
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                currentUsers = [];
+                snapshot.forEach(doc => currentUsers.push({id: doc.id, ...doc.data()}));
+                document.getElementById('stat-total-users').innerText = currentUsers.length;
+                if(currentView === 'users') renderUsers();
+            });
+
+            // 5. Initialize Dashboard Analytics
+            setTimeout(() => {
+                renderAnalyticsGraph();
+            }, 500);
         }
 
         // --- UI Navigation ---
@@ -509,6 +591,54 @@
             // Render specific data
             if(tabId === 'astrologers') renderAstrologers();
             if(tabId === 'payments') renderPayments();
+            if(tabId === 'users') renderUsers();
+        }
+
+        // --- Analytics Graph Logic ---
+        function renderAnalyticsGraph() {
+            const ctx = document.getElementById('analyticsChart');
+            if(!ctx) return;
+
+            if(analyticsChart) analyticsChart.destroy();
+
+            // Mock Data setup for the graph to look appealing until index.html sends real tracking data
+            const data = {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    {
+                        label: 'Website Visits',
+                        data: [120, 190, 150, 220, 300, 450, 410],
+                        borderColor: '#D4AF37', // Gold
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Contacts/Clicks (Chat & Call)',
+                        data: [45, 80, 60, 95, 140, 210, 190],
+                        borderColor: '#A855F7', // Purple
+                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            };
+
+            analyticsChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#E2E8F0' } } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#E2E8F0' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#E2E8F0' } }
+                    }
+                }
+            });
         }
 
         // --- Payments Logic ---
@@ -673,9 +803,22 @@
                                 <p class="text-[10px] text-cosmic-light/60">${astro.skills.join(', ')}</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-                            <div class="bg-white/5 rounded p-2 text-center"><span class="block text-[10px] text-cosmic-light/50">Price</span><span class="font-bold text-white">₹${astro.price}/min</span></div>
-                            <div class="bg-white/5 rounded p-2 text-center"><span class="block text-[10px] text-cosmic-light/50">Exp</span><span class="font-bold text-white">${astro.experience} Yrs</span></div>
+                        <div class="grid grid-cols-3 gap-2 text-xs mb-4">
+                            <div class="bg-white/5 rounded p-2 text-center flex flex-col justify-center">
+                                <span class="block text-[9px] text-cosmic-light/50 uppercase">Price/Min</span>
+                                <div class="flex items-center justify-center gap-1">
+                                    <span class="font-bold text-white">₹${astro.price}</span>
+                                    ${astro.comparePrice ? `<span class="text-[9px] text-red-400 line-through">₹${astro.comparePrice}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="bg-white/5 rounded p-2 text-center flex flex-col justify-center">
+                                <span class="block text-[9px] text-cosmic-light/50 uppercase">Exp</span>
+                                <span class="font-bold text-white">${astro.experience} Yrs</span>
+                            </div>
+                            <div class="bg-white/5 rounded p-2 text-center flex flex-col justify-center">
+                                <span class="block text-[9px] text-cosmic-light/50 uppercase">Contacts</span>
+                                <span class="font-bold text-cosmic-accent">${astro.orders || 0}</span>
+                            </div>
                         </div>
                         <div class="mt-auto flex gap-2">
                             <button onclick="editAstrologer('${astro.id}')" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-1.5 rounded-lg text-xs font-medium transition-colors">Edit</button>
@@ -708,7 +851,9 @@
             document.getElementById('astro-name').value = astro.name;
             document.getElementById('astro-nameHi').value = astro.nameHi || '';
             document.getElementById('astro-price').value = astro.price;
+            document.getElementById('astro-compare-price').value = astro.comparePrice || '';
             document.getElementById('astro-exp').value = astro.experience;
+            document.getElementById('astro-orders').value = astro.orders || 0;
             document.getElementById('astro-skills').value = astro.skills.join(', ');
             document.getElementById('astro-skillsHi').value = (astro.skillsHi || []).join(', ');
             document.getElementById('astro-langs').value = astro.languages.join(', ');
@@ -736,7 +881,9 @@
                 name: document.getElementById('astro-name').value.trim(),
                 nameHi: document.getElementById('astro-nameHi').value.trim(),
                 price: parseFloat(document.getElementById('astro-price').value),
+                comparePrice: parseFloat(document.getElementById('astro-compare-price').value) || null,
                 experience: parseInt(document.getElementById('astro-exp').value),
+                orders: parseInt(document.getElementById('astro-orders').value) || 0,
                 skills: toArray(document.getElementById('astro-skills').value),
                 skillsHi: toArray(document.getElementById('astro-skillsHi').value),
                 languages: toArray(document.getElementById('astro-langs').value),
@@ -779,6 +926,90 @@
                     }
                 }
             );
+        }
+
+        // --- Customers / Users Management Logic ---
+        function renderUsers() {
+            const grid = document.getElementById('admin-users-grid');
+            grid.innerHTML = '';
+
+            if(currentUsers.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-cosmic-light/50">No users found yet.</div>';
+                return;
+            }
+
+            currentUsers.forEach(u => {
+                const joinDate = new Date(u.createdAt || Date.now()).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                
+                const card = `
+                    <div class="glass-card rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                                ${u.email ? u.email.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm truncate">${u.email || 'Anonymous User'}</h3>
+                                <p class="text-[10px] text-cosmic-light/50">Joined: ${joinDate}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-cosmic-900 border border-white/5 rounded-lg p-3 space-y-2 mb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-cosmic-light/70"><i class="fa-solid fa-phone mr-1 opacity-50"></i> Phone</span>
+                                <span class="text-xs font-medium text-white">${u.phone || 'Not Provided'}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-cosmic-light/70"><i class="fa-solid fa-clock mr-1 opacity-50"></i> Session Time</span>
+                                <span class="text-xs font-medium text-white">${u.totalSessionMinutes || 0} mins</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-white/5">
+                                <span class="text-xs font-bold text-cosmic-light/90">Wallet Balance</span>
+                                <span class="text-sm font-bold text-green-400">₹${u.balance || 0}</span>
+                            </div>
+                        </div>
+
+                        <button onclick="openUserModal('${u.id}', '${u.email || 'User'}', ${u.balance || 0})" class="w-full bg-cosmic-accent/10 hover:bg-cosmic-accent/20 text-cosmic-accent font-bold py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wallet"></i> Manage Balance
+                        </button>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function openUserModal(userId, userEmail, currentBalance) {
+            document.getElementById('user-modal-id').value = userId;
+            document.getElementById('user-modal-email').innerText = userEmail;
+            document.getElementById('user-modal-balance').value = currentBalance;
+            
+            document.getElementById('user-modal').classList.remove('hidden');
+            document.getElementById('user-modal').classList.add('flex');
+        }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.add('hidden');
+            document.getElementById('user-modal').classList.remove('flex');
+        }
+
+        async function saveUserBalance(e) {
+            e.preventDefault();
+            const btn = document.getElementById('save-user-btn');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            const userId = document.getElementById('user-modal-id').value;
+            const newBalance = parseFloat(document.getElementById('user-modal-balance').value);
+
+            try {
+                await updateDoc(doc(db, "users", userId), { balance: newBalance });
+                showToast("User balance updated successfully", "success");
+                closeUserModal();
+            } catch (error) {
+                showToast("Error updating balance", "error");
+                console.error(error);
+            }
+            
+            btn.innerText = originalText;
         }
 
         // --- Custom Utilities (Toasts, Confirms, Copy) ---
@@ -873,6 +1104,11 @@
         window.saveSettings = saveSettings;
         window.markPaymentVerified = markPaymentVerified;
         window.copyText = copyText;
+
+        // User Management Exports
+        window.openUserModal = openUserModal;
+        window.closeUserModal = closeUserModal;
+        window.saveUserBalance = saveUserBalance;
 
     </script>
 </body>
