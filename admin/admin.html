@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AstroPath Admin Panel</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: {
+                            900: '#0B0A1A',
+                            800: '#1A1832',
+                            700: '#2A274A',
+                            light: '#E2E8F0',
+                            accent: '#D4AF37'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0A1A;
+            color: white;
+            /* Prevent pull-to-refresh on mobile */
+            overscroll-behavior-y: none; 
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-card {
+            background: rgba(26, 24, 50, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col overflow-hidden">
+
+    <div id="auth-screen" class="fixed inset-0 bg-cosmic-900 z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl w-full max-w-md shadow-2xl border-t-4 border-cosmic-accent">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-cosmic-900 text-3xl mx-auto mb-4 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                    <i class="fa-solid fa-moon"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white">AstroPath Admin</h1>
+                <p class="text-sm text-cosmic-light/60 mt-1">Sign in to manage your platform</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Admin Email</label>
+                    <input type="email" id="login-email" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="admin@astropath.com" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="••••••••" />
+                </div>
+                
+                <div id="login-error" class="text-red-400 text-xs hidden text-center bg-red-400/10 p-2 rounded-lg border border-red-400/20"></div>
+
+                <button type="submit" id="login-btn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-3.5 rounded-xl hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all active:scale-95 mt-4">
+                    Secure Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-screen" class="hidden flex-col h-full w-full relative">
+        
+        <!-- Header (Mobile & Desktop) -->
+        <header class="bg-cosmic-800 border-b border-white/10 h-16 flex-shrink-0 flex items-center justify-between px-4 z-20 shadow-md">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-moon text-cosmic-accent text-xl"></i>
+                <span class="font-bold text-lg text-white">Admin Panel</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="admin-email-display" class="hidden sm:block text-xs text-cosmic-light/70"></span>
+                <button onclick="handleLogout()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area with Bottom Nav padding for mobile -->
+        <main class="flex-1 overflow-y-auto pb-20 md:pb-0 bg-cosmic-900 hide-scrollbar relative">
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section p-4 max-w-7xl mx-auto space-y-6 block">
+                <h2 class="text-xl font-bold text-white mb-4 pt-2">Overview</h2>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+                    <div class="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2"><i class="fa-solid fa-users"></i></div>
+                        <span id="stat-astrologers" class="text-2xl font-bold text-white">0</span>
+                        <span class="text-xs text-cosmic-light/60">Astrologers</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center mb-2"><i class="fa-solid fa-receipt"></i></div>
+                        <span id="stat-pending" class="text-2xl font-bold text-white">0</span>
+                        <span class="text-xs text-cosmic-light/60">Pending UTRs</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mb-2"><i class="fa-solid fa-check-double"></i></div>
+                        <span id="stat-verified" class="text-2xl font-bold text-white">0</span>
+                        <span class="text-xs text-cosmic-light/60">Verified Pymts</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center mb-2"><i class="fa-solid fa-wallet"></i></div>
+                        <span id="stat-revenue" class="text-xl font-bold text-white truncate w-full">₹0</span>
+                        <span class="text-xs text-cosmic-light/60">Total Processed</span>
+                    </div>
+                </div>
+
+                <!-- Recent Activity (Payments Preview) -->
+                <div class="glass-card rounded-2xl p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-white">Recent Transactions</h3>
+                        <button onclick="switchTab('payments')" class="text-xs text-cosmic-accent">View All</button>
+                    </div>
+                    <div id="dashboard-recent-payments" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-payments" class="view-section p-4 max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-center mb-6 pt-2">
+                    <h2 class="text-xl font-bold text-white">Payment Verifications</h2>
+                    <span class="bg-yellow-500/20 text-yellow-500 text-xs px-2 py-1 rounded-md font-bold border border-yellow-500/30">Action Required</span>
+                </div>
+
+                <div class="space-y-4" id="payments-list">
+                    <!-- Loading state -->
+                    <div class="text-center py-10 text-cosmic-light/50"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><p class="text-sm">Loading payments...</p></div>
+                </div>
+            </div>
+
+            <div id="view-astrologers" class="view-section p-4 max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-center mb-6 pt-2">
+                    <h2 class="text-xl font-bold text-white">Astrologers</h2>
+                    <button onclick="openAstroModal()" class="bg-cosmic-accent text-cosmic-900 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 active:scale-95 transition-transform">
+                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Add New</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="admin-astrologers-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="view-settings" class="view-section p-4 max-w-3xl mx-auto hidden">
+                <h2 class="text-xl font-bold text-white mb-6 pt-2">Global Settings</h2>
+                
+                <div class="glass-card p-5 md:p-6 rounded-2xl">
+                    <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-5">
+                        
+                        <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl mb-6">
+                            <h3 class="text-blue-400 font-bold text-sm mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Payment Configuration</h3>
+                            <p class="text-xs text-cosmic-light/70">These settings immediately update the payment modal on the user website.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Your UPI ID (Receiving Account)</label>
+                            <input type="text" id="set-upi" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors font-mono text-sm" placeholder="e.g. yourname@ybl" />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Business/Payee Name</label>
+                            <input type="text" id="set-name" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors text-sm" placeholder="e.g. AstroPath Services" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Currency Symbol</label>
+                                <input type="text" id="set-currency" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors text-sm text-center" value="₹" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Min. Minutes (Upfront)</label>
+                                <input type="number" id="set-min-mins" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors text-sm text-center" placeholder="5" />
+                            </div>
+                        </div>
+
+                        <button type="submit" id="save-settings-btn" class="w-full bg-white text-cosmic-900 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all active:scale-95 mt-4 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+
+        <nav class="fixed bottom-0 w-full bg-cosmic-800 border-t border-white/10 pb-safe z-30 md:hidden">
+            <div class="flex justify-around items-center h-16">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-accent">
+                    <i class="fa-solid fa-house text-lg mb-1"></i>
+                    <span class="text-[10px] font-medium">Home</span>
+                </button>
+                <button onclick="switchTab('payments')" id="nav-payments" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50 relative">
+                    <i class="fa-solid fa-receipt text-lg mb-1"></i>
+                    <span class="text-[10px] font-medium">UTRs</span>
+                    <span id="nav-badge" class="absolute top-1 right-1/4 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                </button>
+                <button onclick="switchTab('astrologers')" id="nav-astrologers" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
+                    <i class="fa-solid fa-user-astronaut text-lg mb-1"></i>
+                    <span class="text-[10px] font-medium">Astros</span>
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
+                    <i class="fa-solid fa-gear text-lg mb-1"></i>
+                    <span class="text-[10px] font-medium">Settings</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Desktop Sidebar Nav (Hidden on Mobile) -->
+        <div class="hidden md:flex fixed top-16 left-0 bottom-0 w-64 bg-cosmic-800 border-r border-white/10 flex-col py-6 px-4 gap-2 z-10">
+            <button onclick="switchTab('dashboard')" id="desk-nav-dashboard" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-cosmic-accent/10 text-cosmic-accent font-bold transition-colors text-left">
+                <i class="fa-solid fa-house w-5"></i> Dashboard
+            </button>
+            <button onclick="switchTab('payments')" id="desk-nav-payments" class="desk-nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <div class="flex items-center gap-3"><i class="fa-solid fa-receipt w-5"></i> UTRs</div>
+                <span id="desk-nav-badge" class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="switchTab('astrologers')" id="desk-nav-astrologers" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <i class="fa-solid fa-user-astronaut w-5"></i> Astrologers
+            </button>
+            <button onclick="switchTab('settings')" id="desk-nav-settings" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <i class="fa-solid fa-gear w-5"></i> Settings
+            </button>
+        </div>
+
+    </div>
+
+    <div id="astro-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-end sm:items-center justify-center backdrop-blur-sm px-0 sm:px-4">
+        <div class="bg-cosmic-800 border-t sm:border border-white/10 rounded-t-2xl sm:rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl relative animate-slide-up sm:animate-none">
+            
+            <div class="flex justify-between items-center p-4 border-b border-white/10 shrink-0">
+                <h3 id="astro-modal-title" class="text-lg font-bold text-white">Add Astrologer</h3>
+                <button onclick="closeAstroModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-cosmic-light/70 hover:bg-white/10 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 overflow-y-auto hide-scrollbar flex-1">
+                <form id="astro-form" onsubmit="saveAstrologer(event)" class="space-y-4">
+                    <input type="hidden" id="astro-id" value="">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Name (English)</label>
+                            <input type="text" id="astro-name" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Astro Rahul">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Name (Hindi)</label>
+                            <input type="text" id="astro-nameHi" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="एस्ट्रो राहुल">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Price (₹/min)</label>
+                            <input type="number" id="astro-price" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="20">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Experience (Yrs)</label>
+                            <input type="number" id="astro-exp" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="5">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Skills (Comma separated)</label>
+                        <input type="text" id="astro-skills" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Vedic, Tarot, Numerology">
+                        <input type="text" id="astro-skillsHi" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none mt-2" placeholder="वैदिक, टैरो, अंक">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Languages (Comma separated)</label>
+                        <input type="text" id="astro-langs" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="English, Hindi">
+                        <input type="text" id="astro-langsHi" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none mt-2" placeholder="अंग्रेज़ी, हिंदी">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Image URL</label>
+                        <input type="url" id="astro-image" required class="w-full bg-cosmic-900 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="https://...">
+                    </div>
+                    
+                    <div class="flex items-center gap-3 pt-2">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="astro-verified" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-cosmic-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            <span class="ml-3 text-sm font-medium text-white">Verified Badge</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <div class="p-4 border-t border-white/10 shrink-0 bg-cosmic-800 rounded-b-2xl">
+                <button type="submit" form="astro-form" id="save-astro-btn" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-cosmic-accent/20">
+                    Save Astrologer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm/Alert Modal -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/80 z-[70] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-cosmic-800 border border-white/10 p-6 rounded-2xl w-full max-w-sm text-center shadow-2xl">
+            <div id="msg-icon" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl"></div>
+            <h3 id="msg-title" class="text-xl font-bold text-white mb-2"></h3>
+            <p id="msg-desc" class="text-sm text-cosmic-light/70 mb-6"></p>
+            <div id="msg-actions" class="flex gap-3 justify-center"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[80] flex flex-col gap-2 pointer-events-none"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
+            authDomain: "designsnap-f3309.firebaseapp.com",
+            databaseURL: "https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "designsnap-f3309",
+            storageBucket: "designsnap-f3309.firebasestorage.app",
+            messagingSenderId: "741888249963",
+            appId: "1:741888249963:web:9540c9f68d6f0d5da9a12e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Variables
+        let currentAstrologers = [];
+        let currentPayments = [];
+        let appSettings = {};
+        let currentView = 'dashboard';
+
+        // --- Auth Management ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // For simplicity in this functional UI, any logged-in user can access the admin dashboard. 
+                // In production, add Firestore Rules to check if user.uid belongs to an admin list.
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('flex');
+                document.getElementById('admin-email-display').innerText = user.email;
+                
+                // Add padding to main content for desktop sidebar
+                if(window.innerWidth >= 768) {
+                    document.querySelector('main').classList.add('md:pl-64');
+                }
+
+                initDataSync();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('flex');
+            }
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            const err = document.getElementById('login-error');
+            
+            btn.innerText = "Authenticating...";
+            err.classList.add('hidden');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast("Logged in successfully", "success");
+            } catch (error) {
+                err.innerText = error.message.replace('Firebase: ', '');
+                err.classList.remove('hidden');
+                err.classList.add('block');
+                btn.innerText = "Secure Login";
+            }
+        }
+
+        async function handleLogout() {
+            showConfirmDialog(
+                "Logout?", 
+                "Are you sure you want to exit the admin panel?", 
+                "warning", 
+                "Yes, Logout", 
+                async () => {
+                    await signOut(auth);
+                    showToast("Logged out", "info");
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            );
+        }
+
+        // --- Data Synchronization (Real-time) ---
+        function initDataSync() {
+            // 1. Sync Settings
+            onSnapshot(doc(db, "settings", "global"), (doc) => {
+                if (doc.exists()) {
+                    appSettings = doc.data();
+                    document.getElementById('set-upi').value = appSettings.adminUpiId || '';
+                    document.getElementById('set-name').value = appSettings.adminName || '';
+                    document.getElementById('set-currency').value = appSettings.currency || '₹';
+                    document.getElementById('set-min-mins').value = appSettings.minMinutes || 5;
+                }
+            });
+
+            // 2. Sync Astrologers
+            onSnapshot(collection(db, "astrologers"), (snapshot) => {
+                currentAstrologers = [];
+                snapshot.forEach(doc => currentAstrologers.push({id: doc.id, ...doc.data()}));
+                document.getElementById('stat-astrologers').innerText = currentAstrologers.length;
+                if(currentView === 'astrologers') renderAstrologers();
+            });
+
+            // 3. Sync Payments
+            const paymentsQ = query(collection(db, "payment_verifications"), orderBy("timestamp", "desc"));
+            onSnapshot(paymentsQ, (snapshot) => {
+                currentPayments = [];
+                let pendingCount = 0;
+                let verifiedCount = 0;
+                let totalRev = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    currentPayments.push({id: doc.id, ...data});
+                    if(data.status === 'pending_verification') pendingCount++;
+                    if(data.status === 'verified') {
+                        verifiedCount++;
+                        totalRev += Number(data.amount || 0);
+                    }
+                });
+
+                // Update Stats
+                document.getElementById('stat-pending').innerText = pendingCount;
+                document.getElementById('stat-verified').innerText = verifiedCount;
+                document.getElementById('stat-revenue').innerText = `₹${totalRev}`;
+                
+                // Update Badges
+                const badge = document.getElementById('nav-badge');
+                const deskBadge = document.getElementById('desk-nav-badge');
+                if(pendingCount > 0) {
+                    badge.classList.remove('hidden');
+                    deskBadge.classList.remove('hidden');
+                    deskBadge.innerText = pendingCount;
+                } else {
+                    badge.classList.add('hidden');
+                    deskBadge.classList.add('hidden');
+                }
+
+                if(currentView === 'payments') renderPayments();
+                renderRecentPayments(); // Always update dashboard recent list
+            });
+        }
+
+        // --- UI Navigation ---
+        function switchTab(tabId) {
+            currentView = tabId;
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            // Show target view
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`view-${tabId}`).classList.add('block');
+
+            // Reset mobile nav styling
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-cosmic-accent');
+                el.classList.add('text-cosmic-light/50');
+            });
+            document.getElementById(`nav-${tabId}`).classList.add('text-cosmic-accent');
+            document.getElementById(`nav-${tabId}`).classList.remove('text-cosmic-light/50');
+
+            // Reset desktop nav styling
+            document.querySelectorAll('.desk-nav-btn').forEach(el => {
+                el.classList.remove('bg-cosmic-accent/10', 'text-cosmic-accent');
+                el.classList.add('text-cosmic-light/70');
+            });
+            document.getElementById(`desk-nav-${tabId}`).classList.add('bg-cosmic-accent/10', 'text-cosmic-accent');
+            document.getElementById(`desk-nav-${tabId}`).classList.remove('text-cosmic-light/70');
+
+            // Render specific data
+            if(tabId === 'astrologers') renderAstrologers();
+            if(tabId === 'payments') renderPayments();
+        }
+
+        // --- Payments Logic ---
+        function formatDate(isoString) {
+            const d = new Date(isoString);
+            return d.toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+        }
+
+        function renderRecentPayments() {
+            const container = document.getElementById('dashboard-recent-payments');
+            container.innerHTML = '';
+            
+            const recent = currentPayments.slice(0, 3); // top 3
+            if(recent.length === 0) {
+                container.innerHTML = '<p class="text-xs text-cosmic-light/50 italic">No recent transactions.</p>';
+                return;
+            }
+
+            recent.forEach(p => {
+                const isPending = p.status === 'pending_verification';
+                const statusColor = isPending ? 'text-yellow-500' : 'text-green-500';
+                const statusIcon = isPending ? 'fa-clock' : 'fa-check-circle';
+                
+                container.innerHTML += `
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center ${statusColor}">
+                                <i class="fa-solid ${statusIcon} text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-white">₹${p.amount} <span class="text-[10px] text-cosmic-light/50 ml-1">for ${p.name}</span></p>
+                                <p class="text-[10px] text-cosmic-light/50">${formatDate(p.timestamp)}</p>
+                            </div>
+                        </div>
+                        ${isPending ? `<button onclick="switchTab('payments')" class="bg-yellow-500/10 text-yellow-500 text-[10px] px-2 py-1 rounded border border-yellow-500/20 font-bold">Review</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function renderPayments() {
+            const container = document.getElementById('payments-list');
+            container.innerHTML = '';
+
+            if(currentPayments.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-cosmic-light/50"><i class="fa-solid fa-receipt text-2xl mb-2 opacity-50"></i><p class="text-sm">No payment records found.</p></div>';
+                return;
+            }
+
+            currentPayments.forEach(p => {
+                const isPending = p.status === 'pending_verification';
+                const borderColor = isPending ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/5';
+                const bgHeader = isPending ? 'bg-yellow-500/10' : 'bg-white/5';
+                
+                const card = `
+                    <div class="glass-card rounded-xl border ${borderColor} overflow-hidden">
+                        <div class="${bgHeader} px-4 py-2 flex justify-between items-center border-b border-white/5">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid ${isPending ? 'fa-triangle-exclamation text-yellow-500' : 'fa-circle-check text-green-500'}"></i>
+                                <span class="text-xs font-bold ${isPending ? 'text-yellow-500' : 'text-green-500'} uppercase tracking-wider">${isPending ? 'Action Needed' : 'Verified'}</span>
+                            </div>
+                            <span class="text-[10px] text-cosmic-light/70">${formatDate(p.timestamp)}</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex flex-wrap justify-between items-start gap-4">
+                                <div>
+                                    <p class="text-[10px] text-cosmic-light/50 uppercase mb-1">User Email</p>
+                                    <p class="text-sm font-medium text-white break-all">${p.userEmail}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-cosmic-light/50 uppercase mb-1">Amount</p>
+                                    <p class="text-lg font-bold text-cosmic-accent">₹${p.amount}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-cosmic-900 border border-white/10 rounded-lg p-3 mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-cosmic-light/50 uppercase mb-0.5">Submitted UTR</p>
+                                    <p class="text-base font-mono font-bold text-white tracking-widest">${p.utrNumber}</p>
+                                </div>
+                                <button onclick="copyText('${p.utrNumber}')" class="text-cosmic-light/50 hover:text-white p-2">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+
+                            <p class="text-xs text-cosmic-light/70 mt-3">Requested <span class="font-medium text-white">${p.type}</span> with <span class="font-medium text-white">${p.name}</span></p>
+
+                            ${isPending ? `
+                            <div class="mt-4 pt-4 border-t border-white/5 flex gap-3">
+                                <button onclick="markPaymentVerified('${p.id}')" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/50 hover:bg-green-500 hover:text-white font-bold py-2.5 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check"></i> Mark as Verified
+                                </button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        async function markPaymentVerified(docId) {
+            showConfirmDialog(
+                "Verify Payment?", 
+                "Are you sure you have received this amount in your bank account? This will mark the transaction as complete.", 
+                "success", 
+                "Yes, I Received It", 
+                async () => {
+                    try {
+                        const docRef = doc(db, "payment_verifications", docId);
+                        await updateDoc(docRef, {
+                            status: "verified",
+                            verifiedAt: new Date().toISOString()
+                        });
+                        showToast("Payment verified successfully", "success");
+                    } catch (e) {
+                        showToast("Error verifying payment", "error");
+                        console.error(e);
+                    }
+                }
+            );
+        }
+
+        // --- Settings Logic ---
+        async function saveSettings(e) {
+            e.preventDefault();
+            const btn = document.getElementById('save-settings-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            
+            const newSettings = {
+                adminUpiId: document.getElementById('set-upi').value,
+                adminName: document.getElementById('set-name').value,
+                currency: document.getElementById('set-currency').value,
+                minMinutes: parseInt(document.getElementById('set-min-mins').value)
+            };
+
+            try {
+                await setDoc(doc(db, "settings", "global"), newSettings);
+                showToast("Settings updated securely", "success");
+            } catch (error) {
+                showToast("Failed to save settings", "error");
+                console.error(error);
+            }
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+        }
+
+        // --- Astrologer Logic ---
+        function renderAstrologers() {
+            const grid = document.getElementById('admin-astrologers-grid');
+            grid.innerHTML = '';
+
+            currentAstrologers.forEach(astro => {
+                const card = `
+                    <div class="glass-card rounded-xl p-4 flex flex-col relative group">
+                        <div class="flex items-start gap-3 mb-3">
+                            <img src="${astro.image}" class="w-12 h-12 rounded-full object-cover border border-white/20">
+                            <div>
+                                <h3 class="font-bold text-white text-sm flex items-center gap-1">
+                                    ${astro.name} 
+                                    ${astro.isVerified ? '<i class="fa-solid fa-circle-check text-green-500 text-[10px]"></i>' : ''}
+                                </h3>
+                                <p class="text-[10px] text-cosmic-light/60">${astro.skills.join(', ')}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+                            <div class="bg-white/5 rounded p-2 text-center"><span class="block text-[10px] text-cosmic-light/50">Price</span><span class="font-bold text-white">₹${astro.price}/min</span></div>
+                            <div class="bg-white/5 rounded p-2 text-center"><span class="block text-[10px] text-cosmic-light/50">Exp</span><span class="font-bold text-white">${astro.experience} Yrs</span></div>
+                        </div>
+                        <div class="mt-auto flex gap-2">
+                            <button onclick="editAstrologer('${astro.id}')" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-1.5 rounded-lg text-xs font-medium transition-colors">Edit</button>
+                            <button onclick="deleteAstrologer('${astro.id}', '${astro.name}')" class="w-8 h-8 flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function openAstroModal() {
+            document.getElementById('astro-form').reset();
+            document.getElementById('astro-id').value = '';
+            document.getElementById('astro-modal-title').innerText = 'Add Astrologer';
+            document.getElementById('astro-modal').classList.remove('hidden');
+            document.getElementById('astro-modal').classList.add('flex');
+        }
+
+        function closeAstroModal() {
+            document.getElementById('astro-modal').classList.add('hidden');
+            document.getElementById('astro-modal').classList.remove('flex');
+        }
+
+        function editAstrologer(id) {
+            const astro = currentAstrologers.find(a => a.id === id);
+            if(!astro) return;
+
+            document.getElementById('astro-id').value = astro.id;
+            document.getElementById('astro-name').value = astro.name;
+            document.getElementById('astro-nameHi').value = astro.nameHi || '';
+            document.getElementById('astro-price').value = astro.price;
+            document.getElementById('astro-exp').value = astro.experience;
+            document.getElementById('astro-skills').value = astro.skills.join(', ');
+            document.getElementById('astro-skillsHi').value = (astro.skillsHi || []).join(', ');
+            document.getElementById('astro-langs').value = astro.languages.join(', ');
+            document.getElementById('astro-langsHi').value = (astro.languagesHi || []).join(', ');
+            document.getElementById('astro-image').value = astro.image;
+            document.getElementById('astro-verified').checked = astro.isVerified;
+
+            document.getElementById('astro-modal-title').innerText = 'Edit Astrologer';
+            document.getElementById('astro-modal').classList.remove('hidden');
+            document.getElementById('astro-modal').classList.add('flex');
+        }
+
+        async function saveAstrologer(e) {
+            e.preventDefault();
+            const btn = document.getElementById('save-astro-btn');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            
+            const id = document.getElementById('astro-id').value;
+            
+            // Helper to clean array inputs
+            const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
+
+            const astroData = {
+                name: document.getElementById('astro-name').value.trim(),
+                nameHi: document.getElementById('astro-nameHi').value.trim(),
+                price: parseFloat(document.getElementById('astro-price').value),
+                experience: parseInt(document.getElementById('astro-exp').value),
+                skills: toArray(document.getElementById('astro-skills').value),
+                skillsHi: toArray(document.getElementById('astro-skillsHi').value),
+                languages: toArray(document.getElementById('astro-langs').value),
+                languagesHi: toArray(document.getElementById('astro-langsHi').value),
+                image: document.getElementById('astro-image').value.trim(),
+                isVerified: document.getElementById('astro-verified').checked,
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "astrologers", id), astroData);
+                    showToast("Astrologer updated", "success");
+                } else {
+                    // New additions get default stats
+                    astroData.rating = 5.0;
+                    astroData.orders = 0;
+                    await addDoc(collection(db, "astrologers"), astroData);
+                    showToast("Astrologer added", "success");
+                }
+                closeAstroModal();
+            } catch (error) {
+                showToast("Error saving data", "error");
+                console.error(error);
+            }
+            btn.innerText = originalText;
+        }
+
+        async function deleteAstrologer(id, name) {
+            showConfirmDialog(
+                "Delete Astrologer?", 
+                `Are you sure you want to permanently delete <b>${name}</b> from the platform?`, 
+                "danger", 
+                "Delete", 
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "astrologers", id));
+                        showToast(`${name} removed`, "info");
+                    } catch (e) {
+                        showToast("Error deleting", "error");
+                    }
+                }
+            );
+        }
+
+        // --- Custom Utilities (Toasts, Confirms, Copy) ---
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colors = "bg-cosmic-800 border-white/10 text-white";
+            let icon = "fa-circle-info text-blue-400";
+            if (type === "success") { colors = "bg-green-500/10 border-green-500/50 text-green-100"; icon = "fa-circle-check text-green-400"; }
+            if (type === "error") { colors = "bg-red-500/10 border-red-500/50 text-red-100"; icon = "fa-circle-exclamation text-red-400"; }
+
+            toast.className = `${colors} border px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transform transition-all duration-300 translate-x-full opacity-0 text-sm backdrop-blur-md`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showConfirmDialog(title, text, type, btnText, onConfirmCallback) {
+            const modal = document.getElementById('msg-modal');
+            const iconEl = document.getElementById('msg-icon');
+            const actionsEl = document.getElementById('msg-actions');
+            
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-desc').innerHTML = text;
+            
+            // Style based on type
+            let btnColor = "bg-cosmic-accent text-cosmic-900";
+            if(type === 'danger') {
+                iconEl.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl bg-red-500/20 text-red-500";
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                btnColor = "bg-red-500 text-white";
+            } else if (type === 'success') {
+                iconEl.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl bg-green-500/20 text-green-500";
+                iconEl.innerHTML = '<i class="fa-solid fa-shield-check"></i>';
+                btnColor = "bg-green-500 text-white";
+            } else {
+                iconEl.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl bg-blue-500/20 text-blue-500";
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
+            }
+
+            actionsEl.innerHTML = `
+                <button id="msg-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-cosmic-light/70 hover:text-white bg-white/5 transition-colors flex-1">Cancel</button>
+                <button id="msg-confirm" class="px-4 py-2 rounded-lg text-sm font-bold ${btnColor} transition-transform active:scale-95 flex-1">${btnText}</button>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.getElementById('msg-cancel').onclick = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            document.getElementById('msg-confirm').onclick = () => {
+                onConfirmCallback();
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+        }
+
+        function copyText(text) {
+            // navigator.clipboard might not work in some iframes, fallback used
+            try {
+                navigator.clipboard.writeText(text);
+                showToast("UTR copied to clipboard", "success");
+            } catch (err) {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                showToast("UTR copied", "success");
+            }
+        }
+
+        // Global assignments for HTML onclick handlers
+        window.handleLogin = handleLogin;
+        window.handleLogout = handleLogout;
+        window.switchTab = switchTab;
+        window.openAstroModal = openAstroModal;
+        window.closeAstroModal = closeAstroModal;
+        window.saveAstrologer = saveAstrologer;
+        window.editAstrologer = editAstrologer;
+        window.deleteAstrologer = deleteAstrologer;
+        window.saveSettings = saveSettings;
+        window.markPaymentVerified = markPaymentVerified;
+        window.copyText = copyText;
+
+    </script>
+</body>
+</html>
