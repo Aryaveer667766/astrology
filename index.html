@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Critical for mobile: standard viewport + preventing zoom-in on inputs -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>AstroPath - Find Your Destiny</title>
+    <title>AstroPath - Coming Soon</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -85,6 +85,27 @@
             background-size: 200px 200px;
             opacity: 0.3;
         }
+        .countdown-digit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            color: #D4AF37;
+        }
+        @media (min-width: 768px) {
+            .countdown-digit {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col font-sans relative">
@@ -95,163 +116,162 @@
             <div class="flex justify-between items-center h-16 md:h-20">
                 <!-- Logo -->
                 <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <i class="fa-solid fa-moon text-cosmic-accent text-2xl md:text-3xl"></i>
+                    <i class="fa-solid fa-moon text-cosmic-accent text-2xl md:text-3xl animate-float"></i>
                     <span class="font-serif font-bold text-xl md:text-2xl tracking-wider text-white">AstroPath</span>
                 </div>
 
-                <!-- Right Side: Language & CTA -->
-                <div class="flex items-center gap-3 md:gap-4">
-                    <div class="relative">
-                        <select id="languageSelect" onchange="changeLanguage(this.value)" class="appearance-none bg-cosmic-800 border border-cosmic-accent/50 text-white text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-cosmic-accent pl-3 pr-7 py-1.5 md:pl-4 md:pr-8 md:py-2 cursor-pointer transition">
-                            <option value="en">EN</option>
-                            <option value="hi">HI</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 transform -translate-y-1/2 text-[10px] md:text-xs text-cosmic-accent pointer-events-none"></i>
-                    </div>
-                    
-                    <button onclick="scrollToAstrologers()" class="hidden sm:block bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold px-5 py-2 rounded-full hover:shadow-[0_0_15px_rgba(212,175,55,0.5)] transition-all transform hover:-translate-y-0.5 text-sm md:text-base" data-i18n="nav_cta">
-                        Consult Now
-                    </button>
+                <!-- Right Side: Social Links -->
+                <div class="flex items-center gap-4 md:gap-6">
+                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
+                        <i class="fa-brands fa-instagram text-lg"></i>
+                    </a>
+                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
+                        <i class="fa-brands fa-facebook text-lg"></i>
+                    </a>
+                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
+                        <i class="fa-brands fa-twitter text-lg"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow">
-        <section class="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden px-4">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] bg-purple-900/30 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
-            
-            <div class="max-w-7xl mx-auto relative z-10 text-center">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full glass-panel text-xs md:text-sm text-cosmic-accent mb-6 md:mb-8 animate-pulse">
-                    <i class="fa-solid fa-star"></i>
-                    <span data-i18n="hero_badge">Trusted by 10,000+ Users</span>
-                </div>
-                
-                <h1 class="text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-4 md:mb-6 leading-tight">
-                    <span data-i18n="hero_title_1">Discover Your</span> <br />
-                    <span class="text-gold" data-i18n="hero_title_2">True Destiny</span>
-                </h1>
-                
-                <p class="mt-4 max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-cosmic-light/80 mb-8 md:mb-10 px-2" data-i18n="hero_subtitle">
-                    Connect with India's most renowned astrologers for guidance on love, career, and life. 100% confidential.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 px-4 sm:px-0">
-                    <button onclick="scrollToAstrologers()" class="w-full sm:w-auto bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 text-base md:text-lg font-bold px-6 py-3.5 md:px-8 md:py-4 rounded-xl md:rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-phone"></i>
-                        <span data-i18n="hero_btn_call">Talk to Astrologer</span>
-                    </button>
-                    <button onclick="scrollToAstrologers()" class="w-full sm:w-auto glass-panel text-white border border-cosmic-accent/30 text-base md:text-lg font-bold px-6 py-3.5 md:px-8 md:py-4 rounded-xl md:rounded-full hover:bg-cosmic-800 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-comment-dots text-cosmic-accent"></i>
-                        <span data-i18n="hero_btn_chat">Chat Now</span>
-                    </button>
+    <main class="flex-grow flex items-center justify-center px-4 py-16 md:py-0">
+        <div class="max-w-3xl w-full text-center">
+            <!-- Coming Soon Content -->
+            <div class="space-y-8 md:space-y-12">
+                <!-- Animated Icon -->
+                <div class="flex justify-center">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-cosmic-accent/20 to-purple-500/20 rounded-full blur-3xl"></div>
+                        <div class="relative bg-cosmic-800 rounded-full p-6 md:p-8 border-2 border-cosmic-accent/30 animate-pulse-glow">
+                            <i class="fa-solid fa-rocket text-4xl md:text-6xl text-cosmic-accent"></i>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Trust Markers -->
-                <div class="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto border-t border-white/10 pt-8 md:pt-10">
-                    <div class="flex flex-col items-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-cosmic-800 flex items-center justify-center mb-2 md:mb-3 text-cosmic-accent text-lg md:text-xl">
-                            <i class="fa-solid fa-user-shield"></i>
+                <!-- Main Heading -->
+                <div>
+                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-4 md:mb-6 leading-tight">
+                        <span class="text-white">Something</span>
+                        <br />
+                        <span class="text-gold">Cosmic</span>
+                        <br />
+                        <span class="text-white">is Coming</span>
+                    </h1>
+                    
+                    <p class="text-base sm:text-lg md:text-xl text-cosmic-light/80 max-w-2xl mx-auto px-2">
+                        We're preparing something extraordinary. Discover authentic astrological guidance from India's finest experts.
+                    </p>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="space-y-4 md:space-y-6">
+                    <p class="text-sm md:text-base text-cosmic-accent font-semibold tracking-widest uppercase">Launching In</p>
+                    
+                    <div class="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
+                        <div class="text-center">
+                            <div class="countdown-digit" id="days">00</div>
+                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Days</p>
                         </div>
-                        <h3 class="font-bold text-base md:text-lg" data-i18n="trust_1_title">100% Private</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60" data-i18n="trust_1_desc">Completely confidential.</p>
+                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
+                        <div class="text-center">
+                            <div class="countdown-digit" id="hours">00</div>
+                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Hours</p>
+                        </div>
+                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
+                        <div class="text-center">
+                            <div class="countdown-digit" id="minutes">00</div>
+                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Minutes</p>
+                        </div>
+                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
+                        <div class="text-center">
+                            <div class="countdown-digit" id="seconds">00</div>
+                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Seconds</p>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-cosmic-800 flex items-center justify-center mb-2 md:mb-3 text-cosmic-accent text-lg md:text-xl">
-                            <i class="fa-solid fa-certificate"></i>
+                </div>
+
+                <!-- Email Signup -->
+                <div class="space-y-3 md:space-y-4 max-w-md mx-auto w-full">
+                    <p class="text-sm md:text-base text-cosmic-light/70">Get notified when we launch</p>
+                    
+                    <form onsubmit="handleEmailSignup(event)" class="flex flex-col sm:flex-row gap-2 md:gap-3">
+                        <input 
+                            type="email" 
+                            placeholder="Enter your email" 
+                            required
+                            class="flex-1 bg-cosmic-800 border border-cosmic-accent/30 rounded-lg md:rounded-full px-4 md:px-6 py-3 md:py-3.5 text-white text-sm md:text-base placeholder-cosmic-light/40 focus:outline-none focus:border-cosmic-accent/60 focus:ring-2 focus:ring-cosmic-accent/20 transition-all"
+                        />
+                        <button 
+                            type="submit"
+                            class="bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold px-6 md:px-8 py-3 md:py-3.5 rounded-lg md:rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all active:scale-95 text-sm md:text-base whitespace-nowrap"
+                        >
+                            Notify Me
+                        </button>
+                    </form>
+                    
+                    <p class="text-xs text-cosmic-light/50">We'll never spam. Promise!</p>
+                </div>
+
+                <!-- Features Preview -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mt-12 md:mt-16 border-t border-white/10 pt-10 md:pt-16">
+                    <div class="space-y-3 md:space-y-4">
+                        <div class="flex justify-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
+                                <i class="fa-solid fa-user-shield text-cosmic-accent text-lg md:text-xl"></i>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-base md:text-lg" data-i18n="trust_2_title">Verified Experts</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60" data-i18n="trust_2_desc">Multi-step screening.</p>
+                        <h3 class="font-semibold text-base md:text-lg text-white">Verified Experts</h3>
+                        <p class="text-xs md:text-sm text-cosmic-light/60">Handpicked astrologers with years of experience</p>
                     </div>
-                    <div class="flex flex-col items-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-cosmic-800 flex items-center justify-center mb-2 md:mb-3 text-cosmic-accent text-lg md:text-xl">
-                            <i class="fa-solid fa-wallet"></i>
+
+                    <div class="space-y-3 md:space-y-4">
+                        <div class="flex justify-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
+                                <i class="fa-solid fa-lock text-cosmic-accent text-lg md:text-xl"></i>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-base md:text-lg" data-i18n="trust_3_title">Secure Payments</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60" data-i18n="trust_3_desc">Direct & safe transactions.</p>
+                        <h3 class="font-semibold text-base md:text-lg text-white">100% Private</h3>
+                        <p class="text-xs md:text-sm text-cosmic-light/60">Your conversations stay completely confidential</p>
+                    </div>
+
+                    <div class="space-y-3 md:space-y-4">
+                        <div class="flex justify-center">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
+                                <i class="fa-solid fa-phone text-cosmic-accent text-lg md:text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold text-base md:text-lg text-white">Instant Connect</h3>
+                        <p class="text-xs md:text-sm text-cosmic-light/60">Chat or call with astrologers anytime</p>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section id="astrologers" class="py-16 md:py-20 bg-cosmic-900 border-t border-white/5 relative z-10 px-4">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-10 md:mb-16">
-                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-gold mb-3 md:mb-4" data-i18n="section_astro_title">Our Premium Astrologers</h2>
-                    <p class="text-sm md:text-base text-cosmic-light/80 max-w-2xl mx-auto" data-i18n="section_astro_subtitle">Select an expert to get instant guidance on your life's journey.</p>
-                </div>
-
-                <!-- Grid to be populated by JavaScript -->
-                <div id="astrologerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    <!-- Cards will be injected here -->
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <footer class="bg-cosmic-900 border-t border-white/10 pt-10 pb-8 px-4">
-        <div class="max-w-7xl mx-auto text-center">
-            <div class="flex items-center justify-center gap-2 mb-4">
+    <footer class="bg-cosmic-900 border-t border-white/10 py-8 px-4 mt-16 md:mt-24">
+        <div class="max-w-7xl mx-auto text-center space-y-4">
+            <div class="flex items-center justify-center gap-2">
                 <i class="fa-solid fa-moon text-cosmic-accent text-xl md:text-2xl"></i>
                 <span class="font-serif font-bold text-lg md:text-xl text-white">AstroPath</span>
             </div>
-            <p class="text-cosmic-light/50 text-xs md:text-sm mb-6" data-i18n="footer_desc">Your ultimate guide to spiritual and astrological awakening.</p>
+            <p class="text-cosmic-light/50 text-xs md:text-sm">Your ultimate guide to spiritual and astrological awakening</p>
             <p class="text-cosmic-light/40 text-[10px] md:text-xs">&copy; 2026 AstroPath. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Payment Verification Modal (Mobile First Structure) -->
-    <div id="payment-modal" class="fixed inset-0 bg-black/90 flex items-end sm:items-center justify-center z-50 hidden backdrop-blur-sm transition-opacity">
-        <!-- Modal Content Box -->
-        <div class="bg-gray-900 border-t sm:border border-yellow-600 sm:rounded-2xl rounded-t-2xl p-5 md:p-6 w-full max-w-sm sm:mx-4 shadow-[0_-10px_40px_rgba(202,138,4,0.15)] relative animate-slide-up sm:animate-none">
-            
-            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10">
-                <i class="fa-solid fa-xmark text-xl"></i>
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+        <div class="bg-cosmic-800 border border-cosmic-accent/30 rounded-2xl p-6 md:p-8 max-w-sm mx-4 text-center space-y-4 animate-slide-up">
+            <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto border-2 border-green-500">
+                <i class="fa-solid fa-check text-2xl"></i>
+            </div>
+            <h3 class="text-xl md:text-2xl font-bold text-white">Thanks for signing up!</h3>
+            <p class="text-cosmic-light/70 text-sm md:text-base">Check your email for updates about our launch.</p>
+            <button onclick="closeModal()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-3 rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all active:scale-95">
+                Close
             </button>
-
-            <!-- Main Payment Form -->
-            <div id="payment-modal-content">
-                <h2 class="text-xl md:text-2xl font-bold text-white mb-1" data-i18n="modal_title">Start Session</h2>
-                <p class="text-gray-400 text-xs md:text-sm mb-5">
-                    <span data-i18n="modal_desc">Pay</span> 
-                    <span id="pay-amount" class="text-yellow-500 font-bold mx-1">₹0</span> 
-                    <span data-i18n="modal_desc_2">to start your session with</span> 
-                    <span id="astro-name-display" class="font-semibold text-white ml-1">Astrologer</span>.
-                </p>
-
-                <!-- Dynamic QR Code Container (Hidden on very small screens to save space, relies on button) -->
-                <div class="bg-white p-2 rounded-xl w-40 h-40 md:w-48 md:h-48 mx-auto mb-3 flex items-center justify-center hidden sm:flex">
-                    <img id="upi-qr-image" src="" alt="UPI QR Code" class="w-full h-full object-contain" />
-                </div>
-                <p class="text-center text-gray-400 text-[11px] md:text-xs mb-4 hidden sm:block" data-i18n="modal_scan">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
-
-                <!-- Mobile Deep Link (Primary CTA on Mobile) -->
-                <a id="mobile-pay-btn" href="#" class="flex items-center justify-center w-full text-center bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3.5 md:py-3 px-4 rounded-xl mb-6 transition-colors active:scale-95 text-sm md:text-base">
-                    <i class="fa-brands fa-google-pay text-xl mr-2"></i>
-                    <span data-i18n="modal_btn_app">Pay via UPI App</span>
-                </a>
-
-                <!-- UTR Input Section -->
-                <div class="space-y-3 border-t border-gray-700 pt-5">
-                    <label class="block text-xs md:text-sm font-medium text-gray-300" data-i18n="modal_label_utr">Enter UTR / Reference Number</label>
-                    <!-- Text size 16px is critical on mobile to prevent iOS zooming -->
-                    <input type="number" id="utr-input" placeholder="12-digit UTR number" class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3.5 md:py-3 text-white text-[16px] focus:outline-none focus:border-yellow-500 transition-colors placeholder-gray-500" />
-                    <button onclick="submitUtr()" class="w-full bg-white text-black font-bold py-3.5 md:py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors active:scale-95 text-sm md:text-base">
-                        <span data-i18n="modal_btn_verify">Verify Payment</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Success Message (Hidden by default) -->
-            <div id="payment-success" class="hidden flex-col items-center justify-center text-center py-6">
-                <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-4 mx-auto border-2 border-green-500">
-                    <i class="fa-solid fa-check text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2" data-i18n="modal_success_title">Payment Received</h3>
-                <p class="text-gray-400 text-sm mb-6" data-i18n="modal_success_desc">Your UTR has been submitted. The admin is verifying it and will connect you shortly.</p>
-                <button onclick="closePaymentModal()" class="w-full bg-yellow-600 text-black font-bold py-3.5 rounded-xl active:scale-95" data-i18n="modal_btn_close">Close</button>
-            </div>
-
         </div>
     </div>
 
@@ -260,7 +280,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Initialize Firebase with your config
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
             authDomain: "designsnap-f3309.firebaseapp.com",
@@ -276,260 +296,76 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // --- 1. Global State & App Configuration ---
-        const appConfig = {
-            adminUpiId: "yourclientupi@ybl", // REPLACE WITH REAL UPI
-            adminName: "AstroPath Services",
-            currency: "₹",
-            minMinutes: 5 // Require payment for at least 5 minutes upfront
-        };
+        // --- Countdown Timer ---
+        function updateCountdown() {
+            // Set launch date to 30 days from now (you can modify this)
+            const launchDate = new Date();
+            launchDate.setDate(launchDate.getDate() + 30);
 
-        let currentLang = 'en';
-        let currentSessionData = null;
+            const countdown = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = launchDate - now;
 
-        // Analytics Tracker Mock
-        function trackEvent(eventName, eventData) {
-            console.log(`[ANALYTICS] ${eventName}:`, eventData);
-        }
-        trackEvent('page_view', { path: window.location.pathname });
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // --- 2. Mock Data ---
-        const astrologersData = [
-            {
-                id: "astro_1",
-                name: "Astro Rahul", nameHi: "एस्ट्रो राहुल",
-                skills: ["Vedic", "Tarot", "Numerology"], skillsHi: ["वैदिक", "टैरो", "अंक"],
-                languages: ["English", "Hindi"], languagesHi: ["अंग्रेज़ी", "हिंदी"],
-                experience: 12, price: 20, rating: 4.9, orders: 15400,
-                image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80&auto=format&fit=crop",
-                isVerified: true
-            },
-            {
-                id: "astro_2",
-                name: "Dr. Anjali", nameHi: "डॉ. अंजलि",
-                skills: ["Vastu", "Prashna"], skillsHi: ["वास्तु", "प्रश्ना"],
-                languages: ["Hindi", "Sanskrit"], languagesHi: ["हिंदी", "संस्कृत"],
-                experience: 18, price: 35, rating: 5.0, orders: 22100,
-                image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80&auto=format&fit=crop",
-                isVerified: true
-            },
-            {
-                id: "astro_3",
-                name: "Guru Prakash", nameHi: "गुरु प्रकाश",
-                skills: ["Nadi", "Palmistry"], skillsHi: ["नाडी", "हस्तरेखा"],
-                languages: ["English", "Tamil", "Hindi"], languagesHi: ["अंग्रेज़ी", "तमिल", "हिंदी"],
-                experience: 25, price: 50, rating: 4.8, orders: 31000,
-                image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80&auto=format&fit=crop",
-                isVerified: true
-            }
-        ];
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
 
-        // --- 3. Translations Dictionary ---
-        const translations = {
-            en: {
-                nav_cta: "Consult Now",
-                hero_badge: "Trusted by 10,000+ Users",
-                hero_title_1: "Discover Your", hero_title_2: "True Destiny",
-                hero_subtitle: "Connect with India's most renowned astrologers for guidance on love, career, and life. 100% confidential.",
-                hero_btn_call: "Talk to Astrologer", hero_btn_chat: "Chat Now",
-                trust_1_title: "100% Private", trust_1_desc: "Completely confidential.",
-                trust_2_title: "Verified Experts", trust_2_desc: "Multi-step screening.",
-                trust_3_title: "Secure Payments", trust_3_desc: "Direct & safe transactions.",
-                section_astro_title: "Our Premium Astrologers",
-                section_astro_subtitle: "Select an expert to get instant guidance on your life's journey.",
-                footer_desc: "Your ultimate guide to spiritual and astrological awakening.",
-                card_exp: "Exp:", card_years: "Yrs", card_orders: "orders", card_min: "/min",
-                btn_chat: "Chat", btn_call: "Call",
-                // Modal Translations
-                modal_title: "Start Session", modal_desc: "Pay", modal_desc_2: "to start your session with",
-                modal_scan: "Scan with any UPI App (GPay, PhonePe, Paytm)",
-                modal_btn_app: "Pay via UPI App", modal_label_utr: "Enter UTR / Reference Number",
-                modal_btn_verify: "Verify Payment", modal_success_title: "Payment Received",
-                modal_success_desc: "Your UTR has been submitted. The admin is verifying it and will connect you shortly.",
-                modal_btn_close: "Close"
-            },
-            hi: {
-                nav_cta: "परामर्श लें",
-                hero_badge: "10,000+ उपयोगकर्ताओं का भरोसा",
-                hero_title_1: "अपनी सच्ची", hero_title_2: "नियति खोजें",
-                hero_subtitle: "प्रेम और करियर पर मार्गदर्शन के लिए भारत के प्रसिद्ध ज्योतिषियों से जुड़ें। 100% गोपनीय।",
-                hero_btn_call: "ज्योतिषी से बात करें", hero_btn_chat: "अभी चैट करें",
-                trust_1_title: "100% निजी", trust_1_desc: "पूरी तरह से गोपनीय।",
-                trust_2_title: "सत्यापित विशेषज्ञ", trust_2_desc: "कठोर स्क्रीनिंग।",
-                trust_3_title: "सुरक्षित भुगतान", trust_3_desc: "सुरक्षित लेनदेन।",
-                section_astro_title: "हमारे प्रीमियम ज्योतिषी",
-                section_astro_subtitle: "त्वरित मार्गदर्शन पाने के लिए विशेषज्ञ चुनें।",
-                footer_desc: "आध्यात्मिक जागरण के लिए आपका मार्गदर्शक।",
-                card_exp: "अनुभव:", card_years: "वर्ष", card_orders: "ऑर्डर", card_min: "/मिनट",
-                btn_chat: "चैट", btn_call: "कॉल",
-                // Modal Translations
-                modal_title: "सत्र शुरू करें", modal_desc: "भुगतान करें", modal_desc_2: "के साथ सत्र शुरू करने के लिए",
-                modal_scan: "किसी भी UPI ऐप से स्कैन करें",
-                modal_btn_app: "UPI ऐप से भुगतान करें", modal_label_utr: "UTR / संदर्भ संख्या दर्ज करें",
-                modal_btn_verify: "भुगतान सत्यापित करें", modal_success_title: "भुगतान प्राप्त हुआ",
-                modal_success_desc: "आपका UTR सबमिट कर दिया गया है। एडमिन इसे सत्यापित कर रहे हैं।",
-                modal_btn_close: "बंद करें"
-            }
-        };
-
-        // --- 4. DOM Functions ---
-        function formatNumber(num) {
-            return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
+                if (distance < 0) {
+                    clearInterval(countdown);
+                    document.getElementById('days').textContent = '00';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                }
+            }, 1000);
         }
 
-        function renderAstrologers() {
-            const grid = document.getElementById('astrologerGrid');
-            grid.innerHTML = '';
-            const t = translations[currentLang];
-
-            astrologersData.forEach(astro => {
-                const name = currentLang === 'hi' && astro.nameHi ? astro.nameHi : astro.name;
-                const skills = currentLang === 'hi' && astro.skillsHi ? astro.skillsHi.join(', ') : astro.skills.join(', ');
-                const langs = currentLang === 'hi' && astro.languagesHi ? astro.languagesHi.join(', ') : astro.languages.join(', ');
-
-                const cardHTML = `
-                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 shadow-lg">
-                        <div class="p-4 md:p-5 flex gap-4">
-                            <!-- Avatar -->
-                            <div class="relative flex-shrink-0">
-                                <img src="${astro.image}" alt="${name}" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-cosmic-800">
-                                ${astro.isVerified ? `<div class="absolute -bottom-1 right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-cosmic-900"><i class="fa-solid fa-check text-[10px]"></i></div>` : ''}
-                            </div>
-                            
-                            <!-- Info -->
-                            <div class="flex-1 min-w-0 py-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="text-lg md:text-xl font-bold text-white truncate">${name}</h3>
-                                    <div class="flex items-center text-xs font-semibold text-white bg-white/10 px-2 py-1 rounded-md ml-2">
-                                        <i class="fa-solid fa-star text-yellow-400 mr-1 text-[10px]"></i> ${astro.rating}
-                                    </div>
-                                </div>
-                                <p class="text-xs md:text-sm text-cosmic-accent truncate mt-1">${skills}</p>
-                                <p class="text-xs text-cosmic-light/70 truncate mb-2"><i class="fa-solid fa-language mr-1 opacity-70"></i>${langs}</p>
-                                
-                                <div class="flex items-center gap-2 md:gap-3 text-xs text-cosmic-light/80">
-                                    <span class="flex items-center"><i class="fa-solid fa-briefcase text-cosmic-accent mr-1"></i> ${t.card_exp} ${astro.experience} ${t.card_years}</span>
-                                    <span class="flex items-center"><i class="fa-solid fa-users text-cosmic-accent mr-1"></i> ${formatNumber(astro.orders)}+</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Price & Actions (Mobile Optimized) -->
-                        <div class="mt-auto border-t border-white/10 p-4 md:p-5 bg-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-                            <div class="font-bold text-xl md:text-2xl text-white w-full sm:w-auto text-center sm:text-left mb-2 sm:mb-0">
-                                ${appConfig.currency}${astro.price}<span class="text-xs md:text-sm text-cosmic-light/60 font-normal">${t.card_min}</span>
-                            </div>
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button onclick="initiatePayment('${astro.id}', 'chat')" class="flex-1 sm:flex-none flex items-center justify-center px-4 py-2.5 md:py-2 rounded-xl md:rounded-full font-semibold text-sm transition-all bg-white/10 border border-white/20 text-white active:scale-95">
-                                    <i class="fa-regular fa-comment-dots mr-1.5"></i> ${t.btn_chat}
-                                </button>
-                                <button onclick="initiatePayment('${astro.id}', 'call')" class="flex-1 sm:flex-none flex items-center justify-center px-4 py-2.5 md:py-2 rounded-xl md:rounded-full font-semibold text-sm transition-all bg-gradient-to-r from-green-500 to-green-600 text-white active:scale-95 shadow-lg shadow-green-500/30">
-                                    <i class="fa-solid fa-phone mr-1.5"></i> ${t.btn_call}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += cardHTML;
-            });
-        }
-
-        // --- 5. Payment Modal Logic ---
-        function initiatePayment(astroId, method) {
-            const astro = astrologersData.find(a => a.id === astroId);
-            if (!astro) return;
-
-            const totalAmount = astro.price * appConfig.minMinutes;
-            const astroName = currentLang === 'hi' && astro.nameHi ? astro.nameHi : astro.name;
-
-            currentSessionData = { astroId, name: astroName, amount: totalAmount, type: method };
-
-            // Update UI
-            document.getElementById('astro-name-display').innerText = astroName;
-            document.getElementById('pay-amount').innerText = `${appConfig.currency}${totalAmount}`;
-            document.getElementById('utr-input').value = "";
-            
-            // Toggle visible sections
-            document.getElementById('payment-success').classList.add('hidden');
-            document.getElementById('payment-modal-content').classList.remove('hidden');
-
-            // Generate UPI Link
-            const upiString = `upi://pay?pa=${appConfig.adminUpiId}&pn=${encodeURIComponent(appConfig.adminName)}&am=${totalAmount}&cu=INR`;
-            document.getElementById('mobile-pay-btn').href = upiString;
-            
-            // Generate QR (only really visible on tablet/desktop due to hidden sm:flex)
-            document.getElementById('upi-qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF`;
-
-            // Open Modal
-            document.getElementById('payment-modal').classList.remove('hidden');
-            trackEvent('payment_initiated', currentSessionData);
-        }
-
-        function closePaymentModal() {
-            document.getElementById('payment-modal').classList.add('hidden');
-            document.getElementById('utr-input').value = "";
-        }
-
-        async function submitUtr() {
-            const utr = document.getElementById('utr-input').value.trim();
-            if (utr.length < 10) { // Using 10 as minimum to be safe, UTRs vary slightly
-                alert(currentLang === 'hi' ? "कृपया सही UTR दर्ज करें।" : "Please enter a valid UTR number.");
-                return;
-            }
-
-            const verificationData = {
-                ...currentSessionData,
-                utrNumber: utr,
-                timestamp: new Date().toISOString(),
-                status: "pending_verification"
-            };
-
-            trackEvent('utr_submitted', verificationData);
+        // --- Email Signup Handler ---
+        async function handleEmailSignup(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input[type="email"]').value;
 
             try {
-                // Save the payment verification to Firebase Firestore
-                await addDoc(collection(db, "payment_verifications"), verificationData);
+                await addDoc(collection(db, "coming_soon_signups"), {
+                    email: email,
+                    timestamp: new Date().toISOString(),
+                    source: "coming_soon_page"
+                });
 
-                // Hide form, show success
-                document.getElementById('payment-modal-content').classList.add('hidden');
-                document.getElementById('payment-success').classList.remove('hidden');
-                document.getElementById('payment-success').classList.add('flex');
+                // Show success modal
+                document.getElementById('success-modal').classList.remove('hidden');
+                
+                // Reset form
+                event.target.reset();
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeModal();
+                }, 3000);
             } catch (error) {
-                console.error("Error saving payment to Firebase: ", error);
-                alert(currentLang === 'hi' ? "सबमिट करने में त्रुटि हुई। कृपया पुनः प्रयास करें।" : "Error submitting payment. Please try again.");
+                console.error("Error saving email: ", error);
+                alert("An error occurred. Please try again.");
             }
         }
 
-        // --- 6. Utilities ---
-        function changeLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) el.innerHTML = translations[lang][key];
-            });
-            // Handle specific placeholders if needed
-            document.getElementById('utr-input').placeholder = lang === 'hi' ? '12-अंकीय UTR नंबर' : '12-digit UTR number';
-            
-            renderAstrologers();
-            trackEvent('language_changed', { lang });
+        function closeModal() {
+            document.getElementById('success-modal').classList.add('hidden');
         }
 
-        function scrollToAstrologers() {
-            document.getElementById('astrologers').scrollIntoView({ behavior: 'smooth' });
-        }
-
+        // Initialize on page load
         window.onload = () => {
-            renderAstrologers();
-            changeLanguage(document.getElementById('languageSelect').value);
+            updateCountdown();
         };
 
-        // Expose functions globally so they can be called by inline HTML onclick handlers
-        // This is necessary because <script type="module"> creates a private scope.
-        window.changeLanguage = changeLanguage;
-        window.scrollToAstrologers = scrollToAstrologers;
-        window.initiatePayment = initiatePayment;
-        window.closePaymentModal = closePaymentModal;
-        window.submitUtr = submitUtr;
+        // Expose functions globally
+        window.handleEmailSignup = handleEmailSignup;
+        window.closeModal = closeModal;
     </script>
 </body>
 </html>
