@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AstroPath - Premium Astrological Guidance</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="[cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -13,6 +13,7 @@
                         cosmic: {
                             900: '#0B0A1A',
                             800: '#1A1832',
+                            700: '#252347',
                             light: '#E2E8F0',
                             accent: '#D4AF37'
                         }
@@ -25,6 +26,9 @@
                         'float': 'float 6s ease-in-out infinite',
                         'slide-up': 'slideUp 0.3s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ripple': 'ripple 1.5s cubic-bezier(0, 0.5, 0.5, 1) infinite',
+                        'typing': 'typing 1.4s infinite',
+                        'gradient': 'gradient 3s ease infinite',
                     },
                     keyframes: {
                         float: {
@@ -34,14 +38,26 @@
                         slideUp: {
                             '0%': { transform: 'translateY(100%)', opacity: '0' },
                             '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        ripple: {
+                            '0%': { transform: 'scale(1)', opacity: '1' },
+                            '100%': { transform: 'scale(2.5)', opacity: '0' },
+                        },
+                        typing: {
+                            '0%, 60%, 100%': { opacity: '0.3' },
+                            '30%': { opacity: '1' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
                         }
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0B0A1A; color: white; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .glass-panel { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
@@ -62,18 +78,103 @@
                 radial-gradient(2px 2px at 160px 120px,#ddd,rgba(0,0,0,0));
             background-repeat: repeat; background-size: 200px 200px; opacity: 0.3; z-index: 0; pointer-events: none;
         }
-        /* Ringing pulse animation */
+        
+        /* Enhanced Ring Pulse Animation */
         @keyframes ringPulse {
-            0%   { transform: scale(1);   opacity: 1; }
-            60%  { transform: scale(1.6); opacity: 0; }
-            100% { transform: scale(1.6); opacity: 0; }
+            0%   { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
         }
-        .ring-pulse { animation: ringPulse 1.4s ease-out infinite; }
-        .ring-pulse-delay { animation: ringPulse 1.4s ease-out infinite 0.7s; }
-        /* Chat message scroll area */
+        .ring-pulse { animation: ringPulse 2s ease-out infinite; }
+        .ring-pulse-delay { animation: ringPulse 2s ease-out infinite 0.5s; }
+        .ring-pulse-delay-2 { animation: ringPulse 2s ease-out infinite 1s; }
+        
+        /* Chat Styles */
         .chat-scroll { overflow-y: auto; display: flex; flex-direction: column; }
         .chat-scroll::-webkit-scrollbar { width: 3px; }
         .chat-scroll::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.2); border-radius: 10px; }
+        
+        /* Message Bubbles */
+        .msg-bubble-sent {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+            border-radius: 20px 20px 4px 20px;
+        }
+        .msg-bubble-received {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px 20px 20px 4px;
+        }
+        
+        /* Typing Indicator */
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #D4AF37;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* Call Screen Gradient */
+        .call-gradient {
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.3) 0%, rgba(11, 10, 26, 0.95) 50%, #0B0A1A 100%);
+        }
+        
+        /* Sound Wave Animation */
+        @keyframes soundWave {
+            0%, 100% { height: 4px; }
+            50% { height: 20px; }
+        }
+        .sound-wave {
+            width: 3px;
+            background: linear-gradient(to top, #D4AF37, #FBF5B7);
+            border-radius: 3px;
+            animation: soundWave 0.5s ease-in-out infinite;
+        }
+        
+        /* Place Autocomplete Dropdown */
+        .place-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1A1832;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .place-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .place-item:hover { background: rgba(212,175,55,0.1); }
+        .place-item:last-child { border-bottom: none; }
+        
+        /* Quick Actions */
+        .quick-action-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s;
+        }
+        .quick-action-btn:hover {
+            background: rgba(212,175,55,0.1);
+            border-color: rgba(212,175,55,0.3);
+        }
+        
+        /* Session Info Card */
+        .session-info-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Favorites Heart */
+        .favorite-btn.active { color: #ef4444; }
+        .favorite-btn.active i { font-weight: 900; }
     </style>
 </head>
 <body class="antialiased relative">
@@ -89,6 +190,11 @@
                     <span class="font-serif font-bold text-xl md:text-2xl tracking-wide text-white">AstroPath</span>
                 </div>
                 <div class="flex items-center gap-3 md:gap-4">
+                    <!-- Notifications Bell -->
+                    <button onclick="openNotifications()" class="relative w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                        <i class="fa-solid fa-bell"></i>
+                        <span id="notif-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+                    </button>
                     <div class="relative hidden sm:block">
                         <select id="languageSelect" onchange="changeLanguage(this.value)" class="appearance-none bg-cosmic-800 border border-cosmic-accent/50 text-white text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-cosmic-accent pl-3 pr-7 py-1.5 md:pl-4 md:pr-8 md:py-2 cursor-pointer transition">
                             <option value="en">EN</option>
@@ -141,6 +247,12 @@
                     <button onclick="scrollToAstrologers()" class="glass-panel text-white font-bold px-8 py-4 rounded-full text-lg hover:bg-white/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2">
                         <i class="fa-solid fa-comment-dots"></i> Chat Now
                     </button>
+                </div>
+                
+                <!-- First Free Minutes Banner -->
+                <div class="mt-8 inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30">
+                    <i class="fa-solid fa-gift text-green-400"></i>
+                    <span class="text-sm text-green-300 font-medium">First 3 minutes FREE for new users!</span>
                 </div>
             </div>
         </section>
@@ -228,7 +340,26 @@
                         <h2 class="text-2xl md:text-4xl font-serif font-bold text-white mb-2">Our Premium Astrologers</h2>
                         <p class="text-sm md:text-base text-cosmic-light/70">Select an expert to get instant guidance on your life's journey.</p>
                     </div>
+                    <!-- Filter/Sort Options -->
+                    <div class="flex gap-2 mt-4 md:mt-0">
+                        <select id="sortAstrologers" onchange="sortAstrologers(this.value)" class="bg-cosmic-800 border border-white/10 text-white text-sm rounded-xl px-4 py-2 focus:outline-none focus:border-cosmic-accent">
+                            <option value="rating">Top Rated</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="experience">Experience</option>
+                        </select>
+                    </div>
                 </div>
+                
+                <!-- Filter Tags -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="filterBySkill('all')" class="filter-tag active px-4 py-2 rounded-full text-sm font-medium bg-cosmic-accent/20 text-cosmic-accent border border-cosmic-accent/30 hover:bg-cosmic-accent/30 transition-colors">All</button>
+                    <button onclick="filterBySkill('Vedic')" class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors">Vedic</button>
+                    <button onclick="filterBySkill('Tarot')" class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors">Tarot</button>
+                    <button onclick="filterBySkill('Numerology')" class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors">Numerology</button>
+                    <button onclick="filterBySkill('Palmistry')" class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors">Palmistry</button>
+                </div>
+                
                 <div id="astrologerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     <div class="col-span-full text-center py-10 text-cosmic-light/50"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Connecting to Cosmos...</div>
                 </div>
@@ -258,6 +389,21 @@
                     <div onclick="showHoroscope('Aquarius')" class="glass-panel p-4 rounded-xl min-w-[120px] md:min-w-[140px] text-center cursor-pointer hover:bg-cosmic-800 transition-colors flex-shrink-0"><div class="text-4xl mb-2">♒</div><h3 class="font-bold text-white">Aquarius</h3></div>
                     <div onclick="showHoroscope('Pisces')" class="glass-panel p-4 rounded-xl min-w-[120px] md:min-w-[140px] text-center cursor-pointer hover:bg-cosmic-800 transition-colors flex-shrink-0"><div class="text-4xl mb-2">♓</div><h3 class="font-bold text-white">Pisces</h3></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Kundli Match Section (New) -->
+        <section class="py-12 md:py-16 bg-gradient-to-b from-cosmic-800/30 to-transparent border-t border-white/5 relative z-10 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pink-500/30 bg-pink-500/10 mb-6">
+                    <i class="fa-solid fa-heart-pulse text-pink-400"></i>
+                    <span class="text-xs md:text-sm text-pink-300">New Feature</span>
+                </div>
+                <h2 class="text-2xl md:text-4xl font-serif font-bold text-white mb-4">Free Kundli Matching</h2>
+                <p class="text-cosmic-light/70 mb-8 max-w-xl mx-auto">Check your compatibility with your partner based on Vedic astrology principles. Get instant Gun Milan score.</p>
+                <button onclick="openKundliModal()" class="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold px-8 py-4 rounded-full hover:shadow-[0_0_30px_rgba(236,72,153,0.4)] transition-all transform hover:-translate-y-1">
+                    <i class="fa-solid fa-rings-wedding mr-2"></i> Match Kundli Now
+                </button>
             </div>
         </section>
 
@@ -302,6 +448,10 @@
                         <summary class="font-bold text-white p-5 cursor-pointer flex justify-between items-center outline-none">What if my chat gets disconnected?<i class="fa-solid fa-chevron-down text-cosmic-accent transition-transform group-open:rotate-180"></i></summary>
                         <div class="px-5 pb-5 text-sm text-cosmic-light/70 border-t border-white/5 pt-3">The session is actively timed. If ended early, you only pay for the exact minutes spent connected.</div>
                     </details>
+                    <details class="glass-panel rounded-xl group overflow-hidden">
+                        <summary class="font-bold text-white p-5 cursor-pointer flex justify-between items-center outline-none">Can I rate the astrologer after a session?<i class="fa-solid fa-chevron-down text-cosmic-accent transition-transform group-open:rotate-180"></i></summary>
+                        <div class="px-5 pb-5 text-sm text-cosmic-light/70 border-t border-white/5 pt-3">Yes! After every session, you'll be prompted to rate and review the astrologer. Your feedback helps others make informed choices.</div>
+                    </details>
                 </div>
             </div>
         </section>
@@ -326,6 +476,10 @@
         <i class="fa-solid fa-headset"></i>
     </button>
 
+    <!-- ============================================================ -->
+    <!-- MODALS -->
+    <!-- ============================================================ -->
+
     <!-- Support Modal -->
     <div id="support-modal" class="fixed inset-0 bg-black/90 flex items-end sm:items-center justify-center z-[60] hidden backdrop-blur-sm p-4 sm:p-0">
         <div class="bg-cosmic-900 border sm:border border-blue-500/50 sm:rounded-2xl rounded-t-2xl p-6 md:p-8 w-full max-w-sm sm:mx-4 shadow-2xl relative animate-slide-up sm:animate-none">
@@ -346,8 +500,8 @@
     <div id="auth-modal" class="fixed inset-0 bg-black/90 flex items-end sm:items-center justify-center z-[60] hidden backdrop-blur-sm p-4 sm:p-0">
         <div class="bg-gray-900 border-t sm:border border-cosmic-accent sm:rounded-2xl rounded-t-2xl p-6 md:p-8 w-full max-w-sm sm:mx-4 shadow-[0_-10px_40px_rgba(212,175,55,0.15)] relative animate-slide-up sm:animate-none flex flex-col max-h-[90vh]">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 id="auth-title" class="text-2xl font-bold text-white mb-2 shrink-0">Welcome Back</h2>
-            <p id="auth-subtitle" class="text-gray-400 text-sm mb-6 shrink-0">Login to start consulting astrologers.</p>
+            <h2 id="auth-title" class="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+            <p id="auth-subtitle" class="text-gray-400 text-sm mb-6">Login to start consulting astrologers.</p>
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4 overflow-y-auto shrink-0 pb-2">
                 <div>
                     <label class="block text-xs font-medium text-gray-300 mb-1">Email Address</label>
@@ -388,10 +542,15 @@
                     <div class="bg-black/30 rounded-xl p-4 border border-white/5"><p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider mb-1">Wallet Balance</p><p class="text-2xl font-bold text-green-400">₹<span id="profile-balance">0</span></p></div>
                     <div class="bg-black/30 rounded-xl p-4 border border-white/5"><p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider mb-1">Talk Time</p><p class="text-2xl font-bold text-white"><span id="profile-talktime">0</span><span class="text-sm font-normal text-cosmic-light/50 ml-1">mins</span></p></div>
                 </div>
+                <!-- Quick Recharge Button -->
+                <button onclick="closeProfileModal(); openQuickRecharge()" class="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                    <i class="fa-solid fa-plus"></i> Add Money
+                </button>
             </div>
             <div class="flex border-b border-white/10 shrink-0">
                 <button onclick="switchProfileTab('sessions')" id="tab-btn-sessions" class="flex-1 py-3 text-sm font-bold text-cosmic-accent border-b-2 border-cosmic-accent transition-colors">Session History</button>
                 <button onclick="switchProfileTab('recharges')" id="tab-btn-recharges" class="flex-1 py-3 text-sm font-bold text-cosmic-light/50 border-b-2 border-transparent transition-colors">Recharges</button>
+                <button onclick="switchProfileTab('favorites')" id="tab-btn-favorites" class="flex-1 py-3 text-sm font-bold text-cosmic-light/50 border-b-2 border-transparent transition-colors">Favorites</button>
             </div>
             <div class="p-4 overflow-y-auto custom-scroll flex-1 bg-black/20" id="profile-tab-content">
                 <div class="text-center text-cosmic-light/50 text-sm py-10">Loading...</div>
@@ -430,80 +589,366 @@
         </div>
     </div>
 
+    <!-- Birth Details Collection Modal -->
+    <div id="birth-details-modal" class="fixed inset-0 bg-black/95 flex items-end sm:items-center justify-center z-[65] hidden backdrop-blur-md p-4 sm:p-0">
+        <div class="bg-cosmic-900 border-t sm:border border-purple-500/50 sm:rounded-2xl rounded-t-2xl p-6 md:p-8 w-full max-w-md sm:mx-4 shadow-[0_-10px_40px_rgba(139,92,246,0.2)] relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto">
+            <button onclick="closeBirthDetailsModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white p-2 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-stars"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Your Birth Details</h2>
+                <p class="text-cosmic-light/70 text-sm">For accurate readings, astrologers need your birth information.</p>
+            </div>
+            
+            <form id="birth-details-form" onsubmit="submitBirthDetails(event)" class="space-y-4">
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Full Name *</label>
+                    <input type="text" id="bd-name" required placeholder="Enter your full name" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-purple-500 transition-colors placeholder-cosmic-light/30" />
+                </div>
+                
+                <!-- Date of Birth -->
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Date of Birth *</label>
+                    <input type="date" id="bd-date" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-purple-500 transition-colors" />
+                </div>
+                
+                <!-- Time of Birth -->
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Time of Birth</label>
+                    <div class="flex gap-2">
+                        <input type="time" id="bd-time" class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-purple-500 transition-colors" />
+                        <label class="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:border-purple-500/50 transition-colors">
+                            <input type="checkbox" id="bd-time-unknown" class="accent-purple-500" />
+                            <span class="text-sm text-cosmic-light/70 whitespace-nowrap">Don't Know</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Place of Birth with Autocomplete -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Place of Birth *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-cosmic-light/50"></i>
+                        <input type="text" id="bd-place" required autocomplete="off" placeholder="Start typing city name..." class="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white text-[16px] focus:outline-none focus:border-purple-500 transition-colors placeholder-cosmic-light/30" oninput="handlePlaceAutocomplete(this.value)" onfocus="showPlaceDropdown()" />
+                    </div>
+                    <div id="place-dropdown" class="place-dropdown hidden"></div>
+                    <input type="hidden" id="bd-place-lat" />
+                    <input type="hidden" id="bd-place-lng" />
+                </div>
+                
+                <!-- Gender -->
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-2">Gender</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:border-purple-500/50 transition-colors has-[:checked]:border-purple-500 has-[:checked]:bg-purple-500/10">
+                            <input type="radio" name="bd-gender" value="male" class="hidden" />
+                            <i class="fa-solid fa-mars text-blue-400"></i>
+                            <span class="text-sm text-white">Male</span>
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:border-purple-500/50 transition-colors has-[:checked]:border-purple-500 has-[:checked]:bg-purple-500/10">
+                            <input type="radio" name="bd-gender" value="female" class="hidden" />
+                            <i class="fa-solid fa-venus text-pink-400"></i>
+                            <span class="text-sm text-white">Female</span>
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:border-purple-500/50 transition-colors has-[:checked]:border-purple-500 has-[:checked]:bg-purple-500/10">
+                            <input type="radio" name="bd-gender" value="other" class="hidden" />
+                            <i class="fa-solid fa-genderless text-purple-400"></i>
+                            <span class="text-sm text-white">Other</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Current Issue/Question (Optional) -->
+                <div>
+                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Your Question (Optional)</label>
+                    <textarea id="bd-question" rows="2" placeholder="What would you like to ask about?" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-purple-500 transition-colors placeholder-cosmic-light/30 resize-none"></textarea>
+                </div>
+                
+                <button type="submit" id="bd-submit-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold py-4 px-4 rounded-xl transition-all active:scale-95 text-base shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+                    <span>Continue to Session</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <p class="text-center text-cosmic-light/50 text-xs mt-4">
+                <i class="fa-solid fa-lock mr-1"></i> Your details are encrypted and kept confidential
+            </p>
+        </div>
+    </div>
+
     <!-- ============================================================ -->
-    <!-- SESSION MODAL — FIXED: single clean structure, no duplicates -->
+    <!-- ENHANCED SESSION MODAL -->
     <!-- ============================================================ -->
     <div id="session-modal" class="fixed inset-0 bg-cosmic-900 z-[70] hidden flex-col transform translate-y-full transition-transform duration-300">
 
         <!-- Session Header -->
-        <div class="bg-cosmic-800 px-4 py-3 border-b border-white/10 flex justify-between items-center shrink-0 shadow-md z-20">
+        <div class="bg-cosmic-800/80 backdrop-blur-md px-4 py-3 border-b border-white/10 flex justify-between items-center shrink-0 shadow-lg z-20">
             <div class="flex items-center gap-3">
-                <img id="session-astro-img-sm" src="" class="w-10 h-10 rounded-full border border-cosmic-accent object-cover" alt="">
+                <div class="relative">
+                    <img id="session-astro-img-sm" src="" class="w-12 h-12 rounded-full border-2 border-cosmic-accent object-cover shadow-lg" alt="">
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-cosmic-800"></span>
+                </div>
                 <div>
-                    <h3 class="font-bold text-white text-sm leading-tight" id="session-astro-name-sm">Astrologer Name</h3>
-                    <p class="text-[10px] text-green-400 font-bold flex items-center gap-1 tracking-wider uppercase">
+                    <h3 class="font-bold text-white text-base leading-tight" id="session-astro-name-sm">Astrologer Name</h3>
+                    <p class="text-[11px] text-green-400 font-semibold flex items-center gap-1.5 tracking-wide">
                         <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                        <span id="session-type-label-sm">Live</span>
+                        <span id="session-type-label-sm">Live Session</span>
                     </p>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-xl font-mono font-bold text-white tracking-wider" id="session-timer">--:--</div>
-                <div class="text-[10px] text-cosmic-light/70">Bal: ₹<span id="session-live-balance">0</span></div>
+            <div class="text-right bg-black/30 rounded-xl px-4 py-2">
+                <div class="text-2xl font-mono font-bold text-white tracking-wider" id="session-timer">--:--</div>
+                <div class="text-[10px] text-cosmic-light/70 flex items-center justify-end gap-1">
+                    <i class="fa-solid fa-wallet text-green-400"></i>
+                    ₹<span id="session-live-balance">0</span>
+                </div>
             </div>
         </div>
 
         <!-- CHAT AREA (shown for chat sessions) -->
-        <div id="session-chat-area" class="hidden flex-col flex-1 bg-[#0B0A1A] overflow-hidden">
-            <div id="chat-messages" class="chat-scroll flex-1 overflow-y-auto p-4 space-y-2">
-                <div class="text-center"><span class="bg-white/10 text-[10px] px-3 py-1 rounded-full text-white/50 uppercase tracking-wide">End-to-End Encrypted</span></div>
+        <div id="session-chat-area" class="hidden flex-col flex-1 bg-gradient-to-b from-cosmic-900 to-[#0a0918] overflow-hidden">
+            <!-- Chat Header Bar -->
+            <div class="bg-cosmic-800/50 px-4 py-2 border-b border-white/5 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2 text-xs text-cosmic-light/60">
+                    <i class="fa-solid fa-shield-halved text-green-400"></i>
+                    <span>End-to-End Encrypted</span>
+                </div>
+                <div class="flex items-center gap-1 text-xs text-cosmic-accent">
+                    <span>₹<span id="chat-rate-display">0</span>/min</span>
+                </div>
             </div>
-            <form onsubmit="sendLiveMessage(event)" class="p-3 bg-cosmic-800 border-t border-white/10 flex gap-2 shrink-0">
-                <input type="text" id="chat-input-user" autocomplete="off" class="flex-1 bg-cosmic-900 border border-white/10 rounded-full px-5 py-3 text-sm text-white focus:outline-none focus:border-cosmic-accent" placeholder="Type message...">
-                <button type="submit" class="w-12 h-12 rounded-full bg-cosmic-accent text-cosmic-900 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg">
+            
+            <!-- Messages Container -->
+            <div id="chat-messages" class="chat-scroll flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Welcome Message -->
+                <div class="flex justify-center my-4">
+                    <div class="bg-white/5 rounded-full px-4 py-2 text-xs text-cosmic-light/60">
+                        <i class="fa-solid fa-clock mr-1"></i> Session started
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Typing Indicator (hidden by default) -->
+            <div id="typing-indicator" class="hidden px-4 pb-2">
+                <div class="flex items-center gap-2 text-cosmic-light/60 text-sm">
+                    <div class="flex gap-1">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                    <span>Astrologer is typing...</span>
+                </div>
+            </div>
+            
+            <!-- Quick Action Buttons -->
+            <div class="px-4 pb-2 flex gap-2 overflow-x-auto hide-scrollbar shrink-0">
+                <button onclick="sendQuickMessage('What does my birth chart say?')" class="quick-action-btn px-3 py-1.5 rounded-full text-xs text-white/80 whitespace-nowrap">
+                    <i class="fa-solid fa-star mr-1 text-cosmic-accent"></i> Birth Chart
+                </button>
+                <button onclick="sendQuickMessage('Tell me about my career prospects')" class="quick-action-btn px-3 py-1.5 rounded-full text-xs text-white/80 whitespace-nowrap">
+                    <i class="fa-solid fa-briefcase mr-1 text-blue-400"></i> Career
+                </button>
+                <button onclick="sendQuickMessage('What about my love life?')" class="quick-action-btn px-3 py-1.5 rounded-full text-xs text-white/80 whitespace-nowrap">
+                    <i class="fa-solid fa-heart mr-1 text-pink-400"></i> Love
+                </button>
+                <button onclick="sendQuickMessage('Any health concerns I should know about?')" class="quick-action-btn px-3 py-1.5 rounded-full text-xs text-white/80 whitespace-nowrap">
+                    <i class="fa-solid fa-heart-pulse mr-1 text-red-400"></i> Health
+                </button>
+            </div>
+            
+            <!-- Message Input -->
+            <form onsubmit="sendLiveMessage(event)" class="p-3 bg-cosmic-800/80 backdrop-blur-md border-t border-white/10 flex gap-2 shrink-0">
+                <button type="button" onclick="toggleAttachMenu()" class="w-12 h-12 rounded-full bg-white/5 text-cosmic-light/70 flex items-center justify-center hover:bg-white/10 transition-colors shrink-0">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <input type="text" id="chat-input-user" autocomplete="off" class="flex-1 bg-cosmic-900/80 border border-white/10 rounded-full px-5 py-3 text-sm text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="Type your message...">
+                <button type="submit" class="w-12 h-12 rounded-full bg-gradient-to-r from-cosmic-accent to-yellow-500 text-cosmic-900 flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-lg shadow-cosmic-accent/30">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </form>
         </div>
 
         <!-- CALL AREA (shown for call sessions) -->
-        <div id="session-call-area" class="hidden flex-1 flex-col items-center justify-center bg-gradient-to-b from-cosmic-900 to-black relative">
-            <!-- Ringing pulse rings -->
-            <div id="ring-pulse-1" class="absolute w-48 h-48 rounded-full border-2 border-cosmic-accent/40 ring-pulse"></div>
-            <div id="ring-pulse-2" class="absolute w-64 h-64 rounded-full border border-cosmic-accent/20 ring-pulse-delay"></div>
-
-            <img id="session-astro-img-lg" src="" class="w-32 h-32 rounded-full border-4 border-cosmic-accent shadow-[0_0_40px_rgba(212,175,55,0.4)] mb-6 object-cover relative z-10" alt="">
+        <div id="session-call-area" class="hidden flex-1 flex-col items-center justify-center call-gradient relative overflow-hidden">
+            <!-- Animated Background -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-cosmic-accent/10 rounded-full blur-[80px] animate-pulse-slow" style="animation-delay: 1s;"></div>
+            </div>
+            
+            <!-- Ringing Pulse Rings -->
+            <div id="ring-pulse-1" class="absolute w-40 h-40 rounded-full border-2 border-cosmic-accent/50 ring-pulse"></div>
+            <div id="ring-pulse-2" class="absolute w-56 h-56 rounded-full border border-cosmic-accent/30 ring-pulse-delay"></div>
+            <div id="ring-pulse-3" class="absolute w-72 h-72 rounded-full border border-cosmic-accent/20 ring-pulse-delay-2"></div>
+            
+            <!-- Astrologer Image -->
+            <div class="relative z-10 mb-6">
+                <img id="session-astro-img-lg" src="" class="w-36 h-36 rounded-full border-4 border-cosmic-accent shadow-[0_0_60px_rgba(212,175,55,0.4)] object-cover" alt="">
+                <div id="call-status-icon" class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    <span id="call-status-badge">Ringing</span>
+                </div>
+            </div>
+            
+            <!-- Astrologer Name -->
             <h2 class="text-3xl font-bold text-white relative z-10 mb-2" id="session-astro-name-lg">Astrologer</h2>
-            <p id="call-status-text" class="text-green-400 text-sm font-mono relative z-10 mb-8">Ringing...</p>
-
-            <!-- End button inside call area too for easy reach -->
-            <button onclick="endSessionManually()" class="relative z-10 bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-10 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all active:scale-95 flex items-center gap-3 text-lg mt-4">
-                <i class="fa-solid fa-phone-slash"></i> End Call
-            </button>
+            <p id="call-status-text" class="text-cosmic-light/70 text-sm relative z-10 mb-2">Connecting you...</p>
+            
+            <!-- Sound Wave Animation (shown when connected) -->
+            <div id="sound-wave-container" class="hidden flex items-end gap-1 h-8 mb-8 relative z-10">
+                <div class="sound-wave" style="animation-delay: 0s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.1s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.2s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.3s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.4s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.3s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.2s;"></div>
+                <div class="sound-wave" style="animation-delay: 0.1s;"></div>
+            </div>
+            
+            <!-- Call Controls -->
+            <div class="flex items-center gap-6 relative z-10 mt-8">
+                <button id="mute-btn" onclick="toggleMute()" class="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                    <i class="fa-solid fa-microphone text-xl"></i>
+                </button>
+                <button onclick="endSessionManually()" class="w-20 h-20 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.5)] hover:shadow-[0_0_40px_rgba(239,68,68,0.6)] transition-all active:scale-95">
+                    <i class="fa-solid fa-phone-slash text-2xl"></i>
+                </button>
+                <button id="speaker-btn" onclick="toggleSpeaker()" class="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors border border-white/10">
+                    <i class="fa-solid fa-volume-high text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Session Info Card -->
+            <div class="session-info-card rounded-2xl px-6 py-4 mt-10 relative z-10 flex items-center gap-6">
+                <div class="text-center">
+                    <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider">Duration</p>
+                    <p class="text-lg font-mono font-bold text-white" id="call-duration-display">00:00</p>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div class="text-center">
+                    <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider">Rate</p>
+                    <p class="text-lg font-bold text-cosmic-accent">₹<span id="call-rate-display">0</span>/min</p>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div class="text-center">
+                    <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider">Balance</p>
+                    <p class="text-lg font-bold text-green-400">₹<span id="call-balance-display">0</span></p>
+                </div>
+            </div>
         </div>
 
-        <!-- Universal End Bar (always visible at bottom) -->
-        <div class="p-4 bg-cosmic-800 border-t border-white/10 text-center shrink-0 z-20">
-            <button onclick="endSessionManually()" id="end-session-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all active:scale-95 w-full md:w-auto md:min-w-[300px] mx-auto flex items-center justify-center gap-2 text-base">
+        <!-- Universal End Bar (always visible at bottom for chat) -->
+        <div id="chat-end-bar" class="hidden p-4 bg-cosmic-800/80 backdrop-blur-md border-t border-white/10 shrink-0 z-20">
+            <button onclick="endSessionManually()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all active:scale-95 w-full flex items-center justify-center gap-2 text-sm">
                 <i class="fa-solid fa-phone-slash"></i> End Consultation
             </button>
+        </div>
+    </div>
+
+    <!-- Session Ended / Rating Modal -->
+    <div id="rating-modal" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[75] hidden backdrop-blur-md p-4">
+        <div class="bg-cosmic-900 border border-white/10 rounded-2xl p-6 md:p-8 w-full max-w-sm mx-4 shadow-2xl text-center">
+            <div class="w-20 h-20 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-3xl mx-auto mb-4 border-2 border-green-500/30">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Session Completed</h2>
+            <p class="text-cosmic-light/70 text-sm mb-6">
+                Duration: <span id="rating-duration" class="font-bold text-white">0 mins</span> • 
+                Cost: <span id="rating-cost" class="font-bold text-cosmic-accent">₹0</span>
+            </p>
+            
+            <div class="mb-6">
+                <p class="text-sm text-cosmic-light/80 mb-3">Rate your experience with <span id="rating-astro-name" class="text-white font-bold">Astrologer</span></p>
+                <div class="flex justify-center gap-2" id="star-rating">
+                    <button onclick="setRating(1)" class="text-3xl text-white/30 hover:text-yellow-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+                    <button onclick="setRating(2)" class="text-3xl text-white/30 hover:text-yellow-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+                    <button onclick="setRating(3)" class="text-3xl text-white/30 hover:text-yellow-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+                    <button onclick="setRating(4)" class="text-3xl text-white/30 hover:text-yellow-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+                    <button onclick="setRating(5)" class="text-3xl text-white/30 hover:text-yellow-400 transition-colors"><i class="fa-solid fa-star"></i></button>
+                </div>
+            </div>
+            
+            <textarea id="rating-feedback" placeholder="Share your feedback (optional)" rows="3" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent transition-colors placeholder-cosmic-light/30 resize-none mb-4"></textarea>
+            
+            <button onclick="submitRating()" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-3 rounded-xl active:scale-95 transition-transform">
+                Submit Rating
+            </button>
+            <button onclick="closeRatingModal()" class="w-full text-cosmic-light/60 hover:text-white font-medium py-2 mt-2 text-sm transition-colors">
+                Skip
+            </button>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div id="notifications-modal" class="fixed inset-0 bg-black/90 flex items-start justify-center z-[60] hidden backdrop-blur-sm pt-20 px-4">
+        <div class="bg-cosmic-900 border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-bell text-cosmic-accent mr-2"></i>Notifications</h2>
+                <button onclick="closeNotifications()" class="text-cosmic-light/50 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="notifications-list" class="max-h-[60vh] overflow-y-auto custom-scroll">
+                <div class="text-center text-cosmic-light/50 text-sm py-10">No notifications yet</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kundli Match Modal -->
+    <div id="kundli-modal" class="fixed inset-0 bg-black/90 flex items-end sm:items-center justify-center z-[60] hidden backdrop-blur-sm p-4 sm:p-0">
+        <div class="bg-cosmic-900 border-t sm:border border-pink-500/50 sm:rounded-2xl rounded-t-2xl p-6 md:p-8 w-full max-w-lg sm:mx-4 shadow-2xl relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto">
+            <button onclick="closeKundliModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white p-2 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-rings-wedding text-4xl text-pink-400 mb-4"></i>
+                <h2 class="text-2xl font-bold text-white">Kundli Matching</h2>
+                <p class="text-cosmic-light/70 text-sm mt-2">Enter details for compatibility analysis</p>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Partner 1 -->
+                <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                    <h3 class="text-sm font-bold text-pink-400 mb-3"><i class="fa-solid fa-mars mr-2"></i>Partner 1</h3>
+                    <div class="space-y-3">
+                        <input type="text" placeholder="Full Name" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 placeholder-cosmic-light/30" />
+                        <input type="date" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500" />
+                        <input type="text" placeholder="Place of Birth" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 placeholder-cosmic-light/30" />
+                    </div>
+                </div>
+                
+                <!-- Partner 2 -->
+                <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                    <h3 class="text-sm font-bold text-pink-400 mb-3"><i class="fa-solid fa-venus mr-2"></i>Partner 2</h3>
+                    <div class="space-y-3">
+                        <input type="text" placeholder="Full Name" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 placeholder-cosmic-light/30" />
+                        <input type="date" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500" />
+                        <input type="text" placeholder="Place of Birth" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 placeholder-cosmic-light/30" />
+                    </div>
+                </div>
+                
+                <button onclick="showKundliResult()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-4 rounded-xl active:scale-95 transition-transform shadow-lg">
+                    <i class="fa-solid fa-heart-pulse mr-2"></i> Check Compatibility
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-20 right-4 left-4 md:left-auto z-[80] flex flex-col gap-2 pointer-events-none items-center md:items-end"></div>
 
-    <!-- Firebase Logic -->
+    <!-- Firebase & App Logic -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-        import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { initializeApp } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js)";
+        import { getAnalytics } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js)";
+        import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, orderBy, getDocs, serverTimestamp, deleteDoc } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js)";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js)";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
             authDomain: "designsnap-f3309.firebaseapp.com",
-            databaseURL: "https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app",
+            databaseURL: "[designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app](https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app)",
             projectId: "designsnap-f3309",
             storageBucket: "designsnap-f3309.firebasestorage.app",
             messagingSenderId: "741888249963",
@@ -517,11 +962,16 @@
         const auth = getAuth(app);
 
         // --- State ---
-        let appConfig = { adminUpiId: "yourclientupi@ybl", adminName: "AstroPath Services", currency: "₹", minMinutes: 5, commissionPercent: 30 };
+        let appConfig = { adminUpiId: "yourclientupi@ybl", adminName: "AstroPath Services", currency: "₹", minMinutes: 5, commissionPercent: 30, freeMinutes: 3 };
         let currentUser = null;
         let userBalance = 0;
+        let userBirthDetails = null;
+        let userFavorites = [];
         let isSignUpMode = false;
         let astrologersData = [];
+        let filteredAstrologers = [];
+        let currentFilter = 'all';
+        let currentSort = 'rating';
 
         // Session State
         let activeSessionTimer = null;
@@ -533,47 +983,123 @@
         let pc = null;
         let localStream = null;
         let remoteStream = null;
+        let isMuted = false;
+        let isSpeakerOn = true;
+        let pendingSessionMethod = null;
+        let sessionRating = 0;
+
+        // Place Autocomplete Data
+        const placesData = [
+            // India - Major Cities
+            { name: "Mumbai, Maharashtra, India", lat: 19.076, lng: 72.8777 },
+            { name: "Delhi, India", lat: 28.7041, lng: 77.1025 },
+            { name: "Bangalore, Karnataka, India", lat: 12.9716, lng: 77.5946 },
+            { name: "Chennai, Tamil Nadu, India", lat: 13.0827, lng: 80.2707 },
+            { name: "Kolkata, West Bengal, India", lat: 22.5726, lng: 88.3639 },
+            { name: "Hyderabad, Telangana, India", lat: 17.385, lng: 78.4867 },
+            { name: "Pune, Maharashtra, India", lat: 18.5204, lng: 73.8567 },
+            { name: "Ahmedabad, Gujarat, India", lat: 23.0225, lng: 72.5714 },
+            { name: "Jaipur, Rajasthan, India", lat: 26.9124, lng: 75.7873 },
+            { name: "Lucknow, Uttar Pradesh, India", lat: 26.8467, lng: 80.9462 },
+            { name: "Surat, Gujarat, India", lat: 21.1702, lng: 72.8311 },
+            { name: "Kanpur, Uttar Pradesh, India", lat: 26.4499, lng: 80.3319 },
+            { name: "Nagpur, Maharashtra, India", lat: 21.1458, lng: 79.0882 },
+            { name: "Indore, Madhya Pradesh, India", lat: 22.7196, lng: 75.8577 },
+            { name: "Thane, Maharashtra, India", lat: 19.2183, lng: 72.9781 },
+            { name: "Bhopal, Madhya Pradesh, India", lat: 23.2599, lng: 77.4126 },
+            { name: "Visakhapatnam, Andhra Pradesh, India", lat: 17.6868, lng: 83.2185 },
+            { name: "Patna, Bihar, India", lat: 25.5941, lng: 85.1376 },
+            { name: "Vadodara, Gujarat, India", lat: 22.3072, lng: 73.1812 },
+            { name: "Ghaziabad, Uttar Pradesh, India", lat: 28.6692, lng: 77.4538 },
+            { name: "Ludhiana, Punjab, India", lat: 30.901, lng: 75.8573 },
+            { name: "Agra, Uttar Pradesh, India", lat: 27.1767, lng: 78.0081 },
+            { name: "Nashik, Maharashtra, India", lat: 19.9975, lng: 73.7898 },
+            { name: "Faridabad, Haryana, India", lat: 28.4089, lng: 77.3178 },
+            { name: "Meerut, Uttar Pradesh, India", lat: 28.9845, lng: 77.7064 },
+            { name: "Rajkot, Gujarat, India", lat: 22.3039, lng: 70.8022 },
+            { name: "Varanasi, Uttar Pradesh, India", lat: 25.3176, lng: 82.9739 },
+            { name: "Srinagar, Jammu & Kashmir, India", lat: 34.0837, lng: 74.7973 },
+            { name: "Amritsar, Punjab, India", lat: 31.634, lng: 74.8723 },
+            { name: "Allahabad, Uttar Pradesh, India", lat: 25.4358, lng: 81.8463 },
+            { name: "Ranchi, Jharkhand, India", lat: 23.3441, lng: 85.3096 },
+            { name: "Coimbatore, Tamil Nadu, India", lat: 11.0168, lng: 76.9558 },
+            { name: "Jabalpur, Madhya Pradesh, India", lat: 23.1815, lng: 79.9864 },
+            { name: "Gwalior, Madhya Pradesh, India", lat: 26.2183, lng: 78.1828 },
+            { name: "Vijayawada, Andhra Pradesh, India", lat: 16.5062, lng: 80.648 },
+            { name: "Jodhpur, Rajasthan, India", lat: 26.2389, lng: 73.0243 },
+            { name: "Madurai, Tamil Nadu, India", lat: 9.9252, lng: 78.1198 },
+            { name: "Raipur, Chhattisgarh, India", lat: 21.2514, lng: 81.6296 },
+            { name: "Kota, Rajasthan, India", lat: 25.2138, lng: 75.8648 },
+            { name: "Chandigarh, India", lat: 30.7333, lng: 76.7794 },
+            { name: "Guwahati, Assam, India", lat: 26.1445, lng: 91.7362 },
+            { name: "Solapur, Maharashtra, India", lat: 17.6599, lng: 75.9064 },
+            { name: "Hubli, Karnataka, India", lat: 15.3647, lng: 75.124 },
+            { name: "Tiruchirappalli, Tamil Nadu, India", lat: 10.7905, lng: 78.7047 },
+            { name: "Bareilly, Uttar Pradesh, India", lat: 28.367, lng: 79.4304 },
+            { name: "Moradabad, Uttar Pradesh, India", lat: 28.8386, lng: 78.7733 },
+            { name: "Mysore, Karnataka, India", lat: 12.2958, lng: 76.6394 },
+            { name: "Tiruppur, Tamil Nadu, India", lat: 11.1085, lng: 77.3411 },
+            { name: "Gurgaon, Haryana, India", lat: 28.4595, lng: 77.0266 },
+            { name: "Noida, Uttar Pradesh, India", lat: 28.5355, lng: 77.391 },
+            // International Cities
+            { name: "New York, USA", lat: 40.7128, lng: -74.006 },
+            { name: "Los Angeles, USA", lat: 34.0522, lng: -118.2437 },
+            { name: "London, UK", lat: 51.5074, lng: -0.1278 },
+            { name: "Dubai, UAE", lat: 25.2048, lng: 55.2708 },
+            { name: "Singapore", lat: 1.3521, lng: 103.8198 },
+            { name: "Sydney, Australia", lat: -33.8688, lng: 151.2093 },
+            { name: "Toronto, Canada", lat: 43.6532, lng: -79.3832 },
+            { name: "Amsterdam, Netherlands", lat: 52.3676, lng: 4.9041 },
+            { name: "Paris, France", lat: 48.8566, lng: 2.3522 },
+            { name: "Berlin, Germany", lat: 52.52, lng: 13.405 },
+            { name: "Tokyo, Japan", lat: 35.6762, lng: 139.6503 },
+            { name: "Hong Kong", lat: 22.3193, lng: 114.1694 },
+            { name: "San Francisco, USA", lat: 37.7749, lng: -122.4194 },
+            { name: "Chicago, USA", lat: 41.8781, lng: -87.6298 },
+            { name: "Houston, USA", lat: 29.7604, lng: -95.3698 },
+            { name: "Melbourne, Australia", lat: -37.8136, lng: 144.9631 },
+            { name: "Bangkok, Thailand", lat: 13.7563, lng: 100.5018 },
+            { name: "Kuala Lumpur, Malaysia", lat: 3.139, lng: 101.6869 },
+        ];
 
         // =============================================
-        // RINGING SOUND — Web Audio API (no file needed)
+        // RINGING SOUND — Web Audio API
         // =============================================
         let ringAudioCtx = null;
         let ringOscillators = [];
         let ringInterval = null;
 
         function startRinging() {
-            stopRinging(); // ensure clean state
-            ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            function playRingTone() {
-                if (!ringAudioCtx) return;
-                // Classic phone ring: two tones, short bursts
-                const tones = [480, 440];
-                tones.forEach((freq, i) => {
-                    const osc = ringAudioCtx.createOscillator();
-                    const gainNode = ringAudioCtx.createGain();
-                    osc.connect(gainNode);
-                    gainNode.connect(ringAudioCtx.destination);
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ringAudioCtx.currentTime);
-                    gainNode.gain.setValueAtTime(0.15, ringAudioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, ringAudioCtx.currentTime + 0.4);
-                    osc.start(ringAudioCtx.currentTime + i * 0.05);
-                    osc.stop(ringAudioCtx.currentTime + 0.5);
-                    ringOscillators.push(osc);
-                });
-            }
-
-            playRingTone();
-            // Ring every 2 seconds (ring 0.5s, pause 1.5s)
-            ringInterval = setInterval(playRingTone, 2000);
+            stopRinging();
+            try {
+                ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                function playRingTone() {
+                    if (!ringAudioCtx) return;
+                    const tones = [480, 440];
+                    tones.forEach((freq, i) => {
+                        const osc = ringAudioCtx.createOscillator();
+                        const gainNode = ringAudioCtx.createGain();
+                        osc.connect(gainNode);
+                        gainNode.connect(ringAudioCtx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, ringAudioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.12, ringAudioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, ringAudioCtx.currentTime + 0.4);
+                        osc.start(ringAudioCtx.currentTime + i * 0.05);
+                        osc.stop(ringAudioCtx.currentTime + 0.5);
+                        ringOscillators.push(osc);
+                    });
+                }
+                playRingTone();
+                ringInterval = setInterval(playRingTone, 2000);
+            } catch(e) { console.log('Audio not supported'); }
         }
 
         function stopRinging() {
             if (ringInterval) { clearInterval(ringInterval); ringInterval = null; }
             ringOscillators.forEach(osc => { try { osc.stop(); } catch(e) {} });
             ringOscillators = [];
-            if (ringAudioCtx) { ringAudioCtx.close(); ringAudioCtx = null; }
+            if (ringAudioCtx) { try { ringAudioCtx.close(); } catch(e) {} ringAudioCtx = null; }
         }
 
         // Analytics
@@ -595,10 +1121,55 @@
                     const data = d.data();
                     if (data.status === 'approved' || data.isVerified) astrologersData.push({ id: d.id, ...data });
                 });
-                renderAstrologers();
+                applyFiltersAndSort();
             });
         }
         initAppData();
+
+        // --- Filtering & Sorting ---
+        function applyFiltersAndSort() {
+            let result = [...astrologersData];
+            
+            // Filter
+            if (currentFilter !== 'all') {
+                result = result.filter(a => (a.skills || []).some(s => s.toLowerCase().includes(currentFilter.toLowerCase())));
+            }
+            
+            // Sort
+            switch(currentSort) {
+                case 'rating':
+                    result.sort((a, b) => (b.rating || 5) - (a.rating || 5));
+                    break;
+                case 'price-low':
+                    result.sort((a, b) => (a.price || 0) - (b.price || 0));
+                    break;
+                case 'price-high':
+                    result.sort((a, b) => (b.price || 0) - (a.price || 0));
+                    break;
+                case 'experience':
+                    result.sort((a, b) => (b.experience || 0) - (a.experience || 0));
+                    break;
+            }
+            
+            filteredAstrologers = result;
+            renderAstrologers();
+        }
+
+        window.filterBySkill = function(skill) {
+            currentFilter = skill;
+            document.querySelectorAll('.filter-tag').forEach(btn => {
+                btn.classList.remove('active', 'bg-cosmic-accent/20', 'text-cosmic-accent', 'border-cosmic-accent/30');
+                btn.classList.add('bg-white/5', 'text-white/70', 'border-white/10');
+            });
+            event.target.classList.add('active', 'bg-cosmic-accent/20', 'text-cosmic-accent', 'border-cosmic-accent/30');
+            event.target.classList.remove('bg-white/5', 'text-white/70', 'border-white/10');
+            applyFiltersAndSort();
+        };
+
+        window.sortAstrologers = function(sortBy) {
+            currentSort = sortBy;
+            applyFiltersAndSort();
+        };
 
         // --- Auth ---
         onAuthStateChanged(auth, async (user) => {
@@ -608,6 +1179,8 @@
                     if (userSnap.exists()) {
                         const data = userSnap.data();
                         userBalance = data.balance || 0;
+                        userBirthDetails = data.birthDetails || null;
+                        userFavorites = data.favorites || [];
                         document.getElementById('user-balance-display').innerText = userBalance;
                         document.getElementById('profile-balance').innerText = userBalance;
                         document.getElementById('profile-talktime').innerText = data.totalSessionMinutes || 0;
@@ -621,11 +1194,16 @@
                 document.getElementById('profile-email').innerText = user.email;
                 document.getElementById('profile-avatar-letter').innerText = user.email.charAt(0).toUpperCase();
                 closeAuthModal();
+                
+                // Check for pending notifications
+                loadNotifications();
             } else {
                 document.getElementById('login-btn-header').classList.remove('hidden');
                 document.getElementById('user-profile-header').classList.add('hidden');
                 document.getElementById('user-profile-header').classList.remove('flex');
                 userBalance = 0;
+                userBirthDetails = null;
+                userFavorites = [];
             }
         });
 
@@ -645,7 +1223,15 @@
                 if (isSignUpMode) {
                     if (!phone) throw new Error("Please enter a mobile number.");
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                    await setDoc(doc(db, "users", userCred.user.uid), { email, phone, balance: 50, totalSessionMinutes: 0, createdAt: new Date().toISOString() });
+                    await setDoc(doc(db, "users", userCred.user.uid), { 
+                        email, 
+                        phone, 
+                        balance: 50, 
+                        totalSessionMinutes: 0, 
+                        createdAt: new Date().toISOString(),
+                        hasUsedFreeMinutes: false,
+                        favorites: []
+                    });
                     showToast("Account Created! ₹50 Bonus added.");
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
@@ -687,6 +1273,122 @@
             document.getElementById('auth-modal').classList.remove('flex');
         }
 
+        // --- Birth Details ---
+        function openBirthDetailsModal(astroId, method) {
+            pendingSessionMethod = { astroId, method };
+            
+            // Pre-fill if we have saved birth details
+            if (userBirthDetails) {
+                document.getElementById('bd-name').value = userBirthDetails.name || '';
+                document.getElementById('bd-date').value = userBirthDetails.date || '';
+                document.getElementById('bd-time').value = userBirthDetails.time || '';
+                document.getElementById('bd-place').value = userBirthDetails.place || '';
+                if (userBirthDetails.gender) {
+                    document.querySelector(`input[name="bd-gender"][value="${userBirthDetails.gender}"]`).checked = true;
+                }
+            }
+            
+            document.getElementById('birth-details-modal').classList.remove('hidden');
+            document.getElementById('birth-details-modal').classList.add('flex');
+        }
+
+        function closeBirthDetailsModal() {
+            document.getElementById('birth-details-modal').classList.add('hidden');
+            document.getElementById('birth-details-modal').classList.remove('flex');
+        }
+
+        async function submitBirthDetails(e) {
+            e.preventDefault();
+            
+            const birthDetails = {
+                name: document.getElementById('bd-name').value,
+                date: document.getElementById('bd-date').value,
+                time: document.getElementById('bd-time-unknown').checked ? 'unknown' : document.getElementById('bd-time').value,
+                place: document.getElementById('bd-place').value,
+                placeLat: document.getElementById('bd-place-lat').value,
+                placeLng: document.getElementById('bd-place-lng').value,
+                gender: document.querySelector('input[name="bd-gender"]:checked')?.value || '',
+                question: document.getElementById('bd-question').value
+            };
+            
+            // Save to user profile
+            if (currentUser) {
+                await updateDoc(doc(db, "users", currentUser.uid), { birthDetails });
+                userBirthDetails = birthDetails;
+            }
+            
+            closeBirthDetailsModal();
+            
+            // Continue with session
+            if (pendingSessionMethod) {
+                const astro = astrologersData.find(a => a.id === pendingSessionMethod.astroId);
+                if (astro) {
+                    startActiveSession(astro, pendingSessionMethod.method, birthDetails);
+                }
+                pendingSessionMethod = null;
+            }
+        }
+
+        // --- Place Autocomplete ---
+        let placeDropdownVisible = false;
+
+        window.handlePlaceAutocomplete = function(query) {
+            const dropdown = document.getElementById('place-dropdown');
+            
+            if (query.length < 2) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            const filtered = placesData.filter(p => 
+                p.name.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 8);
+            
+            if (filtered.length === 0) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            dropdown.innerHTML = filtered.map(place => `
+                <div class="place-item" onclick="selectPlace('${place.name}', ${place.lat}, ${place.lng})">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-cosmic-accent text-sm"></i>
+                        <span class="text-white text-sm">${highlightMatch(place.name, query)}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            dropdown.classList.remove('hidden');
+            placeDropdownVisible = true;
+        };
+
+        function highlightMatch(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="text-cosmic-accent font-bold">$1</span>');
+        }
+
+        window.selectPlace = function(name, lat, lng) {
+            document.getElementById('bd-place').value = name;
+            document.getElementById('bd-place-lat').value = lat;
+            document.getElementById('bd-place-lng').value = lng;
+            document.getElementById('place-dropdown').classList.add('hidden');
+            placeDropdownVisible = false;
+        };
+
+        window.showPlaceDropdown = function() {
+            const query = document.getElementById('bd-place').value;
+            if (query.length >= 2) {
+                handlePlaceAutocomplete(query);
+            }
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#bd-place') && !e.target.closest('#place-dropdown')) {
+                document.getElementById('place-dropdown')?.classList.add('hidden');
+            }
+        });
+
         // --- Support ---
         function openSupportModal() {
             if (!currentUser) { openAuthModal(); return; }
@@ -714,6 +1416,22 @@
             btn.innerText = "Send to Support";
         }
 
+        // --- Notifications ---
+        async function loadNotifications() {
+            if (!currentUser) return;
+            // In a real app, load from Firestore
+            // For demo, we'll show the badge if there are pending items
+        }
+
+        window.openNotifications = function() {
+            document.getElementById('notifications-modal').classList.remove('hidden');
+            document.getElementById('notif-badge').classList.add('hidden');
+        };
+
+        window.closeNotifications = function() {
+            document.getElementById('notifications-modal').classList.add('hidden');
+        };
+
         // --- Profile ---
         async function openProfileModal() {
             document.getElementById('profile-modal').classList.remove('hidden');
@@ -728,24 +1446,47 @@
         async function switchProfileTab(tab) {
             const content = document.getElementById('profile-tab-content');
             content.innerHTML = '<div class="text-center text-cosmic-light/50 text-sm py-10"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
+            
             document.getElementById('tab-btn-sessions').className = `flex-1 py-3 text-sm font-bold transition-colors ${tab === 'sessions' ? 'text-cosmic-accent border-b-2 border-cosmic-accent' : 'text-cosmic-light/50 border-b-2 border-transparent'}`;
             document.getElementById('tab-btn-recharges').className = `flex-1 py-3 text-sm font-bold transition-colors ${tab === 'recharges' ? 'text-cosmic-accent border-b-2 border-cosmic-accent' : 'text-cosmic-light/50 border-b-2 border-transparent'}`;
+            document.getElementById('tab-btn-favorites').className = `flex-1 py-3 text-sm font-bold transition-colors ${tab === 'favorites' ? 'text-cosmic-accent border-b-2 border-cosmic-accent' : 'text-cosmic-light/50 border-b-2 border-transparent'}`;
 
             if (!currentUser) return;
+            
             try {
                 if (tab === 'sessions') {
                     const q = query(collection(db, "sessions"), where("userId", "==", currentUser.uid));
                     const snap = await getDocs(q);
                     if (snap.empty) { content.innerHTML = '<div class="text-center text-cosmic-light/50 text-sm py-10">No sessions yet.</div>'; return; }
-                    const docs = snap.docs.map(d => d.data()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
+                        const aTime = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                        const bTime = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+                        return bTime - aTime;
+                    });
                     let html = '<div class="space-y-3">';
                     docs.forEach(s => {
-                        const date = s.timestamp ? new Date(s.timestamp.toDate ? s.timestamp.toDate() : s.timestamp).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : '—';
+                        const date = s.timestamp ? new Date(s.timestamp.toDate ? s.timestamp.toDate() : s.timestamp).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
                         const mins = Math.ceil((s.durationSeconds || 0) / 60);
-                        html += `<div class="bg-black/30 p-3 rounded-xl border border-white/5 flex justify-between items-center"><div><p class="text-sm font-bold text-white">${s.astroName}</p><p class="text-[10px] text-cosmic-light/50">${date} • ${(s.type || 'chat').toUpperCase()}</p></div><div class="text-right"><p class="text-sm font-bold text-red-400">-₹${Math.floor(s.cost || 0)}</p><p class="text-[10px] text-cosmic-light/50">${mins} mins</p></div></div>`;
+                        const typeIcon = s.type === 'call' ? 'fa-phone' : 'fa-comment-dots';
+                        html += `<div class="bg-black/30 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-cosmic-accent/20 flex items-center justify-center text-cosmic-accent">
+                                    <i class="fa-solid ${typeIcon}"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white">${s.astroName}</p>
+                                    <p class="text-[10px] text-cosmic-light/50">${date}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold ${s.cost > 0 ? 'text-red-400' : 'text-green-400'}">${s.cost > 0 ? '-' : ''}₹${Math.floor(s.cost || 0)}</p>
+                                <p class="text-[10px] text-cosmic-light/50">${mins} mins</p>
+                            </div>
+                        </div>`;
                     });
                     content.innerHTML = html + '</div>';
-                } else {
+                    
+                } else if (tab === 'recharges') {
                     const q = query(collection(db, "payment_verifications"), where("userId", "==", currentUser.uid));
                     const snap = await getDocs(q);
                     if (snap.empty) { content.innerHTML = '<div class="text-center text-cosmic-light/50 text-sm py-10">No recharges found.</div>'; return; }
@@ -754,34 +1495,108 @@
                     docs.forEach(p => {
                         const date = new Date(p.timestamp).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
                         const isPending = p.status === 'pending_verification';
-                        html += `<div class="bg-black/30 p-3 rounded-xl border border-white/5 flex justify-between items-center"><div><p class="text-sm font-bold text-white">Recharge</p><p class="text-[10px] font-mono text-cosmic-light/50">UTR: ${p.utrNumber}</p></div><div class="text-right"><p class="text-sm font-bold text-green-400">+₹${p.amount}</p><p class="text-[10px] font-bold ${isPending ? 'text-yellow-500' : 'text-green-500'}">${isPending ? 'Pending' : 'Success'}</p></div></div>`;
+                        html += `<div class="bg-black/30 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-bold text-white">Recharge</p>
+                                <p class="text-[10px] font-mono text-cosmic-light/50">UTR: ${p.utrNumber}</p>
+                                <p class="text-[10px] text-cosmic-light/40">${date}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-green-400">+₹${p.amount}</p>
+                                <p class="text-[10px] font-bold ${isPending ? 'text-yellow-500' : 'text-green-500'}">
+                                    <i class="fa-solid ${isPending ? 'fa-clock' : 'fa-check-circle'} mr-1"></i>${isPending ? 'Pending' : 'Success'}
+                                </p>
+                            </div>
+                        </div>`;
+                    });
+                    content.innerHTML = html + '</div>';
+                    
+                } else if (tab === 'favorites') {
+                    if (userFavorites.length === 0) {
+                        content.innerHTML = '<div class="text-center text-cosmic-light/50 text-sm py-10"><i class="fa-regular fa-heart text-2xl mb-2 block opacity-50"></i>No favorites yet.<br>Tap the heart icon on astrologer cards to add.</div>';
+                        return;
+                    }
+                    const favAstros = astrologersData.filter(a => userFavorites.includes(a.id));
+                    let html = '<div class="space-y-3">';
+                    favAstros.forEach(a => {
+                        html += `<div class="bg-black/30 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <img src="${a.image}" class="w-12 h-12 rounded-full object-cover border border-cosmic-accent/30" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(a.name)}&background=1A1832&color=D4AF37)'">
+                                <div>
+                                    <p class="text-sm font-bold text-white">${a.name}</p>
+                                    <p class="text-[10px] text-cosmic-light/50">${(a.skills || []).slice(0,2).join(', ')}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-cosmic-accent font-bold">₹${a.price}/min</span>
+                                <button onclick="handleInteraction('${a.id}', 'chat')" class="w-10 h-10 rounded-full bg-cosmic-accent/20 text-cosmic-accent flex items-center justify-center hover:bg-cosmic-accent hover:text-cosmic-900 transition-colors">
+                                    <i class="fa-solid fa-comment-dots"></i>
+                                </button>
+                            </div>
+                        </div>`;
                     });
                     content.innerHTML = html + '</div>';
                 }
-            } catch (err) { content.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Failed to load history.</div>'; }
+            } catch (err) { 
+                console.error(err);
+                content.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Failed to load history.</div>'; 
+            }
         }
+
+        // --- Toggle Favorite ---
+        window.toggleFavorite = async function(astroId, event) {
+            event.stopPropagation();
+            if (!currentUser) { openAuthModal(); return; }
+            
+            const btn = event.currentTarget;
+            const isFav = userFavorites.includes(astroId);
+            
+            if (isFav) {
+                userFavorites = userFavorites.filter(id => id !== astroId);
+                btn.classList.remove('active');
+                btn.querySelector('i').className = 'fa-regular fa-heart';
+            } else {
+                userFavorites.push(astroId);
+                btn.classList.add('active');
+                btn.querySelector('i').className = 'fa-solid fa-heart';
+            }
+            
+            await updateDoc(doc(db, "users", currentUser.uid), { favorites: userFavorites });
+            showToast(isFav ? 'Removed from favorites' : 'Added to favorites');
+        };
 
         // --- Render Astrologers ---
         function formatNumber(num) { return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num; }
 
         function renderAstrologers() {
             const grid = document.getElementById('astrologerGrid');
+            const data = filteredAstrologers.length > 0 ? filteredAstrologers : astrologersData;
             grid.innerHTML = '';
-            if (astrologersData.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-cosmic-light/50">No astrologers online right now.</div>';
+            
+            if (data.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-cosmic-light/50">No astrologers found matching your criteria.</div>';
                 return;
             }
-            astrologersData.forEach(astro => {
+            
+            data.forEach(astro => {
                 const skills = (astro.skills || []).join(', ');
                 const langs = (astro.languages || []).join(', ');
                 const isDiscount = astro.comparePrice && astro.comparePrice > astro.price;
+                const isFavorite = userFavorites.includes(astro.id);
+                
                 grid.innerHTML += `
-                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 shadow-lg relative">
-                        ${isDiscount ? `<div class="absolute top-3 right-3 bg-red-500/20 text-red-400 border border-red-500/50 text-[10px] font-bold px-2 py-0.5 rounded-full z-10"><i class="fa-solid fa-fire mr-1"></i>Discount</div>` : ''}
+                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 shadow-lg relative group">
+                        ${isDiscount ? `<div class="absolute top-3 right-14 bg-red-500/20 text-red-400 border border-red-500/50 text-[10px] font-bold px-2 py-0.5 rounded-full z-10"><i class="fa-solid fa-fire mr-1"></i>Discount</div>` : ''}
                         ${astro.isOnline ? `<div class="absolute top-3 left-3 flex items-center gap-1 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-500/50 z-10"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Online</div>` : ''}
+                        
+                        <!-- Favorite Button -->
+                        <button onclick="toggleFavorite('${astro.id}', event)" class="favorite-btn absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center z-10 hover:bg-black/50 transition-colors ${isFavorite ? 'active text-red-500' : 'text-white/50'}">
+                            <i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                        </button>
+                        
                         <div class="p-4 md:p-5 flex gap-4 mt-2">
                             <div class="relative flex-shrink-0">
-                                <img src="${astro.image}" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-cosmic-800 bg-cosmic-900" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(astro.name)}&background=1A1832&color=D4AF37'">
+                                <img src="${astro.image}" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-cosmic-800 bg-cosmic-900" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(astro.name)}&background=1A1832&color=D4AF37)'">
                                 ${astro.isVerified ? `<div class="absolute -bottom-1 right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-cosmic-900"><i class="fa-solid fa-check text-[10px]"></i></div>` : ''}
                             </div>
                             <div class="flex-1 min-w-0 py-1">
@@ -816,13 +1631,23 @@
             if (!currentUser) { openAuthModal(); return; }
             const astro = astrologersData.find(a => a.id === astroId);
             if (!astro) return;
+            
             const totalRequired = astro.price * appConfig.minMinutes;
             trackEvent('interaction_clicked', { astroId, method, userBalance, required: totalRequired });
-            if (userBalance >= totalRequired) { startActiveSession(astro, method); }
-            else { initiatePayment(astro, method, totalRequired); }
+            
+            if (userBalance >= totalRequired) {
+                // Check if we need birth details
+                if (!userBirthDetails) {
+                    openBirthDetailsModal(astroId, method);
+                } else {
+                    startActiveSession(astro, method, userBirthDetails);
+                }
+            } else {
+                initiatePayment(astro, method, totalRequired);
+            }
         }
 
-        async function startActiveSession(astro, method) {
+        async function startActiveSession(astro, method, birthDetails = null) {
             activeAstro = { ...astro, type: method };
             sessionSeconds = 0;
 
@@ -832,26 +1657,46 @@
             document.getElementById('session-astro-name-lg').innerText = astro.name;
             document.getElementById('session-astro-img-lg').src = astro.image;
             document.getElementById('session-live-balance').innerText = userBalance;
-            document.getElementById('session-type-label-sm').innerText = method === 'call' ? 'Live Call' : 'Live Chat';
-            document.getElementById('session-timer').innerText = 'Ringing...';
-            document.getElementById('call-status-text').innerText = 'Ringing...';
+            document.getElementById('session-type-label-sm').innerText = method === 'call' ? 'Voice Call' : 'Live Chat';
+            document.getElementById('session-timer').innerText = 'Connecting...';
+            document.getElementById('call-status-text').innerText = 'Connecting you...';
+            document.getElementById('call-status-badge').innerText = 'Ringing';
+            document.getElementById('chat-rate-display').innerText = astro.price;
+            document.getElementById('call-rate-display').innerText = astro.price;
+            document.getElementById('call-balance-display').innerText = userBalance;
 
             // Show correct area
             const chatArea = document.getElementById('session-chat-area');
             const callArea = document.getElementById('session-call-area');
+            const chatEndBar = document.getElementById('chat-end-bar');
 
             if (method === 'chat') {
                 chatArea.classList.remove('hidden');
                 chatArea.classList.add('flex');
                 callArea.classList.add('hidden');
                 callArea.classList.remove('flex');
-                document.getElementById('chat-messages').innerHTML = '<div class="text-center"><span class="bg-white/10 text-[10px] px-3 py-1 rounded-full text-white/50 uppercase tracking-wide">Connecting...</span></div>';
+                chatEndBar.classList.remove('hidden');
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="flex justify-center my-4">
+                        <div class="bg-white/5 rounded-full px-4 py-2 text-xs text-cosmic-light/60">
+                            <i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> End-to-End Encrypted
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="bg-purple-500/20 border border-purple-500/30 rounded-2xl px-4 py-3 max-w-[90%] text-center">
+                            <p class="text-xs text-purple-300 mb-1">Your Details Shared</p>
+                            <p class="text-sm text-white">${birthDetails?.name || 'User'} • ${birthDetails?.date || 'DOB not shared'}</p>
+                            <p class="text-xs text-cosmic-light/60">${birthDetails?.place || 'Place not shared'}</p>
+                        </div>
+                    </div>
+                `;
             } else {
                 callArea.classList.remove('hidden');
                 callArea.classList.add('flex');
                 chatArea.classList.add('hidden');
                 chatArea.classList.remove('flex');
-                // Start ringing sound
+                chatEndBar.classList.add('hidden');
+                document.getElementById('sound-wave-container').classList.add('hidden');
                 startRinging();
             }
 
@@ -867,7 +1712,8 @@
                 const sessionRef = await addDoc(collection(db, "sessions"), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
-                    userName: currentUser.email.split('@')[0],
+                    userName: birthDetails?.name || currentUser.email.split('@')[0],
+                    userBirthDetails: birthDetails,
                     astroId: activeAstro.id,
                     astroName: activeAstro.name,
                     type: method,
@@ -887,19 +1733,24 @@
                     }
 
                     if (data.status === 'active' && !activeSessionTimer) {
-                        stopRinging(); // stop ring when connected
+                        stopRinging();
                         document.getElementById('session-timer').innerText = '00:00';
-                        document.getElementById('call-status-text').innerText = 'Connected securely...';
+                        document.getElementById('call-status-text').innerText = 'Connected';
+                        document.getElementById('call-status-badge').innerText = 'Live';
+                        document.getElementById('sound-wave-container').classList.remove('hidden');
 
                         activeSessionTimer = setInterval(() => {
                             sessionSeconds++;
                             const m = Math.floor(sessionSeconds / 60).toString().padStart(2, '0');
                             const s = (sessionSeconds % 60).toString().padStart(2, '0');
                             document.getElementById('session-timer').innerText = `${m}:${s}`;
+                            document.getElementById('call-duration-display').innerText = `${m}:${s}`;
 
                             const currentCost = Math.ceil(sessionSeconds / 60) * activeAstro.price;
                             const remaining = userBalance - currentCost;
                             document.getElementById('session-live-balance').innerText = Math.max(0, remaining);
+                            document.getElementById('call-balance-display').innerText = Math.max(0, remaining);
+                            
                             if (remaining <= 0) { endSessionManually("Out of Balance"); }
                         }, 1000);
 
@@ -965,7 +1816,7 @@
 
         function initLiveChat(sessionId) {
             const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = '<div class="text-center"><span class="bg-white/10 text-[10px] px-3 py-1 rounded-full text-white/50 uppercase tracking-wide">End-to-End Encrypted</span></div>';
+            const typingIndicator = document.getElementById('typing-indicator');
 
             const q = query(collection(db, "sessions", sessionId, "messages"), orderBy("timestamp", "asc"));
             liveChatUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -973,15 +1824,28 @@
                     if (change.type === "added") {
                         const msg = change.doc.data();
                         const isMe = msg.senderId === currentUser.uid;
+                        const time = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+                        
                         messagesContainer.insertAdjacentHTML('beforeend', `
-                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'} w-full">
-                                <div class="max-w-[85%] ${isMe ? 'bg-cosmic-accent text-cosmic-900 rounded-br-sm' : 'bg-white/10 text-white rounded-bl-sm border border-white/5'} rounded-2xl px-4 py-2 shadow-md">
-                                    <p class="text-sm">${escapeHtml(msg.text)}</p>
+                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'} w-full animate-slide-up">
+                                <div class="max-w-[80%] ${isMe ? 'msg-bubble-sent text-cosmic-900' : 'msg-bubble-received text-white'} px-4 py-2.5 shadow-lg">
+                                    <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
+                                    <p class="text-[10px] ${isMe ? 'text-cosmic-900/60' : 'text-cosmic-light/40'} text-right mt-1">${time}</p>
                                 </div>
                             </div>`);
                         messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
                 });
+            });
+            
+            // Listen for typing indicator
+            onSnapshot(doc(db, "sessions", sessionId), (docSnap) => {
+                const data = docSnap.data();
+                if (data?.astroTyping) {
+                    typingIndicator.classList.remove('hidden');
+                } else {
+                    typingIndicator.classList.add('hidden');
+                }
             });
         }
 
@@ -1000,6 +1864,34 @@
                     text, senderId: currentUser.uid, timestamp: serverTimestamp()
                 });
             } catch(e) { showToast("Failed to send message."); }
+        };
+
+        window.sendQuickMessage = function(text) {
+            document.getElementById('chat-input-user').value = text;
+            document.getElementById('chat-input-user').focus();
+        };
+
+        window.toggleMute = function() {
+            if (localStream) {
+                isMuted = !isMuted;
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+                const btn = document.getElementById('mute-btn');
+                btn.innerHTML = isMuted ? '<i class="fa-solid fa-microphone-slash text-xl text-red-400"></i>' : '<i class="fa-solid fa-microphone text-xl"></i>';
+                btn.classList.toggle('bg-red-500/20', isMuted);
+            }
+        };
+
+        window.toggleSpeaker = function() {
+            isSpeakerOn = !isSpeakerOn;
+            const audio = document.getElementById('remote-audio-player');
+            if (audio) audio.muted = !isSpeakerOn;
+            const btn = document.getElementById('speaker-btn');
+            btn.innerHTML = isSpeakerOn ? '<i class="fa-solid fa-volume-high text-xl"></i>' : '<i class="fa-solid fa-volume-xmark text-xl text-red-400"></i>';
+            btn.classList.toggle('bg-red-500/20', !isSpeakerOn);
+        };
+
+        window.toggleAttachMenu = function() {
+            showToast("Attachments coming soon!");
         };
 
         async function endSessionManually(reason = "User Ended") {
@@ -1024,22 +1916,71 @@
             if (deductMoney && currentSessionId && activeAstro) {
                 const billedMinutes = Math.ceil(sessionSeconds / 60);
                 const totalCost = billedMinutes * activeAstro.price;
+                
                 if (billedMinutes > 0) {
                     try {
                         await updateDoc(doc(db, "users", currentUser.uid), { balance: userBalance - totalCost, totalSessionMinutes: increment(billedMinutes) });
                         await updateDoc(doc(db, "sessions", currentSessionId), { durationSeconds: sessionSeconds, cost: totalCost });
-                        showToast(`Session Ended. ${billedMinutes} min. Cost: ₹${totalCost}`);
+                        
+                        // Show rating modal
+                        document.getElementById('rating-duration').innerText = `${billedMinutes} mins`;
+                        document.getElementById('rating-cost').innerText = `₹${totalCost}`;
+                        document.getElementById('rating-astro-name').innerText = activeAstro.name;
+                        sessionRating = 0;
+                        updateStarRating(0);
+                        
+                        setTimeout(() => {
+                            document.getElementById('rating-modal').classList.remove('hidden');
+                            document.getElementById('rating-modal').classList.add('flex');
+                        }, 500);
+                        
                     } catch (e) { console.error(e); }
-                } else { showToast("Session cancelled. No charges applied."); }
+                } else { 
+                    showToast("Session cancelled. No charges applied."); 
+                }
                 trackEvent('session_ended', { astroId: activeAstro.id, duration: sessionSeconds, cost: totalCost });
             }
+            
+            const savedAstro = activeAstro;
             activeAstro = null;
             currentSessionId = null;
             sessionSeconds = 0;
         }
 
+        // --- Rating ---
+        window.setRating = function(rating) {
+            sessionRating = rating;
+            updateStarRating(rating);
+        };
+
+        function updateStarRating(rating) {
+            const stars = document.querySelectorAll('#star-rating button');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('text-yellow-400');
+                    star.classList.remove('text-white/30');
+                } else {
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-white/30');
+                }
+            });
+        }
+
+        window.submitRating = async function() {
+            const feedback = document.getElementById('rating-feedback').value;
+            // In a real app, save to Firestore
+            showToast("Thank you for your feedback!");
+            closeRatingModal();
+        };
+
+        window.closeRatingModal = function() {
+            document.getElementById('rating-modal').classList.add('hidden');
+            document.getElementById('rating-modal').classList.remove('flex');
+        };
+
         // --- Recharge ---
         let pendingRechargeData = null;
+        
         function initiatePayment(astro, method, totalAmount) {
             pendingRechargeData = { astroId: astro.id, name: astro.name, amount: totalAmount, type: method };
             document.getElementById('astro-name-display').innerText = astro.name;
@@ -1051,7 +1992,7 @@
 
             const upiString = `upi://pay?pa=${appConfig.adminUpiId}&pn=${encodeURIComponent(appConfig.adminName)}&am=${totalAmount}&cu=INR`;
             document.getElementById('mobile-pay-btn').href = upiString;
-            document.getElementById('upi-qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF`;
+            document.getElementById('upi-qr-image').src = `[api.qrserver.com](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF)`;
             document.getElementById('payment-modal').classList.remove('hidden');
             document.getElementById('payment-modal').classList.add('flex');
         }
@@ -1060,6 +2001,23 @@
             document.getElementById('payment-modal').classList.add('hidden');
             document.getElementById('payment-modal').classList.remove('flex');
         }
+
+        window.openQuickRecharge = function() {
+            // Open payment modal with default amount
+            pendingRechargeData = { amount: 100 };
+            document.getElementById('astro-name-display').innerText = 'your wallet';
+            document.getElementById('pay-amount').innerText = '₹100';
+            document.getElementById('min-mins-display').innerText = '—';
+            document.getElementById('utr-input').value = '';
+            document.getElementById('payment-success').classList.add('hidden');
+            document.getElementById('payment-modal-content').classList.remove('hidden');
+
+            const upiString = `upi://pay?pa=${appConfig.adminUpiId}&pn=${encodeURIComponent(appConfig.adminName)}&am=100&cu=INR`;
+            document.getElementById('mobile-pay-btn').href = upiString;
+            document.getElementById('upi-qr-image').src = `[api.qrserver.com](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF)`;
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-modal').classList.add('flex');
+        };
 
         async function submitUtr() {
             const utr = document.getElementById('utr-input').value.trim();
@@ -1073,6 +2031,23 @@
                 document.getElementById('payment-success').classList.add('flex');
             } catch (error) { showToast("Error submitting payment."); }
         }
+
+        // --- Kundli ---
+        window.openKundliModal = function() {
+            document.getElementById('kundli-modal').classList.remove('hidden');
+            document.getElementById('kundli-modal').classList.add('flex');
+        };
+
+        window.closeKundliModal = function() {
+            document.getElementById('kundli-modal').classList.add('hidden');
+            document.getElementById('kundli-modal').classList.remove('flex');
+        };
+
+        window.showKundliResult = function() {
+            showToast("Kundli matching requires premium astrologer consultation. Connect with an expert!");
+            closeKundliModal();
+            scrollToAstrologers();
+        };
 
         // --- Utilities ---
         function changeLanguage(lang) { trackEvent('language_changed', { lang }); }
@@ -1115,6 +2090,8 @@
         window.openSupportModal = openSupportModal;
         window.closeSupportModal = closeSupportModal;
         window.submitSupportTicket = submitSupportTicket;
+        window.closeBirthDetailsModal = closeBirthDetailsModal;
+        window.submitBirthDetails = submitBirthDetails;
     </script>
 </body>
 </html>
