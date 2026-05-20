@@ -815,8 +815,8 @@
                 document.getElementById('today-earnings').innerText = Math.floor(todayNet);
             });
 
-            // Load Settlements
-            const qSettlements = query(collection(db, "settlements"), where("astroId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            // Load Settlements (Removed orderBy to avoid composite index requirement)
+            const qSettlements = query(collection(db, "settlements"), where("astroId", "==", currentUser.uid));
             onSnapshot(qSettlements, (snapshot) => {
                 const list = document.getElementById('settlements-list');
                 list.innerHTML = '';
@@ -825,8 +825,16 @@
                     return;
                 }
                 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                // Sort client-side to fix the Firestore index error
+                const settlementsData = [];
+                snapshot.forEach(doc => settlementsData.push(doc.data()));
+                settlementsData.sort((a, b) => {
+                    const timeA = a.timestamp && a.timestamp.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp || 0).getTime();
+                    const timeB = b.timestamp && b.timestamp.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp || 0).getTime();
+                    return timeB - timeA; // Descending
+                });
+
+                settlementsData.forEach(data => {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate ? data.timestamp.toDate() : data.timestamp).toLocaleDateString() : 'Recent';
                     
                     const statusColor = data.status === 'completed' ? 'text-green-400' : 'text-yellow-400';
@@ -926,7 +934,9 @@
             stopRingtone();
             try {
                 await updateDoc(doc(db, "sessions", pendingRequest.id), { status: 'declined' });
-            } catch (e) {}
+            } catch (e) {
+                console.error("Decline Error:", e);
+            }
             pendingRequest = null;
             hideIncomingRequest();
         }
@@ -934,20 +944,32 @@
         async function acceptRequest() {
             if (!pendingRequest) return;
             stopRingtone();
+            
+            // Securely capture the request data before proceeding
+            const reqData = pendingRequest; 
+            
             try {
-                await updateDoc(doc(db, "sessions", pendingRequest.id), { 
+                // 1. Attempt to update the database FIRST
+                await updateDoc(doc(db, "sessions", reqData.id), { 
                     status: 'active',
                     startedAt: serverTimestamp() 
                 });
                 
-                activeSession = pendingRequest;
+                // 2. If DB update succeeds, activate the room UI
+                activeSession = reqData;
                 pendingRequest = null;
                 hideIncomingRequest();
                 
                 startLiveRoom();
             } catch(e) {
-                console.error("Error accepting request: ", e);
-                showToast("System error accepting request.", "error");
+                console.error("Detailed Accept Error: ", e);
+                
+                // Display the exact Firebase error to the user
+                if(e.message && e.message.toLowerCase().includes("permission")) {
+                    showToast("Database Permission Denied. Check Firestore Rules!", "error");
+                } else {
+                    showToast("Failed to connect: " + e.message, "error");
+                }
             }
         }
 
@@ -1038,7 +1060,10 @@
                     senderId: currentUser.uid,
                     timestamp: serverTimestamp()
                 });
-            } catch(e) { showToast("Message failed to send", "error"); }
+            } catch(e) { 
+                console.error("Chat Error:", e);
+                showToast("Message failed: " + e.message, "error"); 
+            }
         }
 
         async function initWebRTC(sessionId) {
