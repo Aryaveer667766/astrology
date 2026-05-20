@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AstroPath - Premium Astrological Guidance</title>
-    <script src="[cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -56,8 +56,8 @@
             }
         }
     </script>
-    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap)" rel="stylesheet">
-    <link rel="stylesheet" href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0B0A1A; color: white; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .glass-panel { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
@@ -940,15 +940,15 @@
 
     <!-- Firebase & App Logic -->
     <script type="module">
-        import { initializeApp } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js)";
-        import { getAnalytics } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js)";
-        import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, orderBy, getDocs, serverTimestamp, deleteDoc } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js)";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js)";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, orderBy, getDocs, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
             authDomain: "designsnap-f3309.firebaseapp.com",
-            databaseURL: "[designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app](https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app)",
+            databaseURL: "https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "designsnap-f3309",
             storageBucket: "designsnap-f3309.firebasestorage.app",
             messagingSenderId: "741888249963",
@@ -1190,9 +1190,9 @@
                 document.getElementById('login-btn-header').classList.add('hidden');
                 document.getElementById('user-profile-header').classList.remove('hidden');
                 document.getElementById('user-profile-header').classList.add('flex');
-                document.getElementById('user-email-display').innerText = user.email.split('@')[0];
-                document.getElementById('profile-email').innerText = user.email;
-                document.getElementById('profile-avatar-letter').innerText = user.email.charAt(0).toUpperCase();
+                document.getElementById('user-email-display').innerText = user.email ? user.email.split('@')[0] : 'User';
+                document.getElementById('profile-email').innerText = user.email || 'User';
+                document.getElementById('profile-avatar-letter').innerText = user.email ? user.email.charAt(0).toUpperCase() : 'U';
                 closeAuthModal();
                 
                 // Check for pending notifications
@@ -1521,7 +1521,7 @@
                     favAstros.forEach(a => {
                         html += `<div class="bg-black/30 p-4 rounded-xl border border-white/5 flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <img src="${a.image}" class="w-12 h-12 rounded-full object-cover border border-cosmic-accent/30" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(a.name)}&background=1A1832&color=D4AF37)'">
+                                <img src="${a.image}" class="w-12 h-12 rounded-full object-cover border border-cosmic-accent/30" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.name)}&background=1A1832&color=D4AF37'">
                                 <div>
                                     <p class="text-sm font-bold text-white">${a.name}</p>
                                     <p class="text-[10px] text-cosmic-light/50">${(a.skills || []).slice(0,2).join(', ')}</p>
@@ -1596,7 +1596,7 @@
                         
                         <div class="p-4 md:p-5 flex gap-4 mt-2">
                             <div class="relative flex-shrink-0">
-                                <img src="${astro.image}" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-cosmic-800 bg-cosmic-900" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(astro.name)}&background=1A1832&color=D4AF37)'">
+                                <img src="${astro.image}" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-cosmic-800 bg-cosmic-900" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(astro.name)}&background=1A1832&color=D4AF37'">
                                 ${astro.isVerified ? `<div class="absolute -bottom-1 right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-cosmic-900"><i class="fa-solid fa-check text-[10px]"></i></div>` : ''}
                             </div>
                             <div class="flex-1 min-w-0 py-1">
@@ -1992,7 +1992,7 @@
 
             const upiString = `upi://pay?pa=${appConfig.adminUpiId}&pn=${encodeURIComponent(appConfig.adminName)}&am=${totalAmount}&cu=INR`;
             document.getElementById('mobile-pay-btn').href = upiString;
-            document.getElementById('upi-qr-image').src = `[api.qrserver.com](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF)`;
+            document.getElementById('upi-qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF`;
             document.getElementById('payment-modal').classList.remove('hidden');
             document.getElementById('payment-modal').classList.add('flex');
         }
@@ -2014,7 +2014,7 @@
 
             const upiString = `upi://pay?pa=${appConfig.adminUpiId}&pn=${encodeURIComponent(appConfig.adminName)}&am=100&cu=INR`;
             document.getElementById('mobile-pay-btn').href = upiString;
-            document.getElementById('upi-qr-image').src = `[api.qrserver.com](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF)`;
+            document.getElementById('upi-qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&bgcolor=FFFFFF`;
             document.getElementById('payment-modal').classList.remove('hidden');
             document.getElementById('payment-modal').classList.add('flex');
         };
