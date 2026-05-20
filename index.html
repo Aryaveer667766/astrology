@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>AstroPath - The Stars Align Soon</title>
+    <title>AstroPath - The Alignment Approaches</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -28,15 +28,16 @@
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'float-delayed': 'float 8s ease-in-out 3s infinite',
                         'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'spin-slow': 'spin 12s linear infinite',
+                        'spin-reverse-slow': 'spin 18s linear infinite reverse',
                     },
                     keyframes: {
                         float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-15px)' },
+                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
+                            '50%': { transform: 'translateY(-15px) scale(1.02)' },
                         },
                         pulseGlow: {
                             '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 15px rgba(245, 208, 97, 0.6))' },
@@ -59,7 +60,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Immersive Aurora Background */
+        /* Immersive Aurora & Energy Background (No Stars) */
         .bg-aurora {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -71,20 +72,21 @@
             filter: blur(60px);
         }
 
-        .stars {
+        /* Floating Energy Orbs instead of Stars */
+        .energy-particles {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: -1;
             background: 
-                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90px 40px, #F5D061, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.6), rgba(0,0,0,0));
+                radial-gradient(4px 4px at 20% 30%, rgba(245, 208, 97, 0.15), rgba(0,0,0,0)),
+                radial-gradient(6px 6px at 40% 70%, rgba(255,255,255,0.1), rgba(0,0,0,0)),
+                radial-gradient(8px 8px at 80% 40%, rgba(245, 208, 97, 0.2), rgba(0,0,0,0)),
+                radial-gradient(5px 5px at 60% 80%, rgba(255,255,255,0.15), rgba(0,0,0,0));
             background-repeat: repeat;
-            background-size: 300px 300px;
-            opacity: 0.4;
-            animation: float 20s linear infinite;
+            background-size: 250px 250px;
+            filter: blur(2px);
+            animation: float 25s linear infinite;
         }
 
         .glass-card {
@@ -136,7 +138,7 @@
     
     <!-- Immersive Backgrounds -->
     <div class="bg-aurora"></div>
-    <div class="stars"></div>
+    <div class="energy-particles"></div>
 
     <!-- Header -->
     <header class="fixed w-full top-0 z-40 transition-all duration-300" style="background: linear-gradient(to bottom, rgba(5,5,10,0.9), transparent);">
@@ -144,9 +146,8 @@
             <div class="flex justify-between items-center h-20 md:h-24">
                 <!-- Logo -->
                 <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
-                    <div class="relative">
-                        <i class="fa-solid fa-compass text-cosmic-accent text-3xl group-hover:animate-spin-slow transition-all"></i>
-                        <i class="fa-solid fa-star absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-[10px]"></i>
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-nodes text-cosmic-accent text-2xl group-hover:animate-spin-slow transition-all"></i>
                     </div>
                     <span class="font-serif font-bold text-2xl tracking-widest text-white group-hover:text-cosmic-accent transition-colors">ASTROPATH</span>
                 </div>
@@ -170,13 +171,18 @@
             
             <div class="space-y-12 animate-slide-up">
                 
-                <!-- Mystical Animated Centerpiece -->
+                <!-- Mystical Animated Centerpiece (Compass & Nodes) -->
                 <div class="flex justify-center mt-8">
                     <div class="relative w-32 h-32 flex items-center justify-center">
+                        <!-- Outer Orbiting Rings -->
                         <div class="absolute inset-0 border border-cosmic-accent/20 rounded-full animate-spin-slow"></div>
-                        <div class="absolute inset-2 border border-cosmic-accent/40 rounded-full border-dashed animate-[spin_15s_linear_infinite_reverse]"></div>
+                        <div class="absolute inset-2 border border-cosmic-accent/40 rounded-full border-dashed animate-spin-reverse-slow"></div>
+                        
+                        <!-- Glowing Center -->
                         <div class="absolute inset-0 bg-gradient-to-tr from-cosmic-accent/20 to-transparent rounded-full blur-xl animate-pulse-glow"></div>
-                        <i class="fa-solid fa-star-and-crescent text-5xl text-cosmic-accent relative z-10 animate-float"></i>
+                        
+                        <!-- Main Icon -->
+                        <i class="fa-solid fa-compass text-6xl text-cosmic-accent relative z-10 animate-float"></i>
                     </div>
                 </div>
 
@@ -190,7 +196,7 @@
                     </h1>
 
                     <p class="text-lg md:text-xl text-cosmic-light/70 max-w-2xl mx-auto font-light leading-relaxed">
-                        We are aligning the stars to bring you India's most profound and authentic astrological guidance. Prepare for enlightenment.
+                        We are aligning the energies to bring you India's most profound and authentic guidance. Prepare for enlightenment.
                     </p>
                 </div>
 
@@ -320,11 +326,9 @@
 
         // --- Countdown Timer synchronized to June 10th ---
         function updateCountdown() {
-            // Function to automatically find the correct June 10th
             const getTargetDate = () => {
                 const now = new Date();
                 let targetYear = now.getFullYear();
-                // Set to June 10th of the current year
                 let targetDate = new Date(`June 10, ${targetYear} 00:00:00`);
                 
                 // If today is past June 10th, target June 10th of the next year
