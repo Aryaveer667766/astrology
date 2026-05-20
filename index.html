@@ -2,47 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Critical for mobile: standard viewport + preventing zoom-in on inputs -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>AstroPath - Coming Soon</title>
-    
+    <title>AstroPath - The Stars Align Soon</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
                         serif: ['Cinzel', 'serif'],
                     },
                     colors: {
                         cosmic: {
-                            900: '#0B0B1A',
-                            800: '#1A1A3A',
-                            700: '#2A2A5A',
-                            accent: '#D4AF37', // Gold
-                            light: '#E6E6FA'
+                            900: '#05050A',
+                            800: '#0D0B1A',
+                            700: '#1A1635',
+                            accent: '#F5D061', // Richer Gold
+                            light: '#F8F9FA'
                         }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'slide-up': 'slideUp 0.3s ease-out forwards',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'spin-slow': 'spin 12s linear infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
+                            '50%': { transform: 'translateY(-15px)' },
                         },
                         pulseGlow: {
-                            '0%, 100%': { opacity: 1, boxShadow: '0 0 15px #D4AF37' },
-                            '50%': { opacity: .5, boxShadow: '0 0 5px #D4AF37' },
+                            '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 15px rgba(245, 208, 97, 0.6))' },
+                            '50%': { opacity: .6, filter: 'drop-shadow(0 0 5px rgba(245, 208, 97, 0.3))' },
                         },
                         slideUp: {
-                            '0%': { transform: 'translateY(100%)', opacity: 0 },
+                            '0%': { transform: 'translateY(40px)', opacity: 0 },
                             '100%': { transform: 'translateY(0)', opacity: 1 },
                         }
                     }
@@ -52,23 +53,24 @@
     </script>
     <style>
         body {
-            background-color: #0B0B1A;
+            background-color: #05050A;
             color: #ffffff;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
-        .glass-panel {
-            background: rgba(26, 26, 58, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* Immersive Aurora Background */
+        .bg-aurora {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(45, 22, 84, 0.4), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(20, 52, 107, 0.4), transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(89, 61, 30, 0.3), transparent 50%);
+            z-index: -2;
+            filter: blur(60px);
         }
-        .text-gold {
-            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+
         .stars {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -76,211 +78,230 @@
             z-index: -1;
             background: 
                 radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.8), rgba(0,0,0,0));
+                radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #F5D061, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.6), rgba(0,0,0,0));
             background-repeat: repeat;
-            background-size: 200px 200px;
-            opacity: 0.3;
+            background-size: 300px 300px;
+            opacity: 0.4;
+            animation: float 20s linear infinite;
         }
+
+        .glass-card {
+            background: rgba(20, 18, 38, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #FFF3B0 0%, #E6C27A 50%, #B38728 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
         .countdown-digit {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 24px;
-            font-family: 'Courier New', monospace;
-            color: #D4AF37;
+            width: 70px;
+            height: 70px;
+            background: rgba(245, 208, 97, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(245, 208, 97, 0.2);
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 28px;
+            box-shadow: inset 0 0 20px rgba(245, 208, 97, 0.05);
+            color: #F5D061;
+            position: relative;
+            overflow: hidden;
         }
+
+        .countdown-digit::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+        }
+
         @media (min-width: 768px) {
-            .countdown-digit {
-                width: 80px;
-                height: 80px;
-                font-size: 32px;
-            }
+            .countdown-digit { width: 90px; height: 90px; font-size: 36px; }
         }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col font-sans relative">
+<body class="antialiased min-h-screen flex flex-col font-sans relative selection:bg-cosmic-accent selection:text-black">
+    
+    <!-- Immersive Backgrounds -->
+    <div class="bg-aurora"></div>
     <div class="stars"></div>
 
-    <header class="glass-panel sticky top-0 z-40 border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 md:h-20">
+    <!-- Header -->
+    <header class="fixed w-full top-0 z-40 transition-all duration-300" style="background: linear-gradient(to bottom, rgba(5,5,10,0.9), transparent);">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center h-20 md:h-24">
                 <!-- Logo -->
-                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <i class="fa-solid fa-moon text-cosmic-accent text-2xl md:text-3xl animate-float"></i>
-                    <span class="font-serif font-bold text-xl md:text-2xl tracking-wider text-white">AstroPath</span>
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <div class="relative">
+                        <i class="fa-solid fa-compass text-cosmic-accent text-3xl group-hover:animate-spin-slow transition-all"></i>
+                        <i class="fa-solid fa-star absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-[10px]"></i>
+                    </div>
+                    <span class="font-serif font-bold text-2xl tracking-widest text-white group-hover:text-cosmic-accent transition-colors">ASTROPATH</span>
                 </div>
 
                 <!-- Right Side: Social Links -->
-                <div class="flex items-center gap-4 md:gap-6">
-                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
+                <div class="flex items-center gap-6">
+                    <a href="#" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-cosmic-light/70 hover:bg-cosmic-accent hover:text-black hover:border-cosmic-accent transition-all duration-300">
                         <i class="fa-brands fa-instagram text-lg"></i>
                     </a>
-                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
-                        <i class="fa-brands fa-facebook text-lg"></i>
-                    </a>
-                    <a href="#" class="text-cosmic-light/60 hover:text-cosmic-accent transition-colors text-sm md:text-base">
-                        <i class="fa-brands fa-twitter text-lg"></i>
+                    <a href="#" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-cosmic-light/70 hover:bg-cosmic-accent hover:text-black hover:border-cosmic-accent transition-all duration-300">
+                        <i class="fa-brands fa-x-twitter text-lg"></i>
                     </a>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center px-4 py-16 md:py-0">
-        <div class="max-w-3xl w-full text-center">
-            <!-- Coming Soon Content -->
-            <div class="space-y-8 md:space-y-12">
-                <!-- Animated Icon -->
-                <div class="flex justify-center">
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-gradient-to-r from-cosmic-accent/20 to-purple-500/20 rounded-full blur-3xl"></div>
-                        <div class="relative bg-cosmic-800 rounded-full p-6 md:p-8 border-2 border-cosmic-accent/30 animate-pulse-glow">
-                            <i class="fa-solid fa-rocket text-4xl md:text-6xl text-cosmic-accent"></i>
-                        </div>
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-4 pt-24 pb-16 relative z-10">
+        <div class="max-w-4xl w-full text-center">
+            
+            <div class="space-y-12 animate-slide-up">
+                
+                <!-- Mystical Animated Centerpiece -->
+                <div class="flex justify-center mt-8">
+                    <div class="relative w-32 h-32 flex items-center justify-center">
+                        <div class="absolute inset-0 border border-cosmic-accent/20 rounded-full animate-spin-slow"></div>
+                        <div class="absolute inset-2 border border-cosmic-accent/40 rounded-full border-dashed animate-[spin_15s_linear_infinite_reverse]"></div>
+                        <div class="absolute inset-0 bg-gradient-to-tr from-cosmic-accent/20 to-transparent rounded-full blur-xl animate-pulse-glow"></div>
+                        <i class="fa-solid fa-star-and-crescent text-5xl text-cosmic-accent relative z-10 animate-float"></i>
                     </div>
                 </div>
 
                 <!-- Main Heading -->
-                <div>
-                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-4 md:mb-6 leading-tight">
-                        <span class="text-white">Something</span>
+                <div class="space-y-6">
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif font-bold leading-tight">
+                        <span class="text-white drop-shadow-lg">A New</span>
+                        <span class="text-gold-gradient italic pr-2">Alignment</span>
                         <br />
-                        <span class="text-gold">Cosmic</span>
-                        <br />
-                        <span class="text-white">is Coming</span>
+                        <span class="text-white drop-shadow-lg">Approaches</span>
                     </h1>
-                    
-                    <p class="text-base sm:text-lg md:text-xl text-cosmic-light/80 max-w-2xl mx-auto px-2">
-                        We're preparing something extraordinary. Discover authentic astrological guidance from India's finest experts.
+
+                    <p class="text-lg md:text-xl text-cosmic-light/70 max-w-2xl mx-auto font-light leading-relaxed">
+                        We are aligning the stars to bring you India's most profound and authentic astrological guidance. Prepare for enlightenment.
                     </p>
                 </div>
 
-                <!-- Countdown Timer -->
-                <div class="space-y-4 md:space-y-6">
-                    <p class="text-sm md:text-base text-cosmic-accent font-semibold tracking-widest uppercase">Launching In</p>
-                    
-                    <div class="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
-                        <div class="text-center">
+                <!-- Glassmorphism Countdown Timer -->
+                <div class="glass-card rounded-3xl p-8 md:p-10 max-w-3xl mx-auto backdrop-blur-xl">
+                    <p class="text-sm md:text-base text-cosmic-accent font-semibold tracking-[0.2em] uppercase mb-6">Cosmic Gateway Opens In</p>
+
+                    <div class="flex justify-center items-center gap-3 md:gap-6 flex-wrap">
+                        <div class="text-center group">
                             <div class="countdown-digit" id="days">00</div>
-                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Days</p>
+                            <p class="text-xs md:text-sm text-cosmic-light/50 mt-3 font-semibold uppercase tracking-widest group-hover:text-cosmic-accent transition-colors">Days</p>
                         </div>
-                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
-                        <div class="text-center">
+                        <div class="text-3xl text-cosmic-accent/30 font-light mb-8">:</div>
+                        <div class="text-center group">
                             <div class="countdown-digit" id="hours">00</div>
-                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Hours</p>
+                            <p class="text-xs md:text-sm text-cosmic-light/50 mt-3 font-semibold uppercase tracking-widest group-hover:text-cosmic-accent transition-colors">Hours</p>
                         </div>
-                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
-                        <div class="text-center">
+                        <div class="text-3xl text-cosmic-accent/30 font-light mb-8">:</div>
+                        <div class="text-center group">
                             <div class="countdown-digit" id="minutes">00</div>
-                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Minutes</p>
+                            <p class="text-xs md:text-sm text-cosmic-light/50 mt-3 font-semibold uppercase tracking-widest group-hover:text-cosmic-accent transition-colors">Mins</p>
                         </div>
-                        <div class="text-2xl md:text-3xl text-cosmic-accent/60 font-bold">:</div>
-                        <div class="text-center">
+                        <div class="text-3xl text-cosmic-accent/30 font-light mb-8 hidden sm:block">:</div>
+                        <div class="text-center group hidden sm:block">
                             <div class="countdown-digit" id="seconds">00</div>
-                            <p class="text-xs md:text-sm text-cosmic-light/60 mt-2 uppercase tracking-wider">Seconds</p>
+                            <p class="text-xs md:text-sm text-cosmic-light/50 mt-3 font-semibold uppercase tracking-widest group-hover:text-cosmic-accent transition-colors">Secs</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Email Signup -->
-                <div class="space-y-3 md:space-y-4 max-w-md mx-auto w-full">
-                    <p class="text-sm md:text-base text-cosmic-light/70">Get notified when we launch</p>
-                    
-                    <form onsubmit="handleEmailSignup(event)" class="flex flex-col sm:flex-row gap-2 md:gap-3">
+                <div class="max-w-md mx-auto w-full space-y-4 pt-4">
+                    <form onsubmit="handleEmailSignup(event)" class="relative flex items-center">
+                        <i class="fa-regular fa-envelope absolute left-5 text-cosmic-light/40 text-lg"></i>
                         <input 
                             type="email" 
-                            placeholder="Enter your email" 
+                            placeholder="Enter your email for early access" 
                             required
-                            class="flex-1 bg-cosmic-800 border border-cosmic-accent/30 rounded-lg md:rounded-full px-4 md:px-6 py-3 md:py-3.5 text-white text-sm md:text-base placeholder-cosmic-light/40 focus:outline-none focus:border-cosmic-accent/60 focus:ring-2 focus:ring-cosmic-accent/20 transition-all"
+                            class="w-full bg-white/5 border border-white/10 rounded-full pl-12 pr-40 py-4 text-white placeholder-cosmic-light/40 focus:outline-none focus:border-cosmic-accent/50 focus:bg-white/10 transition-all backdrop-blur-md"
                         />
                         <button 
                             type="submit"
-                            class="bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold px-6 md:px-8 py-3 md:py-3.5 rounded-lg md:rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all active:scale-95 text-sm md:text-base whitespace-nowrap"
+                            class="absolute right-1.5 top-1.5 bottom-1.5 bg-gradient-to-r from-[#E6C27A] to-[#B38728] text-black font-bold px-6 rounded-full hover:shadow-[0_0_20px_rgba(245,208,97,0.3)] transition-all active:scale-95 text-sm"
                         >
                             Notify Me
                         </button>
                     </form>
-                    
-                    <p class="text-xs text-cosmic-light/50">We'll never spam. Promise!</p>
+                    <p class="text-xs text-cosmic-light/40 font-light flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock text-[10px]"></i> Your energy and data are secure with us.
+                    </p>
                 </div>
 
                 <!-- Features Preview -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mt-12 md:mt-16 border-t border-white/10 pt-10 md:pt-16">
-                    <div class="space-y-3 md:space-y-4">
-                        <div class="flex justify-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
-                                <i class="fa-solid fa-user-shield text-cosmic-accent text-lg md:text-xl"></i>
-                            </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16 pt-16 border-t border-white/5">
+                    <div class="space-y-4 text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto rounded-2xl glass-card flex items-center justify-center group-hover:scale-110 group-hover:border-cosmic-accent/40 transition-all duration-300">
+                            <i class="fa-solid fa-crown text-cosmic-accent text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold text-base md:text-lg text-white">Verified Experts</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60">Handpicked astrologers with years of experience</p>
+                        <h3 class="font-serif font-bold text-lg text-white">Elite Seers</h3>
+                        <p class="text-sm text-cosmic-light/50 font-light px-4">Wisdom from rigorously vetted Vedic masters.</p>
                     </div>
 
-                    <div class="space-y-3 md:space-y-4">
-                        <div class="flex justify-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
-                                <i class="fa-solid fa-lock text-cosmic-accent text-lg md:text-xl"></i>
-                            </div>
+                    <div class="space-y-4 text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto rounded-2xl glass-card flex items-center justify-center group-hover:scale-110 group-hover:border-cosmic-accent/40 transition-all duration-300">
+                            <i class="fa-solid fa-shield-halved text-cosmic-accent text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold text-base md:text-lg text-white">100% Private</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60">Your conversations stay completely confidential</p>
+                        <h3 class="font-serif font-bold text-lg text-white">Absolute Sanctity</h3>
+                        <p class="text-sm text-cosmic-light/50 font-light px-4">Anonymity and privacy guaranteed in every session.</p>
                     </div>
 
-                    <div class="space-y-3 md:space-y-4">
-                        <div class="flex justify-center">
-                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-cosmic-800 flex items-center justify-center border border-cosmic-accent/30">
-                                <i class="fa-solid fa-phone text-cosmic-accent text-lg md:text-xl"></i>
-                            </div>
+                    <div class="space-y-4 text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto rounded-2xl glass-card flex items-center justify-center group-hover:scale-110 group-hover:border-cosmic-accent/40 transition-all duration-300">
+                            <i class="fa-solid fa-bolt text-cosmic-accent text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold text-base md:text-lg text-white">Instant Connect</h3>
-                        <p class="text-xs md:text-sm text-cosmic-light/60">Chat or call with astrologers anytime</p>
+                        <h3 class="font-serif font-bold text-lg text-white">Instant Synergy</h3>
+                        <p class="text-sm text-cosmic-light/50 font-light px-4">Connect immediately via secure chat or voice.</p>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
 
-    <footer class="bg-cosmic-900 border-t border-white/10 py-8 px-4 mt-16 md:mt-24">
-        <div class="max-w-7xl mx-auto text-center space-y-4">
-            <div class="flex items-center justify-center gap-2">
-                <i class="fa-solid fa-moon text-cosmic-accent text-xl md:text-2xl"></i>
-                <span class="font-serif font-bold text-lg md:text-xl text-white">AstroPath</span>
+    <footer class="border-t border-white/5 py-8 mt-auto relative z-10 backdrop-blur-md bg-black/20">
+        <div class="max-w-7xl mx-auto text-center space-y-3">
+            <div class="flex items-center justify-center gap-2 opacity-50">
+                <i class="fa-solid fa-compass text-cosmic-accent"></i>
+                <span class="font-serif font-bold tracking-widest text-white text-sm">ASTROPATH</span>
             </div>
-            <p class="text-cosmic-light/50 text-xs md:text-sm">Your ultimate guide to spiritual and astrological awakening</p>
-            <p class="text-cosmic-light/40 text-[10px] md:text-xs">&copy; 2026 AstroPath. All rights reserved.</p>
+            <p class="text-cosmic-light/30 text-xs font-light">&copy; <span id="year"></span> AstroPath. Guiding your journey through the cosmos.</p>
         </div>
     </footer>
 
     <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-        <div class="bg-cosmic-800 border border-cosmic-accent/30 rounded-2xl p-6 md:p-8 max-w-sm mx-4 text-center space-y-4 animate-slide-up">
-            <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto border-2 border-green-500">
-                <i class="fa-solid fa-check text-2xl"></i>
+    <div id="success-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden backdrop-blur-xl transition-all duration-300 opacity-0">
+        <div class="glass-card border border-cosmic-accent/30 rounded-3xl p-10 max-w-md mx-4 text-center space-y-6 transform scale-95 transition-all duration-300" id="modal-content">
+            <div class="w-20 h-20 bg-green-500/10 text-green-400 rounded-full flex items-center justify-center mx-auto border border-green-500/30 mb-2">
+                <i class="fa-solid fa-check text-3xl"></i>
             </div>
-            <h3 class="text-xl md:text-2xl font-bold text-white">Thanks for signing up!</h3>
-            <p class="text-cosmic-light/70 text-sm md:text-base">Check your email for updates about our launch.</p>
-            <button onclick="closeModal()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-3 rounded-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all active:scale-95">
-                Close
+            <h3 class="text-2xl font-serif font-bold text-white">Alignment Confirmed</h3>
+            <p class="text-cosmic-light/70 text-sm md:text-base font-light">Your coordinates are locked. We will notify you the moment the gateway opens.</p>
+            <button onclick="closeModal()" class="w-full bg-white/5 border border-white/10 text-white font-semibold py-3.5 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all mt-4">
+                Return
             </button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
             authDomain: "designsnap-f3309.firebaseapp.com",
@@ -288,19 +309,32 @@
             projectId: "designsnap-f3309",
             storageBucket: "designsnap-f3309.firebasestorage.app",
             messagingSenderId: "741888249963",
-            appId: "1:741888249963:web:9540c9f68d6f0d5da9a12e",
-            measurementId: "G-YC8TDQF1MM"
+            appId: "1:741888249963:web:9540c9f68d6f0d5da9a12e"
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // --- Countdown Timer ---
+        // Set Current Year in Footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // --- Countdown Timer synchronized to June 10th ---
         function updateCountdown() {
-            // Set launch date to 30 days from now (you can modify this)
-            const launchDate = new Date();
-            launchDate.setDate(launchDate.getDate() + 30);
+            // Function to automatically find the correct June 10th
+            const getTargetDate = () => {
+                const now = new Date();
+                let targetYear = now.getFullYear();
+                // Set to June 10th of the current year
+                let targetDate = new Date(`June 10, ${targetYear} 00:00:00`);
+                
+                // If today is past June 10th, target June 10th of the next year
+                if (now.getTime() > targetDate.getTime()) {
+                    targetDate = new Date(`June 10, ${targetYear + 1} 00:00:00`);
+                }
+                return targetDate.getTime();
+            };
+
+            const launchDate = getTargetDate();
 
             const countdown = setInterval(() => {
                 const now = new Date().getTime();
@@ -314,14 +348,16 @@
                 document.getElementById('days').textContent = String(days).padStart(2, '0');
                 document.getElementById('hours').textContent = String(hours).padStart(2, '0');
                 document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
-                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                
+                const secEl = document.getElementById('seconds');
+                if(secEl) secEl.textContent = String(seconds).padStart(2, '0');
 
                 if (distance < 0) {
                     clearInterval(countdown);
                     document.getElementById('days').textContent = '00';
                     document.getElementById('hours').textContent = '00';
                     document.getElementById('minutes').textContent = '00';
-                    document.getElementById('seconds').textContent = '00';
+                    if(secEl) secEl.textContent = '00';
                 }
             }, 1000);
         }
@@ -330,40 +366,57 @@
         async function handleEmailSignup(event) {
             event.preventDefault();
             const email = event.target.querySelector('input[type="email"]').value;
+            const btn = event.target.querySelector('button');
+            const originalText = btn.innerText;
+            
+            btn.innerText = 'Connecting...';
+            btn.disabled = true;
 
             try {
                 await addDoc(collection(db, "coming_soon_signups"), {
                     email: email,
                     timestamp: new Date().toISOString(),
-                    source: "coming_soon_page"
+                    source: "astropath_launch_page"
                 });
 
-                // Show success modal
-                document.getElementById('success-modal').classList.remove('hidden');
-                
-                // Reset form
+                // Show success modal with animation
+                const modal = document.getElementById('success-modal');
+                const modalContent = document.getElementById('modal-content');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95');
+                    modalContent.classList.add('scale-100');
+                }, 10);
+
                 event.target.reset();
 
-                // Close modal after 3 seconds
-                setTimeout(() => {
-                    closeModal();
-                }, 3000);
             } catch (error) {
                 console.error("Error saving email: ", error);
-                alert("An error occurred. Please try again.");
+                alert("A disturbance in the connection occurred. Please try again.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         }
 
         function closeModal() {
-            document.getElementById('success-modal').classList.add('hidden');
+            const modal = document.getElementById('success-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
-        // Initialize on page load
         window.onload = () => {
             updateCountdown();
         };
 
-        // Expose functions globally
         window.handleEmailSignup = handleEmailSignup;
         window.closeModal = closeModal;
     </script>
