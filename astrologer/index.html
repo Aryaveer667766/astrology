@@ -27,11 +27,12 @@
                     animation: {
                         'ring': 'ring 2s infinite ease-in-out',
                         'slide-up': 'slideUp 0.3s ease-out forwards',
+                        'bounce-slow': 'bounce 3s infinite',
                     },
                     keyframes: {
                         ring: {
                             '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(212, 175, 55, 0.7)' },
-                            '50%': { transform: 'scale(1.05)', boxShadow: '0 0 0 20px rgba(212, 175, 55, 0)' }
+                            '50%': { transform: 'scale(1.1)', boxShadow: '0 0 0 25px rgba(212, 175, 55, 0)' }
                         },
                         slideUp: {
                             '0%': { transform: 'translateY(100%)', opacity: '0' },
@@ -52,7 +53,9 @@
             font-family: 'Inter', sans-serif;
             background-color: #0B0A1A;
             color: white;
+            /* Prevent pull-to-refresh on mobile */
             overscroll-behavior-y: none;
+            -webkit-tap-highlight-color: transparent;
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -61,36 +64,43 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* Custom scroll for chat */
-        .chat-scroll::-webkit-scrollbar { width: 4px; }
+        /* Mobile safe area padding for modern iPhones */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        
+        .chat-scroll::-webkit-scrollbar { width: 3px; }
         .chat-scroll::-webkit-scrollbar-track { background: transparent; }
         .chat-scroll::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 10px; }
     </style>
 </head>
 <body class="antialiased h-screen flex flex-col overflow-hidden">
 
+    <!-- Audio Element for Loud Ringing (Option 2) -->
+    <!-- Using Google's official free alarm sound for reliability -->
+    <audio id="incoming-ringtone" loop src="https://actions.google.com/sounds/v1/alarms/phone_ringing.ogg"></audio>
+
     <!-- Auth Screen -->
     <div id="auth-screen" class="fixed inset-0 bg-cosmic-900 z-[100] flex items-center justify-center p-4">
-        <div class="glass-card p-8 rounded-2xl w-full max-w-md shadow-[0_0_40px_rgba(212,175,55,0.15)] border-t-4 border-cosmic-accent">
+        <div class="glass-card p-8 rounded-3xl w-full max-w-sm shadow-[0_0_40px_rgba(212,175,55,0.15)] border-t-4 border-cosmic-accent">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-cosmic-900 text-3xl mx-auto mb-4 shadow-lg">
                     <i class="fa-solid fa-star-and-crescent"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-white">Astrologer Portal</h1>
-                <p class="text-sm text-cosmic-light/60 mt-1">Sign in to manage your consultations</p>
+                <h1 class="text-2xl font-bold text-white">Partner Portal</h1>
+                <p class="text-sm text-cosmic-light/60 mt-1">Sign in to your dashboard</p>
             </div>
 
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Registered Email</label>
-                    <input type="email" id="login-email" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="guru@astropath.com" />
+                    <input type="email" id="login-email" required class="w-full bg-cosmic-800 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="email@example.com" />
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Password</label>
-                    <input type="password" id="login-password" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="••••••••" />
+                    <input type="password" id="login-password" required class="w-full bg-cosmic-800 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="••••••••" />
                 </div>
                 <div id="login-error" class="text-red-400 text-xs hidden text-center bg-red-400/10 p-2 rounded-lg"></div>
-                <button type="submit" id="login-btn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-3.5 rounded-xl hover:shadow-lg transition-all active:scale-95 mt-4">
+                <button type="submit" id="login-btn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-4 rounded-2xl hover:shadow-lg transition-all active:scale-95 mt-4">
                     Secure Login
                 </button>
             </form>
@@ -102,109 +112,100 @@
 
     <!-- Application Form Screen -->
     <div id="apply-screen" class="fixed inset-0 bg-cosmic-900 z-[100] hidden flex-col items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-card p-6 md:p-8 rounded-2xl w-full max-w-md my-auto shadow-[0_0_40px_rgba(212,175,55,0.15)] border-t-4 border-cosmic-accent relative">
+        <div class="glass-card p-6 md:p-8 rounded-3xl w-full max-w-sm my-auto shadow-[0_0_40px_rgba(212,175,55,0.15)] border-t-4 border-cosmic-accent relative">
             <button onclick="cancelSignup()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-white">Join as Astrologer</h2>
-                <p class="text-xs text-cosmic-light/60 mt-1">Fill details to schedule an interview.</p>
+            <div class="text-center mb-6 pt-4">
+                <h2 class="text-2xl font-bold text-white">Join as Partner</h2>
+                <p class="text-xs text-cosmic-light/60 mt-1">Submit your details for review.</p>
             </div>
             
             <form id="apply-form" onsubmit="handleApply(event)" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Full Name</label>
-                        <input type="text" id="apply-name" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Astro Rahul" />
+                        <input type="text" id="apply-name" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Astro Name" />
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Mobile Number</label>
-                        <input type="tel" id="apply-phone" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="+91..." />
+                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Mobile</label>
+                        <input type="tel" id="apply-phone" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="+91..." />
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Email (For Login)</label>
-                    <input type="email" id="apply-email" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="guru@email.com" />
+                    <input type="email" id="apply-email" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="guru@email.com" />
                 </div>
                 
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Password</label>
-                    <input type="password" id="apply-password" required minlength="6" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="••••••••" />
+                    <input type="password" id="apply-password" required minlength="6" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="••••••••" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Experience (Years)</label>
-                        <input type="number" id="apply-exp" required min="1" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="5" />
+                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Exp (Years)</label>
+                        <input type="number" id="apply-exp" required min="1" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="5" />
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Skills</label>
-                        <input type="text" id="apply-skills" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Vedic, Tarot" />
+                        <input type="text" id="apply-skills" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-3 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="Vedic, Tarot" />
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Resume / Bio Link</label>
-                    <input type="url" id="apply-resume" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="https://drive.google.com/..." />
-                </div>
-
-                <button type="submit" id="apply-btn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-3.5 rounded-xl hover:shadow-lg transition-all active:scale-95 mt-4">Submit Application</button>
+                <button type="submit" id="apply-btn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-cosmic-900 font-bold py-4 rounded-xl hover:shadow-lg transition-all active:scale-95 mt-4">Submit Application</button>
             </form>
         </div>
     </div>
 
     <!-- Pending Review Screen -->
     <div id="pending-screen" class="fixed inset-0 bg-cosmic-900 z-[90] hidden flex-col items-center justify-center p-4">
-        <div class="glass-card p-10 rounded-2xl flex flex-col items-center justify-center text-center max-w-sm">
+        <div class="glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center max-w-sm w-full">
             <div class="w-20 h-20 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_20px_rgba(234,179,8,0.3)]">
                 <i class="fa-solid fa-file-signature"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">Application Pending</h2>
-            <p class="text-sm text-cosmic-light/60 mb-8">We have successfully received your application. Our team will review your resume and contact you for an interview shortly.</p>
-            <button onclick="handleLogout()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">Sign Out</button>
+            <h2 class="text-2xl font-bold text-white mb-2">Under Review</h2>
+            <p class="text-sm text-cosmic-light/60 mb-8">We have successfully received your profile. Support team is reviewing your application.</p>
+            <button onclick="handleLogout()" class="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full text-sm font-bold transition-colors w-full">Sign Out</button>
         </div>
     </div>
 
-    <!-- Onboarding / Profile Creation Screen (Shown if user has no Astro profile) -->
+    <!-- Onboarding / Profile Creation Screen (Fallback) -->
     <div id="onboarding-screen" class="fixed inset-0 bg-cosmic-900 z-[90] hidden flex-col items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-card p-6 rounded-2xl w-full max-w-md my-auto">
-            <h2 class="text-2xl font-bold text-white mb-2 text-center">Complete Your Profile</h2>
-            <p class="text-xs text-cosmic-light/60 mb-6 text-center">Set up your details so users can find you.</p>
+        <div class="glass-card p-6 rounded-3xl w-full max-w-sm my-auto">
+            <h2 class="text-2xl font-bold text-white mb-2 text-center">Complete Setup</h2>
+            <p class="text-xs text-cosmic-light/60 mb-6 text-center">Finalize your details.</p>
             
             <form id="onboard-form" onsubmit="saveNewProfile(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Display Name</label>
-                    <input type="text" id="onb-name" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="e.g., Astro Rahul" />
-                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Price (₹/min)</label>
-                        <input type="number" id="onb-price" required min="10" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="20" />
+                        <input type="number" id="onb-price" required min="10" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm" placeholder="20" />
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Experience (Yrs)</label>
-                        <input type="number" id="onb-exp" required min="1" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="5" />
+                        <input type="number" id="onb-exp" required min="1" class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm" placeholder="5" />
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Skills (Comma separated)</label>
-                    <input type="text" id="onb-skills" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="Vedic, Tarot, Numerology" />
+                    <input type="text" id="onb-skills" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm" placeholder="Vedic, Tarot, Numerology" />
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Languages (Comma separated)</label>
-                    <input type="text" id="onb-langs" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="English, Hindi" />
+                    <input type="text" id="onb-langs" required class="w-full bg-cosmic-800 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm" placeholder="English, Hindi" />
                 </div>
-                <button type="submit" id="onb-btn" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-3.5 rounded-xl mt-4">Save & Enter Dashboard</button>
+                <button type="submit" id="onb-btn" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-4 rounded-xl mt-4">Save & Enter Dashboard</button>
             </form>
         </div>
     </div>
 
-    <!-- Main App Screen -->
-    <div id="app-screen" class="hidden flex-col h-full w-full relative">
+    <!-- Main App Screen (Mobile Centric) -->
+    <div id="app-screen" class="hidden flex-col h-full w-full relative bg-cosmic-900 max-w-md mx-auto shadow-2xl">
         
         <!-- Header -->
-        <header class="bg-cosmic-800 border-b border-white/10 h-16 flex-shrink-0 flex items-center justify-between px-4 z-20 shadow-md">
+        <header class="bg-cosmic-800 border-b border-white/10 h-16 pt-safe flex-shrink-0 flex items-center justify-between px-4 z-20">
             <div class="flex items-center gap-3">
-                <img id="header-avatar" src="" class="w-9 h-9 rounded-full object-cover border border-cosmic-accent" onerror="this.src='https://ui-avatars.com/api/?name=Astro&background=D4AF37&color=000'">
+                <img id="header-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-cosmic-accent" onerror="this.src='https://ui-avatars.com/api/?name=Astro&background=D4AF37&color=000'">
                 <div>
                     <span id="header-name" class="font-bold text-sm text-white block leading-tight">Loading...</span>
                     <!-- Online Toggle -->
@@ -223,141 +224,116 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto pb-20 md:pb-0 bg-cosmic-900 hide-scrollbar relative">
+        <main class="flex-1 overflow-y-auto pb-24 hide-scrollbar relative bg-cosmic-900">
             
             <!-- HOME VIEW (Incoming Requests) -->
-            <div id="view-home" class="view-section p-4 max-w-4xl mx-auto space-y-6 block">
+            <div id="view-home" class="view-section p-4 space-y-6 block">
                 <div class="flex justify-between items-end pt-2">
                     <div>
-                        <h2 class="text-xl font-bold text-white mb-1">Queue & Requests</h2>
-                        <p class="text-xs text-cosmic-light/60">Stay online to receive consultations.</p>
+                        <h2 class="text-xl font-bold text-white mb-1">Live Queue</h2>
+                        <p class="text-xs text-cosmic-light/60">Stay online for requests.</p>
                     </div>
-                    <div class="bg-cosmic-800 px-3 py-1.5 rounded-lg border border-white/5 text-center">
-                        <span class="block text-[10px] text-cosmic-light/50 uppercase tracking-wider">Today</span>
-                        <span class="text-sm font-bold text-green-400">₹<span id="today-earnings">0</span></span>
-                    </div>
-                </div>
-
-                <!-- Incoming Request Card (Dynamically shown) -->
-                <div id="incoming-request-container" class="hidden animate-slide-up">
-                    <div class="bg-gradient-to-br from-cosmic-800 to-cosmic-900 border border-cosmic-accent p-6 rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.2)] text-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-cosmic-accent/5 animate-pulse"></div>
-                        <div class="w-16 h-16 bg-cosmic-accent/20 text-cosmic-accent rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-ring relative z-10">
-                            <i id="req-icon" class="fa-solid fa-phone-volume"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-1 relative z-10">Incoming <span id="req-type">Call</span></h3>
-                        <p class="text-sm text-cosmic-light/70 mb-6 relative z-10">User: <span id="req-user" class="font-bold text-white">Customer123</span></p>
-                        
-                        <div class="flex gap-4 justify-center relative z-10">
-                            <button onclick="declineRequest()" class="w-12 h-12 rounded-full bg-red-500/20 text-red-500 border border-red-500/50 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors">
-                                <i class="fa-solid fa-xmark text-xl"></i>
-                            </button>
-                            <button onclick="acceptRequest()" class="flex-1 max-w-[200px] bg-green-500 hover:bg-green-600 text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all active:scale-95">
-                                <i class="fa-solid fa-check"></i> Accept & Connect
-                            </button>
-                        </div>
+                    <div class="bg-cosmic-800 px-3 py-2 rounded-xl border border-white/5 text-center shadow-lg">
+                        <span class="block text-[9px] text-cosmic-light/50 uppercase tracking-wider">Today's Net</span>
+                        <span class="text-base font-bold text-green-400">₹<span id="today-earnings">0</span></span>
                     </div>
                 </div>
 
-                <!-- Active Queue State -->
-                <div id="empty-queue" class="glass-card p-10 rounded-2xl flex flex-col items-center justify-center text-center mt-8">
-                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-2xl text-cosmic-light/30 mb-4">
-                        <i class="fa-regular fa-clock"></i>
+                <!-- Active Queue State (Empty) -->
+                <div id="empty-queue" class="glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center mt-4">
+                    <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center text-3xl text-cosmic-light/20 mb-4 animate-bounce-slow">
+                        <i class="fa-solid fa-satellite-dish"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-white mb-2">Queue is Empty</h3>
-                    <p class="text-sm text-cosmic-light/50 max-w-xs">Make sure your status is set to 'Online' to receive incoming calls and chats.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">Searching for clients...</h3>
+                    <p class="text-xs text-cosmic-light/50 max-w-[250px]">Keep your status 'Online' and this app open in the background to receive alerts.</p>
                 </div>
             </div>
 
             <!-- EARNINGS & PAYOUTS VIEW -->
-            <div id="view-earnings" class="view-section p-4 max-w-4xl mx-auto hidden">
-                <h2 class="text-xl font-bold text-white mb-6 pt-2">Earnings & Payouts</h2>
+            <div id="view-earnings" class="view-section p-4 hidden">
+                <h2 class="text-xl font-bold text-white mb-4 pt-2">Finances</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-gradient-to-br from-green-900/50 to-cosmic-800 border border-green-500/30 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-xs text-green-400 uppercase tracking-wider font-bold">Net Earnings</p>
-                            <i class="fa-solid fa-wallet text-green-500 opacity-50 text-xl"></i>
-                        </div>
-                        <h3 class="text-3xl font-bold text-white">₹<span id="earn-net">0</span></h3>
-                        <p class="text-[10px] text-cosmic-light/50 mt-2">Available for next payout cycle.</p>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-green-900/50 to-cosmic-800 border border-green-500/30 p-4 rounded-2xl">
+                        <p class="text-[10px] text-green-400 uppercase tracking-wider font-bold mb-1">Net Balance</p>
+                        <h3 class="text-2xl font-bold text-white">₹<span id="earn-net">0</span></h3>
                     </div>
-                    <div class="glass-card p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-xs text-cosmic-light/50 uppercase tracking-wider">Gross Billed</p>
-                            <i class="fa-solid fa-chart-line text-cosmic-light/30 text-xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">₹<span id="earn-gross">0</span></h3>
-                        <p class="text-[10px] text-cosmic-light/50 mt-1">Platform Fee: 30% | Your Share: 70%</p>
-                    </div>
-                </div>
-
-                <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl mb-8 flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-blue-400 mt-0.5"></i>
-                    <div>
-                        <h4 class="text-sm font-bold text-blue-400 mb-1">Payout Cycle Info</h4>
-                        <p class="text-xs text-blue-200/70">Payments are processed automatically on the <strong>3rd of every month</strong>. Ensure your Bank/UPI details below are accurate.</p>
+                    <div class="glass-card p-4 rounded-2xl">
+                        <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wider mb-1">Gross Billed</p>
+                        <h3 class="text-lg font-bold text-white">₹<span id="earn-gross">0</span></h3>
                     </div>
                 </div>
 
                 <!-- Payout Details Form -->
-                <div class="glass-card p-5 md:p-6 rounded-2xl">
-                    <h3 class="font-bold text-white mb-4 border-b border-white/10 pb-2">Payout Method</h3>
+                <div class="glass-card p-5 rounded-3xl mb-6">
+                    <h3 class="font-bold text-white mb-4 border-b border-white/10 pb-2 text-sm"><i class="fa-solid fa-building-columns text-cosmic-accent mr-2"></i>Bank / UPI Details</h3>
                     <form id="payout-form" onsubmit="savePayoutDetails(event)" class="space-y-4">
                         <div>
-                            <label class="block text-[10px] font-medium text-cosmic-light/50 uppercase tracking-wider mb-1">UPI ID</label>
-                            <input type="text" id="pay-upi" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="yourname@bank" />
+                            <label class="block text-[10px] font-medium text-cosmic-light/50 uppercase tracking-wider mb-1">UPI ID (Primary)</label>
+                            <input type="text" id="pay-upi" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent" placeholder="yourname@bank" />
                         </div>
-                        <div class="relative flex items-center py-2">
-                            <div class="flex-grow border-t border-white/10"></div>
-                            <span class="flex-shrink-0 mx-4 text-xs text-cosmic-light/30">OR BANK ACCOUNT</span>
-                            <div class="flex-grow border-t border-white/10"></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 pt-2 border-t border-white/5">
                             <div>
                                 <label class="block text-[10px] font-medium text-cosmic-light/50 uppercase tracking-wider mb-1">Account Number</label>
-                                <input type="text" id="pay-acc" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="1234567890" />
+                                <input type="text" id="pay-acc" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent" placeholder="1234567890" />
                             </div>
                             <div>
                                 <label class="block text-[10px] font-medium text-cosmic-light/50 uppercase tracking-wider mb-1">IFSC Code</label>
-                                <input type="text" id="pay-ifsc" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent transition-colors" placeholder="SBIN0001234" />
+                                <input type="text" id="pay-ifsc" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cosmic-accent" placeholder="SBIN0001234" />
                             </div>
                         </div>
-                        <button type="submit" id="btn-save-payout" class="w-full bg-white text-cosmic-900 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-2">
+                        <button type="submit" id="btn-save-payout" class="w-full bg-white text-cosmic-900 font-bold py-3.5 rounded-xl active:scale-95 transition-transform text-sm mt-2">
                             Save Payout Details
                         </button>
                     </form>
                 </div>
+
+                <!-- Settlements List -->
+                <div class="mb-4">
+                    <h3 class="font-bold text-white mb-3 text-sm flex justify-between items-center">
+                        <span>Past Settlements</span>
+                        <span class="text-[10px] font-normal text-cosmic-light/50">Auto-processed monthly</span>
+                    </h3>
+                    <div id="settlements-list" class="space-y-3">
+                        <!-- Populated via JS -->
+                        <div class="text-center py-6 text-cosmic-light/40 text-xs">No settlements processed yet.</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- PROFILE & SETTINGS VIEW -->
-            <div id="view-profile" class="view-section p-4 max-w-4xl mx-auto hidden">
-                <h2 class="text-xl font-bold text-white mb-6 pt-2">My Profile</h2>
+            <!-- PROFILE VIEW -->
+            <div id="view-profile" class="view-section p-4 hidden">
+                <h2 class="text-xl font-bold text-white mb-4 pt-2">My Profile</h2>
                 
-                <div class="glass-card p-5 md:p-6 rounded-2xl">
+                <div class="glass-card p-5 rounded-3xl">
                     <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-5">
                         
-                        <!-- Rate Setting (Crucial) -->
-                        <div class="bg-cosmic-accent/10 border border-cosmic-accent/30 p-4 rounded-xl flex items-center justify-between mb-6">
+                        <!-- Rate Setting -->
+                        <div class="bg-cosmic-accent/10 border border-cosmic-accent/30 p-4 rounded-2xl flex items-center justify-between mb-2">
                             <div>
-                                <h3 class="font-bold text-cosmic-accent text-sm mb-1">Consultation Rate</h3>
-                                <p class="text-[10px] text-cosmic-light/70">Set your per-minute charge. This updates instantly for users.</p>
+                                <h3 class="font-bold text-cosmic-accent text-sm mb-0.5">Consultation Rate</h3>
+                                <p class="text-[9px] text-cosmic-light/70 uppercase">Per Minute Charge</p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-white font-bold">₹</span>
-                                <input type="number" id="prof-price" required min="10" class="w-20 bg-cosmic-900 border border-cosmic-accent/50 rounded-lg px-2 py-2 text-center text-white text-lg font-bold focus:outline-none" />
-                                <span class="text-xs text-cosmic-light/50">/min</span>
+                            <div class="flex items-center gap-1 bg-cosmic-900 px-3 py-1.5 rounded-xl border border-cosmic-accent/50">
+                                <span class="text-white font-bold text-sm">₹</span>
+                                <input type="number" id="prof-price" required min="10" class="w-12 bg-transparent text-center text-white text-lg font-bold focus:outline-none" />
                             </div>
                         </div>
 
+                        <!-- Locked Identity Field -->
                         <div>
-                            <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Display Name</label>
-                            <input type="text" id="prof-name" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" />
+                            <label class="flex justify-between items-end mb-1">
+                                <span class="text-[10px] uppercase tracking-wider text-cosmic-light/50">Display Name</span>
+                                <span class="text-[9px] text-cosmic-accent"><i class="fa-solid fa-lock text-[8px] mr-1"></i>Contact Support to change</span>
+                            </label>
+                            <input type="text" id="prof-name" readonly class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-cosmic-light/50 text-sm cursor-not-allowed" />
                         </div>
+
                         <div>
                             <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Profile Image URL</label>
                             <input type="url" id="prof-img" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" placeholder="https://..." />
                         </div>
+                        
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Experience (Yrs)</label>
@@ -365,9 +341,10 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Total Consults</label>
-                                <input type="number" id="prof-orders" disabled class="w-full bg-cosmic-900 border border-white/5 rounded-xl px-4 py-3 text-cosmic-light/50 text-sm opacity-70 cursor-not-allowed" title="Updated automatically" />
+                                <input type="number" id="prof-orders" disabled class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-cosmic-light/50 text-sm opacity-70 cursor-not-allowed" />
                             </div>
                         </div>
+
                         <div>
                             <label class="block text-[10px] uppercase tracking-wider text-cosmic-light/50 mb-1">Skills (Comma separated)</label>
                             <input type="text" id="prof-skills" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" />
@@ -377,8 +354,8 @@
                             <input type="text" id="prof-langs" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" />
                         </div>
 
-                        <button type="submit" id="btn-save-profile" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-3.5 rounded-xl transition-all active:scale-95 mt-4">
-                            Update Profile
+                        <button type="submit" id="btn-save-profile" class="w-full bg-cosmic-accent text-cosmic-900 font-bold py-4 rounded-xl transition-all active:scale-95 mt-4 shadow-lg shadow-cosmic-accent/20">
+                            Update Details
                         </button>
                     </form>
                 </div>
@@ -386,36 +363,68 @@
 
         </main>
 
-        <!-- Bottom Navigation (Mobile & Desktop App-like feel) -->
-        <nav class="fixed bottom-0 w-full bg-cosmic-800 border-t border-white/10 pb-safe z-30">
-            <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 w-full max-w-md mx-auto bg-cosmic-800/90 backdrop-blur-md border-t border-white/10 pb-safe z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <div class="flex justify-around items-center h-16">
                 <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-accent">
-                    <i class="fa-solid fa-house text-lg mb-1 relative">
-                        <span id="queue-badge" class="absolute -top-1 -right-2 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                    <i class="fa-solid fa-house text-xl mb-1 relative">
+                        <span id="queue-badge" class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-cosmic-800 hidden"></span>
                     </i>
-                    <span class="text-[10px] font-medium">Home</span>
+                    <span class="text-[9px] font-bold">Home</span>
                 </button>
                 <button onclick="switchTab('earnings')" id="nav-earnings" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
-                    <i class="fa-solid fa-wallet text-lg mb-1"></i>
-                    <span class="text-[10px] font-medium">Earnings</span>
+                    <i class="fa-solid fa-wallet text-xl mb-1"></i>
+                    <span class="text-[9px] font-bold">Earnings</span>
                 </button>
                 <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
-                    <i class="fa-solid fa-user-astronaut text-lg mb-1"></i>
-                    <span class="text-[10px] font-medium">Profile</span>
+                    <i class="fa-solid fa-user-astronaut text-xl mb-1"></i>
+                    <span class="text-[9px] font-bold">Profile</span>
                 </button>
             </div>
         </nav>
     </div>
 
-    <!-- LIVE SESSION ROOM (Full Screen Modal) -->
-    <div id="live-room" class="fixed inset-0 bg-cosmic-900 z-[100] hidden flex-col transition-transform transform translate-y-full">
+    <!-- Incoming Request Modal (Full Screen Mobile) -->
+    <div id="incoming-modal" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[100] hidden flex-col">
+        <!-- RINGS -->
+        <div class="absolute w-64 h-64 bg-cosmic-accent/20 rounded-full animate-ring pointer-events-none"></div>
+        <div class="absolute w-96 h-96 bg-cosmic-accent/10 rounded-full animate-ring pointer-events-none delay-75"></div>
+        
+        <div class="relative z-10 flex flex-col items-center w-full px-6">
+            <div class="w-24 h-24 bg-cosmic-accent text-cosmic-900 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_40px_rgba(212,175,55,0.5)]">
+                <i id="req-icon" class="fa-solid fa-phone-volume animate-bounce"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-2">Incoming <span id="req-type">Call</span></h3>
+            <p class="text-cosmic-light/70 text-lg mb-12">Client: <span id="req-user" class="font-bold text-white">Customer123</span></p>
+            
+            <!-- Mobile Optimized Swipe/Tap Actions -->
+            <div class="flex gap-6 w-full max-w-xs">
+                <button onclick="declineRequest()" class="flex flex-col items-center justify-center gap-2 group">
+                    <div class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center text-2xl group-active:scale-90 transition-transform">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </div>
+                    <span class="text-xs text-white/70 font-medium">Decline</span>
+                </button>
+                
+                <button onclick="acceptRequest()" class="flex-1 flex flex-col items-center justify-center gap-2 group">
+                    <div class="w-20 h-20 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl group-active:scale-90 transition-transform shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span class="text-sm font-bold text-green-400">Accept</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIVE SESSION ROOM (Full Screen Mobile) -->
+    <div id="live-room" class="fixed inset-0 bg-cosmic-900 z-[110] hidden flex-col transition-transform transform translate-y-full pt-safe">
         <!-- Header -->
-        <div class="bg-cosmic-800 px-4 py-3 border-b border-white/10 flex justify-between items-center shrink-0">
+        <div class="bg-cosmic-800 px-4 py-3 border-b border-white/10 flex justify-between items-center shrink-0 shadow-md">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white font-bold" id="room-user-avatar">U</div>
+                <div class="w-10 h-10 rounded-full bg-cosmic-accent/20 border border-cosmic-accent text-cosmic-accent flex items-center justify-center font-bold text-lg" id="room-user-avatar">U</div>
                 <div>
                     <h3 class="font-bold text-white text-sm leading-tight" id="room-user-name">User Name</h3>
-                    <p class="text-[10px] text-green-400 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> <span id="room-type-label">Live Chat</span></p>
+                    <p class="text-[10px] text-green-400 font-bold flex items-center gap-1 tracking-wider uppercase"><span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> <span id="room-type-label">Live</span></p>
                 </div>
             </div>
             <div class="text-right">
@@ -425,59 +434,56 @@
         </div>
 
         <!-- Chat Area (Visible if type == chat) -->
-        <div id="room-chat-area" class="flex-1 flex flex-col bg-cosmic-900 overflow-hidden relative">
-            <div class="stars-bg opacity-10"></div>
+        <div id="room-chat-area" class="flex-1 flex flex-col bg-[#0B0A1A] overflow-hidden relative hidden">
             <!-- Messages container -->
             <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll relative z-10 flex flex-col">
-                <div class="text-center my-2"><span class="bg-white/10 text-xs px-3 py-1 rounded-full text-white/50">Session Started</span></div>
+                <div class="text-center my-2"><span class="bg-white/10 text-[10px] px-3 py-1 rounded-full text-white/50 uppercase tracking-wide">End-to-End Encrypted Session</span></div>
                 <!-- Messages injected here -->
             </div>
-            <!-- Chat Input -->
-            <form onsubmit="sendChatMessage(event)" class="p-3 bg-cosmic-800 border-t border-white/10 flex gap-2 shrink-0 relative z-10 pb-safe">
-                <input type="text" id="chat-input" class="flex-1 bg-cosmic-900 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cosmic-accent" placeholder="Type message..." autocomplete="off">
-                <button type="submit" class="w-10 h-10 rounded-full bg-cosmic-accent text-cosmic-900 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shrink-0">
-                    <i class="fa-solid fa-paper-plane"></i>
+            <!-- Chat Input (Fixed Bottom) -->
+            <form onsubmit="sendChatMessage(event)" class="p-3 bg-cosmic-800 border-t border-white/10 flex gap-2 shrink-0 relative z-10 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
+                <input type="text" id="chat-input" class="flex-1 bg-cosmic-900 border border-white/10 rounded-full px-5 py-3 text-sm text-white focus:outline-none focus:border-cosmic-accent" placeholder="Type message..." autocomplete="off">
+                <button type="submit" class="w-12 h-12 rounded-full bg-cosmic-accent text-cosmic-900 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shrink-0 shadow-lg">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
                 </button>
             </form>
         </div>
 
         <!-- Call Area (Visible if type == call) -->
-        <div id="room-call-area" class="flex-1 flex flex-col items-center justify-center bg-cosmic-900 relative hidden">
+        <div id="room-call-area" class="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-cosmic-900 to-black relative hidden pb-20">
             <!-- Pulsing circles -->
             <div class="absolute w-64 h-64 bg-green-500/10 rounded-full animate-ring pointer-events-none"></div>
-            <div class="absolute w-96 h-96 bg-green-500/5 rounded-full animate-ring pointer-events-none delay-75"></div>
             
-            <div class="w-32 h-32 bg-cosmic-800 rounded-full border-4 border-green-500 flex items-center justify-center text-5xl text-white shadow-[0_0_30px_rgba(34,197,94,0.3)] z-10 mb-8 relative">
+            <div class="w-32 h-32 bg-cosmic-800 rounded-full border-4 border-green-500 flex items-center justify-center text-5xl text-white shadow-[0_0_40px_rgba(34,197,94,0.3)] z-10 mb-8 relative">
                 <i class="fa-solid fa-microphone"></i>
                 <!-- Mute overlay -->
-                <div id="mute-indicator" class="absolute inset-0 bg-red-500/80 rounded-full hidden items-center justify-center">
+                <div id="mute-indicator" class="absolute inset-0 bg-red-600/90 rounded-full hidden items-center justify-center">
                     <i class="fa-solid fa-microphone-slash text-white text-3xl"></i>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-white relative z-10" id="call-status-text">Call in Progress</h2>
-            <p class="text-cosmic-light/50 text-sm mt-2 relative z-10">WebRTC Audio Channel Simulated</p>
+            <h2 class="text-2xl font-bold text-white relative z-10" id="call-status-text">Connected</h2>
+            <p class="text-green-400 text-xs font-mono mt-2 relative z-10">Voice Channel Active</p>
 
-            <div class="flex gap-6 mt-12 relative z-10">
-                <button onclick="toggleMute()" class="w-14 h-14 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors text-xl">
+            <div class="flex gap-6 mt-16 relative z-10">
+                <button onclick="toggleMute()" class="w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center active:bg-white/20 transition-colors text-2xl backdrop-blur-md border border-white/10">
                     <i id="mute-icon" class="fa-solid fa-microphone"></i>
                 </button>
-                <button onclick="toggleVideo()" class="w-14 h-14 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors text-xl relative">
-                    <i class="fa-solid fa-video-slash"></i>
-                    <span class="absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
+                <button onclick="endSession()" class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center active:scale-90 transition-transform text-2xl shadow-[0_0_20px_rgba(220,38,38,0.5)]">
+                    <i class="fa-solid fa-phone-slash"></i>
                 </button>
             </div>
         </div>
 
-        <!-- End Session Button -->
-        <div class="p-4 bg-cosmic-800 border-t border-white/10 text-center shrink-0">
-            <button onclick="endSession()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all active:scale-95 w-full max-w-xs flex items-center justify-center gap-2 mx-auto">
-                <i class="fa-solid fa-phone-slash"></i> End Consultation
+        <!-- End Session Button (Only for Chat, Call has it built into layout) -->
+        <div id="chat-end-bar" class="p-4 bg-cosmic-800 border-t border-white/10 text-center shrink-0 pb-safe hidden">
+            <button onclick="endSession()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all active:scale-95 w-full flex items-center justify-center gap-2">
+                <i class="fa-solid fa-xmark"></i> End Consultation
             </button>
         </div>
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 left-4 md:left-auto z-[110] flex flex-col gap-2 pointer-events-none items-center md:items-end"></div>
+    <div id="toast-container" class="fixed top-safe mt-4 right-4 left-4 z-[120] flex flex-col gap-2 pointer-events-none items-center"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -498,18 +504,40 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // State Variables
         let currentUser = null;
         let myProfile = null;
         let activeView = 'home';
         let isOnline = false;
+        let PLATFORM_FEE_PERCENTAGE = 0.30;
         
         // Session State
-        let pendingRequest = null; // Holds data for incoming call/chat
-        let activeSession = null;  // Holds data for ongoing call/chat
+        let pendingRequest = null;
+        let activeSession = null;
         let sessionTimerInterval = null;
         let sessionSeconds = 0;
         let chatUnsubscribe = null;
+        let requestUnsubscribe = null;
 
+        // Audio Handling
+        const ringtone = document.getElementById('incoming-ringtone');
+        
+        function playRingtone() {
+            try {
+                ringtone.currentTime = 0;
+                let playPromise = ringtone.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn("Autoplay blocked by browser until user interacts. Notification toast sent instead.");
+                    });
+                }
+            } catch(e) {}
+        }
+        function stopRingtone() {
+            try { ringtone.pause(); ringtone.currentTime = 0; } catch(e) {}
+        }
+
+        // --- AUTHENTICATION ---
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
@@ -517,11 +545,16 @@
                 document.getElementById('login-btn').innerText = "Secure Login";
                 checkAndLoadProfile();
             } else {
+                // Reset UI
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('flex');
                 document.getElementById('onboarding-screen').classList.add('hidden');
                 document.getElementById('onboarding-screen').classList.remove('flex');
+                document.getElementById('pending-screen').classList.add('hidden');
+                document.getElementById('pending-screen').classList.remove('flex');
+                stopRingtone();
+                if(requestUnsubscribe) { requestUnsubscribe(); requestUnsubscribe = null; }
             }
         });
 
@@ -543,7 +576,9 @@
         }
 
         async function handleLogout() {
-            if(isOnline) await setDoc(doc(db, "astrologers", currentUser.uid), { isOnline: false }, { merge: true });
+            if(isOnline && currentUser) {
+                try { await updateDoc(doc(db, "astrologers", currentUser.uid), { isOnline: false }, { merge: true }); } catch(e){}
+            }
             await signOut(auth);
         }
 
@@ -569,13 +604,11 @@
             const name = document.getElementById('apply-name').value;
             const phone = document.getElementById('apply-phone').value;
             const exp = document.getElementById('apply-exp').value;
-            const resume = document.getElementById('apply-resume').value;
             const skills = document.getElementById('apply-skills').value;
             const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
 
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                
                 await setDoc(doc(db, "astrologers", userCred.user.uid), {
                     uid: userCred.user.uid,
                     email: email,
@@ -584,9 +617,8 @@
                     experience: parseInt(exp),
                     skills: toArray(skills),
                     languages: ["English", "Hindi"],
-                    resumeLink: resume,
                     status: 'pending',
-                    price: 20, // Default price
+                    price: 20,
                     rating: 5.0,
                     orders: 0,
                     isOnline: false,
@@ -596,18 +628,16 @@
                 });
 
                 showToast("Application submitted successfully!", "success");
-                // Auth state change will auto-show the pending screen
             } catch(error) {
                 showToast(error.message.replace('Firebase: ', ''), "error");
                 btn.innerText = "Submit Application";
             }
         }
 
+        // --- PROFILE & CORE LOGIC ---
         async function checkAndLoadProfile() {
-            // Astrologers are mapped 1:1 with their auth UID in the 'astrologers' collection
             const docRef = doc(db, "astrologers", currentUser.uid);
             
-            // Set up real-time listener for profile
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     myProfile = { id: docSnap.id, ...docSnap.data() };
@@ -621,10 +651,9 @@
                         document.getElementById('pending-screen').classList.remove('hidden');
                         document.getElementById('pending-screen').classList.add('flex');
                     } else if (myProfile.status === 'rejected') {
-                        showToast("Your application was not approved.", "error");
+                        showToast("Your application was not approved by System.", "error");
                         handleLogout();
                     } else {
-                        // Hide Onboarding & Pending, Show App
                         document.getElementById('pending-screen').classList.add('hidden');
                         document.getElementById('pending-screen').classList.remove('flex');
                         document.getElementById('onboarding-screen').classList.add('hidden');
@@ -633,11 +662,13 @@
                         document.getElementById('app-screen').classList.add('flex');
                         
                         updateUIWithProfile();
+                        
                         if(isOnline !== myProfile.isOnline) {
                             isOnline = myProfile.isOnline;
                             document.getElementById('status-toggle').checked = isOnline;
                             document.getElementById('status-text').innerText = isOnline ? 'Online' : 'Offline';
                             document.getElementById('status-text').className = isOnline ? "ml-2 text-[10px] font-bold text-green-400 uppercase tracking-wide" : "ml-2 text-[10px] font-medium text-gray-400 uppercase tracking-wide";
+                            
                             if(isOnline) listenForRequests();
                             else {
                                 if(requestUnsubscribe) requestUnsubscribe();
@@ -648,12 +679,12 @@
                 } else {
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('app-screen').classList.add('hidden');
-                    document.getElementById('apply-screen').classList.remove('hidden');
-                    document.getElementById('apply-screen').classList.add('flex');
+                    document.getElementById('onboarding-screen').classList.remove('hidden');
+                    document.getElementById('onboarding-screen').classList.add('flex');
                 }
             });
             
-            // Platform fee settings
+            // Global settings
             onSnapshot(doc(db, "settings", "global"), (snap) => {
                 if(snap.exists() && snap.data().commissionPercent) {
                     PLATFORM_FEE_PERCENTAGE = snap.data().commissionPercent / 100;
@@ -662,8 +693,6 @@
             
             loadEarnings();
         }
-
-        let PLATFORM_FEE_PERCENTAGE = 0.30;
 
         function updateUIWithProfile() {
             document.getElementById('header-name').innerText = myProfile.name;
@@ -684,10 +713,10 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
 
             const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
+            // NOTE: name is omitted to prevent astrologer from changing it
             const updates = {
                 price: parseFloat(document.getElementById('prof-price').value),
-                name: document.getElementById('prof-name').value.trim(),
-                image: document.getElementById('prof-img').value.trim() || `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('prof-name').value)}&background=D4AF37`,
+                image: document.getElementById('prof-img').value.trim() || myProfile.image,
                 experience: parseInt(document.getElementById('prof-exp').value),
                 skills: toArray(document.getElementById('prof-skills').value),
                 languages: toArray(document.getElementById('prof-langs').value)
@@ -695,11 +724,11 @@
 
             try {
                 await updateDoc(doc(db, "astrologers", currentUser.uid), updates);
-                showToast("Profile updated instantly.", "success");
+                showToast("Profile details updated securely.", "success");
             } catch (err) {
                 showToast("Error updating profile.", "error");
             }
-            btn.innerHTML = 'Update Profile';
+            btn.innerHTML = 'Update Details';
         }
 
         async function saveNewProfile(e) {
@@ -708,19 +737,20 @@
             btn.innerHTML = 'Saving...';
 
             const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
-            const updates = {
-                name: document.getElementById('onb-name').value.trim(),
+            const data = {
                 price: parseFloat(document.getElementById('onb-price').value),
                 experience: parseInt(document.getElementById('onb-exp').value),
                 skills: toArray(document.getElementById('onb-skills').value),
-                languages: toArray(document.getElementById('onb-langs').value)
+                languages: toArray(document.getElementById('onb-langs').value),
+                status: 'approved',
+                isVerified: true
             };
 
             try {
-                await updateDoc(doc(db, "astrologers", currentUser.uid), updates);
-                showToast("Profile setup complete!", "success");
+                await updateDoc(doc(db, "astrologers", currentUser.uid), data);
+                showToast("Setup complete!", "success");
             } catch (err) {
-                showToast("Error saving profile.", "error");
+                showToast("Error saving.", "error");
             }
             btn.innerHTML = 'Save & Enter Dashboard';
         }
@@ -730,14 +760,13 @@
             try {
                 await updateDoc(doc(db, "astrologers", currentUser.uid), { isOnline: newState });
             } catch(e) {
-                // Revert UI if db fails
                 document.getElementById('status-toggle').checked = !newState;
                 showToast("Failed to update status", "error");
             }
         }
 
+        // --- EARNINGS & SETTLEMENTS ---
         async function loadEarnings() {
-            // Load Payout details
             onSnapshot(doc(db, "payout_details", currentUser.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -747,7 +776,7 @@
                 }
             });
 
-            // Calculate Earnings from sessions
+            // Calculate live earnings
             const q = query(collection(db, "sessions"), where("astroId", "==", currentUser.uid), where("status", "==", "completed"));
             onSnapshot(q, (snapshot) => {
                 let gross = 0;
@@ -757,8 +786,7 @@
                 snapshot.forEach(d => {
                     const cost = d.data().cost || 0;
                     gross += cost;
-                    
-                    const sessionDate = new Date(d.data().timestamp).toDateString();
+                    const sessionDate = new Date(d.data().timestamp || d.data().endedAt?.toDate() || Date.now()).toDateString();
                     if(sessionDate === today) todayGross += cost;
                 });
 
@@ -768,6 +796,38 @@
                 document.getElementById('earn-gross').innerText = Math.floor(gross);
                 document.getElementById('earn-net').innerText = Math.floor(net);
                 document.getElementById('today-earnings').innerText = Math.floor(todayNet);
+            });
+
+            // Load Settlements
+            const qSettlements = query(collection(db, "settlements"), where("astroId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+            onSnapshot(qSettlements, (snapshot) => {
+                const list = document.getElementById('settlements-list');
+                list.innerHTML = '';
+                if(snapshot.empty) {
+                    list.innerHTML = '<div class="text-center py-6 text-cosmic-light/40 text-xs border border-white/5 rounded-xl bg-black/20">No settlements processed yet.</div>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const dateStr = data.timestamp ? new Date(data.timestamp.toDate ? data.timestamp.toDate() : data.timestamp).toLocaleDateString() : 'Recent';
+                    
+                    const statusColor = data.status === 'completed' ? 'text-green-400' : 'text-yellow-400';
+                    const icon = data.status === 'completed' ? 'fa-check-circle' : 'fa-clock';
+                    
+                    list.innerHTML += `
+                        <div class="bg-black/30 border border-white/5 p-3 rounded-xl flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-white mb-0.5">Payout Cycle</p>
+                                <p class="text-[9px] text-cosmic-light/50">${dateStr} • UTR: ${data.utr || 'Pending'}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold ${statusColor}">₹${data.amount}</p>
+                                <p class="text-[9px] ${statusColor} uppercase tracking-wider mt-0.5"><i class="fa-solid ${icon} mr-1"></i>${data.status}</p>
+                            </div>
+                        </div>
+                    `;
+                });
             });
         }
 
@@ -790,69 +850,74 @@
             btn.innerText = 'Save Payout Details';
         }
 
-        let requestUnsubscribe = null;
-        
+        // --- SESSION LOGIC (CALL & CHAT) ---
         function listenForRequests() {
             if (requestUnsubscribe) requestUnsubscribe();
 
-            // Listen for sessions where this astrologer is targeted and status is 'requested'
             const q = query(collection(db, "sessions"), where("astroId", "==", currentUser.uid), where("status", "==", "requested"));
             
             requestUnsubscribe = onSnapshot(q, (snapshot) => {
-                if (!snapshot.empty) {
-                    // Get the oldest request
-                    const doc = snapshot.docs[0];
-                    pendingRequest = { id: doc.id, ...doc.data() };
-                    showIncomingRequest();
-                } else {
-                    pendingRequest = null;
-                    hideIncomingRequest();
-                }
+                let hasPending = false;
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (!activeSession) {
+                        pendingRequest = { id: docSnap.id, ...data };
+                        hasPending = true;
+                    }
+                });
+                
+                if (hasPending) { showIncomingRequest(); } 
+                else { pendingRequest = null; hideIncomingRequest(); }
             });
         }
 
         function showIncomingRequest() {
-            if (!isOnline) {
-                // Auto decline if offline somehow
-                declineRequest();
+            if (!isOnline || activeSession || !pendingRequest) {
+                stopRingtone();
                 return;
             }
-            if (activeSession) return; // Don't show if already in a session
 
             document.getElementById('empty-queue').classList.add('hidden');
-            const container = document.getElementById('incoming-request-container');
-            container.classList.remove('hidden');
+            document.getElementById('incoming-modal').classList.remove('hidden');
+            document.getElementById('incoming-modal').classList.add('flex');
 
             document.getElementById('req-type').innerText = pendingRequest.type === 'call' ? 'Call' : 'Chat';
-            document.getElementById('req-user').innerText = pendingRequest.userName || 'User';
-            document.getElementById('req-icon').className = pendingRequest.type === 'call' ? 'fa-solid fa-phone-volume' : 'fa-solid fa-comment-dots text-2xl mt-1';
+            document.getElementById('req-user').innerText = pendingRequest.userName || 'Client';
             
-            // Badge
+            const icon = document.getElementById('req-icon');
+            icon.className = pendingRequest.type === 'call' ? 'fa-solid fa-phone-volume animate-bounce' : 'fa-solid fa-comment-dots animate-bounce mt-2';
+            
             document.getElementById('queue-badge').classList.remove('hidden');
-
-            // Play sound (simulated by toast for now due to browser autoplay policies)
-            showToast(`Incoming ${pendingRequest.type} from ${pendingRequest.userName || 'User'}!`, 'info');
+            
+            // Audio alerting
+            playRingtone();
+            showToast(`Incoming ${pendingRequest.type} request!`, 'info');
         }
 
         function hideIncomingRequest() {
-            document.getElementById('incoming-request-container').classList.add('hidden');
+            document.getElementById('incoming-modal').classList.add('hidden');
+            document.getElementById('incoming-modal').classList.remove('flex');
+            
             if(!activeSession) document.getElementById('empty-queue').classList.remove('hidden');
             document.getElementById('queue-badge').classList.add('hidden');
+            
+            stopRingtone();
         }
 
         async function declineRequest() {
             if (!pendingRequest) return;
+            stopRingtone();
             try {
                 await updateDoc(doc(db, "sessions", pendingRequest.id), { status: 'declined' });
-            } catch (e) { console.error(e); }
+            } catch (e) {}
             pendingRequest = null;
             hideIncomingRequest();
         }
 
         async function acceptRequest() {
             if (!pendingRequest) return;
+            stopRingtone();
             try {
-                // Update DB state to active
                 await updateDoc(doc(db, "sessions", pendingRequest.id), { 
                     status: 'active',
                     startedAt: serverTimestamp() 
@@ -862,35 +927,35 @@
                 pendingRequest = null;
                 hideIncomingRequest();
                 
-                // Open Live Room
                 startLiveRoom();
             } catch(e) {
-                showToast("Error accepting request", "error");
+                showToast("System error accepting request.", "error");
             }
         }
 
         function startLiveRoom() {
             const room = document.getElementById('live-room');
             room.classList.remove('hidden');
-            // Slight delay for translation animation
             setTimeout(() => { room.classList.remove('translate-y-full'); }, 10);
 
-            document.getElementById('room-user-name').innerText = activeSession.userName || 'Customer';
+            document.getElementById('room-user-name').innerText = activeSession.userName || 'Client';
             document.getElementById('room-user-avatar').innerText = (activeSession.userName || 'C').charAt(0).toUpperCase();
-            document.getElementById('room-type-label').innerText = activeSession.type === 'call' ? 'Live Call' : 'Live Chat';
             
-            // UI Toggle
             if(activeSession.type === 'chat') {
+                document.getElementById('room-type-label').innerText = 'Live Chat';
                 document.getElementById('room-chat-area').classList.remove('hidden');
+                document.getElementById('chat-end-bar').classList.remove('hidden');
                 document.getElementById('room-call-area').classList.add('hidden');
                 initChatSync();
             } else {
+                document.getElementById('room-type-label').innerText = 'Live Call';
                 document.getElementById('room-chat-area').classList.add('hidden');
+                document.getElementById('chat-end-bar').classList.add('hidden');
                 document.getElementById('room-call-area').classList.remove('hidden');
+                document.getElementById('room-call-area').classList.add('flex');
                 document.getElementById('call-status-text').innerText = 'Connected';
             }
 
-            // Start Timer
             sessionSeconds = 0;
             document.getElementById('room-timer').innerText = "00:00";
             document.getElementById('room-live-earn').innerText = "0";
@@ -901,17 +966,24 @@
                 const s = (sessionSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('room-timer').innerText = `${m}:${s}`;
 
-                // Calculate live earnings
                 const billedMins = Math.ceil(sessionSeconds / 60);
                 const gross = billedMins * activeSession.pricePerMin;
                 const net = gross * (1 - PLATFORM_FEE_PERCENTAGE);
                 document.getElementById('room-live-earn').innerText = Math.floor(net);
             }, 1000);
+            
+            // Listen for user disconnecting
+            onSnapshot(doc(db, "sessions", activeSession.id), (docSnap) => {
+                if(docSnap.exists() && docSnap.data().status === 'completed') {
+                    // User ended it
+                    handleSessionEndUI();
+                }
+            });
         }
 
         function initChatSync() {
             const msgContainer = document.getElementById('chat-messages');
-            msgContainer.innerHTML = '<div class="text-center my-2"><span class="bg-white/10 text-xs px-3 py-1 rounded-full text-white/50">End-to-End Encrypted Session</span></div>';
+            msgContainer.innerHTML = '<div class="text-center my-2"><span class="bg-white/10 text-[10px] px-3 py-1 rounded-full text-white/50 uppercase tracking-wide">End-to-End Encrypted Session</span></div>';
             
             const q = query(collection(db, "sessions", activeSession.id, "messages"), orderBy("timestamp", "asc"));
             chatUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -921,14 +993,14 @@
                         const isMe = msg.senderId === currentUser.uid;
                         
                         const msgHTML = `
-                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                <div class="max-w-[75%] rounded-2xl px-4 py-2 ${isMe ? 'bg-cosmic-accent text-cosmic-900 rounded-tr-sm' : 'bg-white/10 text-white rounded-tl-sm'}">
-                                    <p class="text-sm">${msg.text}</p>
+                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'} w-full">
+                                <div class="max-w-[85%] rounded-2xl px-4 py-2 ${isMe ? 'bg-cosmic-accent text-cosmic-900 rounded-br-sm shadow-md' : 'bg-white/10 text-white rounded-bl-sm border border-white/5'}">
+                                    <p class="text-sm leading-relaxed">${msg.text}</p>
                                 </div>
                             </div>
                         `;
                         msgContainer.insertAdjacentHTML('beforeend', msgHTML);
-                        msgContainer.scrollTop = msgContainer.scrollHeight; // Auto scroll
+                        msgContainer.scrollTop = msgContainer.scrollHeight;
                     }
                 });
             });
@@ -940,7 +1012,7 @@
             const text = input.value.trim();
             if(!text || !activeSession) return;
 
-            input.value = ''; // clear instantly
+            input.value = ''; 
             try {
                 await addDoc(collection(db, "sessions", activeSession.id, "messages"), {
                     text: text,
@@ -951,14 +1023,12 @@
         }
 
         async function endSession() {
-            clearInterval(sessionTimerInterval);
-            if(chatUnsubscribe) chatUnsubscribe();
-
+            if(!activeSession) return;
+            
             const billedMins = Math.ceil(sessionSeconds / 60);
             const totalCost = billedMins * activeSession.pricePerMin;
 
             try {
-                // Update Session to completed
                 await updateDoc(doc(db, "sessions", activeSession.id), {
                     status: 'completed',
                     durationSeconds: sessionSeconds,
@@ -966,23 +1036,35 @@
                     endedAt: serverTimestamp()
                 });
                 
-                // Increment Astrologer total orders
+                // Increment total orders
                 await updateDoc(doc(db, "astrologers", currentUser.uid), {
                     orders: (myProfile.orders || 0) + 1
                 });
                 
                 showToast(`Session ended. Earned ₹${Math.floor(totalCost * (1 - PLATFORM_FEE_PERCENTAGE))}`, "success");
-            } catch(e) { console.error(e); }
+            } catch(e) {}
 
-            // Close UI
+            handleSessionEndUI();
+        }
+
+        function handleSessionEndUI() {
+            clearInterval(sessionTimerInterval);
+            if(chatUnsubscribe) chatUnsubscribe();
+            
             const room = document.getElementById('live-room');
             room.classList.add('translate-y-full');
-            setTimeout(() => { room.classList.add('hidden'); }, 300);
+            setTimeout(() => { 
+                room.classList.add('hidden'); 
+                document.getElementById('room-chat-area').classList.add('hidden');
+                document.getElementById('room-call-area').classList.add('hidden');
+                document.getElementById('chat-end-bar').classList.add('hidden');
+                document.getElementById('room-call-area').classList.remove('flex');
+            }, 300);
             
             activeSession = null;
         }
 
-        // Call UI mock functions
+        // Call UI
         let isMuted = false;
         function toggleMute() {
             isMuted = !isMuted;
@@ -998,7 +1080,6 @@
                 overlay.classList.remove('flex');
             }
         }
-        function toggleVideo() { showToast("Video calling disabled in current tier.", "info"); }
 
         function switchTab(tabId) {
             activeView = tabId;
@@ -1025,20 +1106,18 @@
             if (type === "success") { colors = "bg-green-500/10 border-green-500/50 text-green-100"; icon = "fa-circle-check text-green-400"; }
             if (type === "error") { colors = "bg-red-500/10 border-red-500/50 text-red-100"; icon = "fa-circle-exclamation text-red-400"; }
 
-            toast.className = `${colors} border px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transform transition-all duration-300 -translate-y-full md:translate-y-0 md:translate-x-full opacity-0 text-sm backdrop-blur-md w-max max-w-[90vw]`;
+            toast.className = `${colors} border px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 -translate-y-full opacity-0 text-xs md:text-sm backdrop-blur-md max-w-sm w-full`;
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${message}</span>`;
             
             container.appendChild(toast);
-            // Animate in
-            setTimeout(() => toast.classList.remove('-translate-y-full', 'md:translate-x-full', 'opacity-0'), 10);
-            // Remove after 3s
+            setTimeout(() => toast.classList.remove('-translate-y-full', 'opacity-0'), 10);
             setTimeout(() => {
-                toast.classList.add('opacity-0');
+                toast.classList.add('opacity-0', '-translate-y-full');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // Global exports for HTML handlers
+        // Global exports
         window.handleLogin = handleLogin;
         window.handleLogout = handleLogout;
         window.toggleSignup = toggleSignup;
@@ -1054,7 +1133,6 @@
         window.endSession = endSession;
         window.sendChatMessage = sendChatMessage;
         window.toggleMute = toggleMute;
-        window.toggleVideo = toggleVideo;
     </script>
 </body>
 </html>
