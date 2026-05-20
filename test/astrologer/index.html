@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Astrologer Portal | AstroPath</title>
     
-    <script src="[cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
         tailwind.config = {
@@ -80,8 +80,8 @@
         }
     </script>
 
-    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap)" rel="stylesheet">
-    <link rel="stylesheet" href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         * {
@@ -429,7 +429,7 @@
         <header class="glass-dark border-b border-white/5 h-16 pt-safe flex-shrink-0 flex items-center justify-between px-4 z-20">
             <div class="flex items-center gap-3">
                 <div class="relative">
-                    <img id="header-avatar" src="" alt="Avatar" class="w-11 h-11 rounded-full object-cover border-2 border-cosmic-accent/50" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=A&background=D4AF37&color=050510&bold=true)'">
+                    <img id="header-avatar" src="" alt="Avatar" class="w-11 h-11 rounded-full object-cover border-2 border-cosmic-accent/50" onerror="this.src='https://ui-avatars.com/api/?name=A&background=D4AF37&color=050510&bold=true'">
                     <div id="header-online-dot" class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 border-2 border-cosmic-800"></div>
                 </div>
                 <div>
@@ -727,10 +727,23 @@
             </div>
         </div>
 
+        <!-- NEW: Client Info Panel (Birth Details) -->
+        <div id="client-info-panel" class="bg-cosmic-800/90 border-b border-white/10 p-3 text-xs shrink-0 transition-all duration-300 shadow-md z-10">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-cosmic-accent font-bold"><i class="fa-solid fa-address-card mr-1"></i> Client Details</span>
+                <button onclick="toggleClientInfo()" class="text-cosmic-light/50 hover:text-white p-1">
+                    <i id="client-info-icon" class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+            <div id="client-info-content" class="grid grid-cols-2 gap-y-2 gap-x-4 text-white/80 transition-all">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
         <!-- Chat Area -->
         <div id="room-chat-area" class="flex-1 flex flex-col overflow-hidden hidden">
             <!-- Messages Container -->
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 chat-scroll flex flex-col">
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 chat-scroll flex flex-col pb-2">
                 <div class="text-center py-2">
                     <span class="bg-white/5 text-[10px] px-4 py-1.5 rounded-full text-cosmic-light/40 uppercase tracking-wide inline-block">
                         <i class="fa-solid fa-shield-halved mr-1.5"></i>End-to-end encrypted
@@ -738,8 +751,17 @@
                 </div>
             </div>
 
+            <!-- NEW: Smart Quick Replies Carousel -->
+            <div class="px-3 pb-2 flex gap-2 overflow-x-auto hide-scrollbar shrink-0 border-t border-white/5 pt-3 bg-cosmic-900">
+                <button onclick="sendQuickMessage('Hello! Welcome to your session. How can I guide you today?')" class="quick-action-btn px-3 py-1.5 rounded-full text-[11px] text-white/80 whitespace-nowrap bg-cosmic-800/80 hover:bg-cosmic-700">👋 Welcome</button>
+                <button onclick="sendQuickMessage('Please give me a moment while I analyze your birth chart.')" class="quick-action-btn px-3 py-1.5 rounded-full text-[11px] text-white/80 whitespace-nowrap bg-cosmic-800/80 hover:bg-cosmic-700">📊 Analyzing Chart</button>
+                <button onclick="sendQuickMessage('Could you please elaborate on your specific question?')" class="quick-action-btn px-3 py-1.5 rounded-full text-[11px] text-white/80 whitespace-nowrap bg-cosmic-800/80 hover:bg-cosmic-700">❓ Ask Question</button>
+                <button onclick="sendQuickMessage('The planetary alignments suggest positive changes ahead.')" class="quick-action-btn px-3 py-1.5 rounded-full text-[11px] text-white/80 whitespace-nowrap bg-cosmic-800/80 hover:bg-cosmic-700">✨ Positive Outlook</button>
+                <button onclick="sendQuickMessage('To provide an accurate reading, I am verifying the D9 Navamsa chart.')" class="quick-action-btn px-3 py-1.5 rounded-full text-[11px] text-white/80 whitespace-nowrap bg-cosmic-800/80 hover:bg-cosmic-700">🔍 Checking Navamsa</button>
+            </div>
+
             <!-- Chat Input -->
-            <form onsubmit="sendChatMessage(event)" class="p-3 glass-dark border-t border-white/5 flex gap-2 shrink-0 pb-safe">
+            <form id="chat-input-form" onsubmit="sendChatMessage(event)" class="p-3 glass-dark border-t border-white/5 flex gap-2 shrink-0 pb-safe">
                 <input 
                     type="text" 
                     id="chat-input" 
@@ -763,7 +785,7 @@
             </div>
 
             <!-- Mic Icon -->
-            <div class="relative z-10 mb-8">
+            <div class="relative z-10 mb-8 mt-10">
                 <div class="w-32 h-32 rounded-full bg-cosmic-800 border-4 border-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
                     <i id="call-mic-icon" class="fa-solid fa-microphone text-5xl text-white"></i>
                 </div>
@@ -787,7 +809,7 @@
         </div>
 
         <!-- Chat End Bar -->
-        <div id="chat-end-bar" class="hidden p-4 glass-dark border-t border-white/5 pb-safe">
+        <div id="chat-end-bar" class="hidden p-4 glass-dark border-t border-white/5 pb-safe shrink-0">
             <button onclick="endSession()" class="w-full bg-red-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 active:scale-98 transition-transform">
                 <i class="fa-solid fa-xmark"></i>
                 End Consultation
@@ -800,14 +822,14 @@
 
     <!-- ==================== FIREBASE & CORE LOGIC ==================== -->
     <script type="module">
-        import { initializeApp } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js)";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
             getAuth, 
             signInWithEmailAndPassword, 
             createUserWithEmailAndPassword, 
             onAuthStateChanged, 
             signOut 
-        } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js)";
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
@@ -822,13 +844,13 @@
             addDoc, 
             serverTimestamp,
             limit
-        } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js)";
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
             authDomain: "designsnap-f3309.firebaseapp.com",
-            databaseURL: "[designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app](https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app)",
+            databaseURL: "https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "designsnap-f3309",
             storageBucket: "designsnap-f3309.firebasestorage.app",
             messagingSenderId: "741888249963",
@@ -854,6 +876,7 @@
         let chatUnsubscribe = null;
         let requestUnsubscribe = null;
         let sessionDocUnsubscribe = null;
+        let typingTimeout = null;
 
         // WebRTC State
         let peerConnection = null;
@@ -862,8 +885,6 @@
 
         // Audio State
         let audioContext = null;
-        let oscillator = null;
-        let gainNode = null;
         let isRinging = false;
 
         // ==================== WEB AUDIO API RINGTONE ====================
@@ -879,23 +900,17 @@
             
             try {
                 const ctx = initAudioContext();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
-
+                if (ctx.state === 'suspended') ctx.resume();
                 isRinging = true;
                 
-                // Create a more pleasant but attention-grabbing ring pattern
                 function playRingPattern() {
                     if (!isRinging) return;
 
                     const now = ctx.currentTime;
-                    
-                    // First tone
                     const osc1 = ctx.createOscillator();
                     const gain1 = ctx.createGain();
                     osc1.type = 'sine';
-                    osc1.frequency.setValueAtTime(880, now); // A5
+                    osc1.frequency.setValueAtTime(880, now); 
                     gain1.gain.setValueAtTime(0, now);
                     gain1.gain.linearRampToValueAtTime(0.4, now + 0.05);
                     gain1.gain.linearRampToValueAtTime(0, now + 0.3);
@@ -904,11 +919,10 @@
                     osc1.start(now);
                     osc1.stop(now + 0.3);
 
-                    // Second tone (higher)
                     const osc2 = ctx.createOscillator();
                     const gain2 = ctx.createGain();
                     osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(1108.73, now + 0.35); // C#6
+                    osc2.frequency.setValueAtTime(1108.73, now + 0.35); 
                     gain2.gain.setValueAtTime(0, now + 0.35);
                     gain2.gain.linearRampToValueAtTime(0.4, now + 0.4);
                     gain2.gain.linearRampToValueAtTime(0, now + 0.7);
@@ -917,12 +931,8 @@
                     osc2.start(now + 0.35);
                     osc2.stop(now + 0.7);
 
-                    // Repeat pattern
-                    setTimeout(() => {
-                        if (isRinging) playRingPattern();
-                    }, 1500);
+                    setTimeout(() => { if (isRinging) playRingPattern(); }, 1500);
                 }
-
                 playRingPattern();
             } catch (e) {
                 console.warn("Audio playback failed:", e);
@@ -933,12 +943,9 @@
             isRinging = false;
         }
 
-        // Unlock audio context on first user interaction
         function unlockAudio() {
             initAudioContext();
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
             document.removeEventListener('touchstart', unlockAudio);
             document.removeEventListener('click', unlockAudio);
         }
@@ -1000,7 +1007,6 @@
                 document.getElementById('apply-screen').classList.remove('flex');
                 checkAndLoadProfile();
             } else {
-                // Reset to auth screen
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('flex');
@@ -1093,7 +1099,7 @@
                     orders: 0,
                     isOnline: false,
                     isVerified: false,
-                    image: `[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D4AF37&color=050510&bold=true)`,
+                    image: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D4AF37&color=050510&bold=true`,
                     createdAt: serverTimestamp()
                 });
 
@@ -1143,7 +1149,6 @@
                 }
             });
 
-            // Load global settings
             onSnapshot(doc(db, "settings", "global"), (snap) => {
                 if (snap.exists() && snap.data().commissionPercent !== undefined) {
                     PLATFORM_FEE_PERCENTAGE = snap.data().commissionPercent / 100;
@@ -1172,7 +1177,7 @@
 
         function updateUIWithProfile() {
             document.getElementById('header-name').textContent = myProfile.name || 'Astrologer';
-            document.getElementById('header-avatar').src = myProfile.image || `[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name) || 'A')}&background=D4AF37&color=050510&bold=true`;
+            document.getElementById('header-avatar').src = myProfile.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name) || 'A'}&background=D4AF37&color=050510&bold=true`;
             
             document.getElementById('prof-price').value = myProfile.price || 20;
             document.getElementById('prof-name').value = myProfile.name || '';
@@ -1209,7 +1214,6 @@
 
         async function toggleOnlineStatus() {
             const newState = !isOnline;
-            
             try {
                 await updateDoc(doc(db, "astrologers", currentUser.uid), { isOnline: newState });
                 showToast(newState ? "You're now online!" : "You're now offline", newState ? "success" : "info");
@@ -1237,7 +1241,6 @@
             } catch (err) {
                 showToast("Failed to update profile", "error");
             }
-            
             btn.textContent = 'Update Profile';
         }
 
@@ -1261,13 +1264,11 @@
             } catch (err) {
                 showToast("Failed to save settings", "error");
             }
-            
             btn.textContent = 'Save & Continue';
         }
 
         // ==================== EARNINGS & SETTLEMENTS ====================
         function loadEarningsData() {
-            // Payout details
             onSnapshot(doc(db, "payout_details", currentUser.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -1277,7 +1278,6 @@
                 }
             });
 
-            // Sessions earnings
             const sessionsQuery = query(
                 collection(db, "sessions"),
                 where("astroId", "==", currentUser.uid),
@@ -1310,14 +1310,9 @@
                         todaySessionCount++;
                     }
 
-                    recentSessions.push({
-                        ...data,
-                        id: d.id,
-                        date: sessionDate
-                    });
+                    recentSessions.push({ ...data, id: d.id, date: sessionDate });
                 });
 
-                // Sort by date descending
                 recentSessions.sort((a, b) => b.date - a.date);
 
                 const netTotal = grossTotal * (1 - PLATFORM_FEE_PERCENTAGE);
@@ -1328,14 +1323,10 @@
                 document.getElementById('today-earnings').textContent = Math.floor(todayNet);
                 document.getElementById('today-sessions').textContent = todaySessionCount;
 
-                // Update recent sessions list
                 updateRecentSessionsList(recentSessions.slice(0, 5));
-
-                // Calculate available for withdrawal (net - settled)
                 calculateAvailableBalance(netTotal);
             });
 
-            // Settlements
             const settlementsQuery = query(
                 collection(db, "settlements"),
                 where("astroId", "==", currentUser.uid)
@@ -1349,7 +1340,6 @@
                     settlements.push({ id: d.id, ...d.data() });
                 });
 
-                // Sort by timestamp descending
                 settlements.sort((a, b) => {
                     const timeA = a.timestamp?.toDate?.() || new Date(a.timestamp || 0);
                     const timeB = b.timestamp?.toDate?.() || new Date(b.timestamp || 0);
@@ -1358,6 +1348,7 @@
 
                 if (settlements.length === 0) {
                     list.innerHTML = '<div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">No payouts processed yet</div>';
+                    window.totalSettledAmount = 0;
                     return;
                 }
 
@@ -1383,12 +1374,9 @@
                     `;
                 }).join('');
 
-                // Recalculate available balance
-                const totalSettled = settlements
+                window.totalSettledAmount = settlements
                     .filter(s => s.status === 'completed')
                     .reduce((sum, s) => sum + (s.amount || 0), 0);
-                
-                window.totalSettledAmount = totalSettled;
             });
         }
 
@@ -1400,7 +1388,6 @@
 
         function updateRecentSessionsList(sessions) {
             const list = document.getElementById('recent-sessions-list');
-            
             if (sessions.length === 0) {
                 list.innerHTML = '<div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">No sessions yet today</div>';
                 return;
@@ -1441,12 +1428,10 @@
                     ifsc: document.getElementById('pay-ifsc').value.trim().toUpperCase(),
                     updatedAt: serverTimestamp()
                 }, { merge: true });
-                
                 showToast("Payout details saved", "success");
             } catch (err) {
                 showToast("Failed to save details", "error");
             }
-            
             btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Save Details';
         }
 
@@ -1557,7 +1542,6 @@
                 startLiveRoom();
             } catch (e) {
                 console.error("Accept error:", e);
-                
                 if (e.message?.includes('permission')) {
                     showToast("Permission denied. Check Firestore rules.", "error");
                 } else {
@@ -1567,6 +1551,33 @@
         }
 
         // ==================== LIVE SESSION ROOM ====================
+        function populateClientInfo(details, userName) {
+            const content = document.getElementById('client-info-content');
+            if (!details) {
+                content.innerHTML = `<div class="col-span-2 text-cosmic-light/50 py-1 text-center">No birth details provided by ${userName || 'Client'}</div>`;
+                return;
+            }
+            content.innerHTML = `
+                <div><span class="text-cosmic-light/50">DOB:</span> ${details.date || 'N/A'}</div>
+                <div><span class="text-cosmic-light/50">Time:</span> ${details.time || 'N/A'}</div>
+                <div class="col-span-2 truncate"><span class="text-cosmic-light/50">Place:</span> ${details.place || 'N/A'}</div>
+                <div><span class="text-cosmic-light/50">Gender:</span> <span class="capitalize">${details.gender || 'N/A'}</span></div>
+                <div class="col-span-2 text-yellow-400 mt-1.5"><span class="text-cosmic-light/50 text-white">Q:</span> ${details.question || 'No specific question mentioned'}</div>
+            `;
+        }
+
+        window.toggleClientInfo = function() {
+            const content = document.getElementById('client-info-content');
+            const icon = document.getElementById('client-info-icon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.className = 'fa-solid fa-chevron-up';
+            } else {
+                content.classList.add('hidden');
+                icon.className = 'fa-solid fa-chevron-down';
+            }
+        };
+
         function startLiveRoom() {
             const room = document.getElementById('live-room');
             room.classList.remove('hidden');
@@ -1578,6 +1589,9 @@
 
             document.getElementById('room-user-name').textContent = activeSession.userName || 'Client';
             document.getElementById('room-user-avatar').textContent = (activeSession.userName || 'C').charAt(0).toUpperCase();
+
+            // Populate Birth Details
+            populateClientInfo(activeSession.userBirthDetails, activeSession.userName);
 
             const chatArea = document.getElementById('room-chat-area');
             const callArea = document.getElementById('room-call-area');
@@ -1665,6 +1679,18 @@
                     }
                 });
             });
+
+            // Live Typing Indicator Event Listener
+            const chatInput = document.getElementById('chat-input');
+            chatInput.addEventListener('input', () => {
+                if (!activeSession) return;
+                updateDoc(doc(db, "sessions", activeSession.id), { astroTyping: true }).catch(()=>{});
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    updateDoc(doc(db, "sessions", activeSession.id), { astroTyping: false }).catch(()=>{});
+                }, 1500);
+            });
         }
 
         function escapeHtml(text) {
@@ -1675,13 +1701,14 @@
 
         async function sendChatMessage(e) {
             e.preventDefault();
-            
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
-            
             if (!text || !activeSession) return;
 
             input.value = '';
+            // Clear typing immediately upon sending
+            updateDoc(doc(db, "sessions", activeSession.id), { astroTyping: false }).catch(()=>{});
+            clearTimeout(typingTimeout);
 
             try {
                 await addDoc(collection(db, "sessions", activeSession.id, "messages"), {
@@ -1695,6 +1722,19 @@
             }
         }
 
+        window.sendQuickMessage = async function(text) {
+            if (!text || !activeSession) return;
+            try {
+                await addDoc(collection(db, "sessions", activeSession.id, "messages"), {
+                    text: text,
+                    senderId: currentUser.uid,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) {
+                showToast("Failed to send message", "error");
+            }
+        };
+
         // ==================== WEBRTC FUNCTIONALITY ====================
         async function initWebRTC() {
             const servers = {
@@ -1705,8 +1745,9 @@
             };
 
             peerConnection = new RTCPeerConnection(servers);
+            isMuted = false;
+            updateMuteUI();
 
-            // Set up remote audio
             const remoteAudio = document.getElementById('remote-audio-player');
             const remoteStream = new MediaStream();
             remoteAudio.srcObject = remoteStream;
@@ -1718,7 +1759,6 @@
                 document.getElementById('call-status-text').textContent = 'Connected';
             };
 
-            // Get local audio
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                 localStream.getTracks().forEach(track => {
@@ -1729,12 +1769,10 @@
                 showToast("Microphone access denied", "warning");
             }
 
-            // Set up Firestore references
             const sessionDoc = doc(db, "sessions", activeSession.id);
             const callerCandidates = collection(sessionDoc, "callerCandidates");
             const calleeCandidates = collection(sessionDoc, "calleeCandidates");
 
-            // Send ICE candidates
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
                     addDoc(calleeCandidates, event.candidate.toJSON());
@@ -1785,26 +1823,28 @@
             });
         }
 
-        function toggleMute() {
-            isMuted = !isMuted;
-            
+        function updateMuteUI() {
             const btnIcon = document.getElementById('mute-btn-icon');
             const muteOverlay = document.getElementById('mute-overlay');
             const muteBtn = document.getElementById('mute-btn');
 
             if (isMuted) {
                 btnIcon.className = 'fa-solid fa-microphone-slash text-red-400';
-                muteOverlay.classList.remove('hidden');
-                muteOverlay.classList.add('flex');
+                muteOverlay?.classList.remove('hidden');
+                muteOverlay?.classList.add('flex');
                 muteBtn.classList.add('bg-red-600/20', 'border-red-500/50');
             } else {
                 btnIcon.className = 'fa-solid fa-microphone';
-                muteOverlay.classList.add('hidden');
-                muteOverlay.classList.remove('flex');
+                muteOverlay?.classList.add('hidden');
+                muteOverlay?.classList.remove('flex');
                 muteBtn.classList.remove('bg-red-600/20', 'border-red-500/50');
             }
+        }
 
-            // Actually mute the track
+        function toggleMute() {
+            isMuted = !isMuted;
+            updateMuteUI();
+
             if (localStream && localStream.getAudioTracks().length > 0) {
                 localStream.getAudioTracks()[0].enabled = !isMuted;
             }
@@ -1825,7 +1865,6 @@
                     endedAt: serverTimestamp()
                 });
 
-                // Increment orders count
                 await updateDoc(doc(db, "astrologers", currentUser.uid), {
                     orders: (myProfile?.orders || 0) + 1
                 });
@@ -1840,7 +1879,6 @@
         }
 
         function handleSessionEndUI() {
-            // Clear intervals and subscriptions
             if (sessionTimerInterval) {
                 clearInterval(sessionTimerInterval);
                 sessionTimerInterval = null;
@@ -1853,8 +1891,8 @@
                 sessionDocUnsubscribe();
                 sessionDocUnsubscribe = null;
             }
+            clearTimeout(typingTimeout);
 
-            // Clean up WebRTC
             if (peerConnection) {
                 peerConnection.close();
                 peerConnection = null;
@@ -1864,10 +1902,8 @@
                 localStream = null;
             }
 
-            // Reset mute state
             isMuted = false;
 
-            // Animate room out
             const room = document.getElementById('live-room');
             room.classList.add('translate-y-full');
             
@@ -1889,18 +1925,15 @@
         function switchTab(tabId) {
             activeView = tabId;
 
-            // Hide all views
             document.querySelectorAll('.view-section').forEach(el => {
                 el.classList.add('hidden');
             });
 
-            // Show selected view
             const targetView = document.getElementById(`view-${tabId}`);
             if (targetView) {
                 targetView.classList.remove('hidden');
             }
 
-            // Update nav buttons
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('active', 'text-cosmic-accent');
                 btn.classList.add('text-cosmic-light/40');
