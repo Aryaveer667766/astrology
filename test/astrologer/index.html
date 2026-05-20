@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Astrologer Portal | AstroPath</title>
+    
+    <script src="[cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cosmic: {
+                            950: '#050510',
+                            900: '#0B0A1A',
+                            800: '#1A1832',
+                            700: '#2A274A',
+                            600: '#3D3A6B',
+                            light: '#E2E8F0',
+                            accent: '#D4AF37',
+                            gold: {
+                                light: '#F5E6A3',
+                                DEFAULT: '#D4AF37',
+                                dark: '#B8960C'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'ring-pulse': 'ringPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ring-outer': 'ringOuter 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-down': 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'bounce-gentle': 'bounceGentle 2s infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'shake': 'shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite',
+                    },
+                    keyframes: {
+                        ringPulse: {
+                            '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+                            '50%': { transform: 'scale(1.15)', opacity: '0.4' }
+                        },
+                        ringOuter: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.6' },
+                            '100%': { transform: 'scale(2)', opacity: '0' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(0)', opacity: '1' },
+                            '100%': { transform: 'translateY(100%)', opacity: '0' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        bounceGentle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(212, 175, 55, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(212, 175, 55, 0.6)' }
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0) rotate(0)' },
+                            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px) rotate(-2deg)' },
+                            '20%, 40%, 60%, 80%': { transform: 'translateX(2px) rotate(2deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)">
+    
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #050510 0%, #0B0A1A 50%, #1A1832 100%);
+            color: white;
+            overscroll-behavior: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .glass-card {
+            background: rgba(26, 24, 50, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-dark {
+            background: rgba(5, 5, 16, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        
+        .gradient-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 50%, #D4AF37 100%);
+        }
+        
+        .gradient-gold-text {
+            background: linear-gradient(135deg, #D4AF37, #F5E6A3, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
+        .mb-safe { margin-bottom: env(safe-area-inset-bottom); }
+        
+        .chat-scroll {
+            scroll-behavior: smooth;
+        }
+        .chat-scroll::-webkit-scrollbar { width: 4px; }
+        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+        .chat-scroll::-webkit-scrollbar-thumb { 
+            background: rgba(212, 175, 55, 0.3); 
+            border-radius: 10px; 
+        }
+        
+        .input-field {
+            background: rgba(5, 5, 16, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%);
+            color: #050510;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        .btn-glass:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.97);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulseGlow 2s infinite;
+        }
+        
+        .message-bubble {
+            max-width: 85%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .message-sent {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%);
+            color: #050510;
+            border-radius: 20px 20px 6px 20px;
+        }
+        
+        .message-received {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px 20px 20px 6px;
+        }
+        
+        @keyframes incoming-ring {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.1) rotate(-15deg); }
+            20% { transform: scale(1.1) rotate(15deg); }
+            30% { transform: scale(1.1) rotate(-15deg); }
+            40% { transform: scale(1.1) rotate(15deg); }
+            50% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .incoming-icon {
+            animation: incoming-ring 1s ease-in-out infinite;
+        }
+        
+        .ring-wave {
+            position: absolute;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 50%;
+            animation: ringOuter 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        .nav-item.active {
+            color: #D4AF37;
+        }
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+        
+        /* Custom toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-hidden">
+
+    <!-- Hidden Audio Elements -->
+    <audio id="remote-audio-player" autoplay playsinline></audio>
+
+    <!-- ==================== AUTH SCREEN ==================== -->
+    <div id="auth-screen" class="fixed inset-0 bg-cosmic-950 z-[100] flex items-center justify-center p-4">
+        <div class="w-full max-w-sm">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl gradient-gold flex items-center justify-center shadow-lg shadow-cosmic-accent/30">
+                    <i class="fa-solid fa-star-and-crescent text-3xl text-cosmic-950"></i>
+                </div>
+                <h1 class="text-2xl font-bold gradient-gold-text">AstroPath</h1>
+                <p class="text-cosmic-light/50 text-sm mt-1">Partner Portal</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="glass-card p-6 rounded-3xl">
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-cosmic-light/70 mb-2 uppercase tracking-wide">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            required 
+                            class="input-field w-full rounded-xl px-4 py-3.5 text-white placeholder:text-white/30" 
+                            placeholder="guru@astropath.com" 
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-cosmic-light/70 mb-2 uppercase tracking-wide">Password</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            required 
+                            class="input-field w-full rounded-xl px-4 py-3.5 text-white placeholder:text-white/30" 
+                            placeholder="••••••••" 
+                        />
+                    </div>
+                    
+                    <div id="login-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3 rounded-xl text-center"></div>
+                    
+                    <button type="submit" id="login-btn" class="btn-primary w-full py-4 rounded-xl text-sm mt-2">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-4 border-t border-white/10 text-center">
+                    <span class="text-cosmic-light/40 text-xs">New astrologer?</span>
+                    <button onclick="showApplyScreen()" class="text-cosmic-accent font-semibold text-xs ml-1 hover:underline">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== APPLICATION SCREEN ==================== -->
+    <div id="apply-screen" class="fixed inset-0 bg-cosmic-950 z-[100] hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-sm my-auto py-8">
+            <div class="glass-card p-6 rounded-3xl relative">
+                <button onclick="hideApplyScreen()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-cosmic-light/50 hover:text-white hover:bg-white/10 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="text-center mb-6 pt-2">
+                    <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-cosmic-accent/20 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus text-cosmic-accent text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Join AstroPath</h2>
+                    <p class="text-xs text-cosmic-light/50 mt-1">Submit your application</p>
+                </div>
+
+                <form id="apply-form" onsubmit="handleApply(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Full Name</label>
+                            <input type="text" id="apply-name" required class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="Your Name" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Mobile</label>
+                            <input type="tel" id="apply-phone" required class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="+91..." />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Email (Login)</label>
+                        <input type="email" id="apply-email" required class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="you@email.com" />
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Password</label>
+                        <input type="password" id="apply-password" required minlength="6" class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="Min 6 characters" />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Experience (Years)</label>
+                            <input type="number" id="apply-exp" required min="1" class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="5" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Specialization</label>
+                            <input type="text" id="apply-skills" required class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="Vedic, Tarot" />
+                        </div>
+                    </div>
+
+                    <button type="submit" id="apply-btn" class="btn-primary w-full py-4 rounded-xl text-sm mt-2">
+                        Submit Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PENDING REVIEW SCREEN ==================== -->
+    <div id="pending-screen" class="fixed inset-0 bg-cosmic-950 z-[90] hidden items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-3xl max-w-sm w-full text-center">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <i class="fa-solid fa-hourglass-half text-yellow-500 text-3xl animate-pulse"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Application Under Review</h2>
+            <p class="text-cosmic-light/60 text-sm mb-8 leading-relaxed">
+                Our team is reviewing your profile. You'll receive access once approved.
+            </p>
+            <button onclick="handleLogout()" class="btn-glass w-full py-3.5 rounded-xl text-white font-medium">
+                Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== ONBOARDING SCREEN ==================== -->
+    <div id="onboarding-screen" class="fixed inset-0 bg-cosmic-950 z-[90] hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card p-6 rounded-3xl w-full max-w-sm my-auto">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-white">Complete Your Setup</h2>
+                <p class="text-xs text-cosmic-light/50 mt-1">Finalize your profile details</p>
+            </div>
+
+            <form id="onboard-form" onsubmit="saveNewProfile(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Rate (₹/min)</label>
+                        <input type="number" id="onb-price" required min="10" class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="20" />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Experience</label>
+                        <input type="number" id="onb-exp" required min="1" class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="5 years" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Skills (comma separated)</label>
+                    <input type="text" id="onb-skills" required class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="Vedic, Tarot, Numerology" />
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Languages (comma separated)</label>
+                    <input type="text" id="onb-langs" required class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="English, Hindi" />
+                </div>
+                <button type="submit" id="onb-btn" class="btn-primary w-full py-4 rounded-xl text-sm mt-2">
+                    Save & Continue
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN APP SCREEN ==================== -->
+    <div id="app-screen" class="hidden flex-col h-screen h-[100dvh] w-full relative max-w-md mx-auto">
+
+        <!-- Header -->
+        <header class="glass-dark border-b border-white/5 h-16 pt-safe flex-shrink-0 flex items-center justify-between px-4 z-20">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <img id="header-avatar" src="" alt="Avatar" class="w-11 h-11 rounded-full object-cover border-2 border-cosmic-accent/50" onerror="this.src='[ui-avatars.com](https://ui-avatars.com/api/?name=A&background=D4AF37&color=050510&bold=true)'">
+                    <div id="header-online-dot" class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 border-2 border-cosmic-800"></div>
+                </div>
+                <div>
+                    <span id="header-name" class="font-semibold text-sm text-white block leading-tight">Loading...</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <div id="status-toggle-btn" onclick="toggleOnlineStatus()" class="toggle-switch"></div>
+                        <span id="status-text" class="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Offline</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="handleLogout()" class="w-9 h-9 rounded-full bg-white/5 text-cosmic-light/60 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto pb-24 hide-scrollbar relative">
+
+            <!-- HOME VIEW -->
+            <div id="view-home" class="view-section p-4 space-y-5">
+                <!-- Stats Banner -->
+                <div class="flex gap-3 mt-2">
+                    <div class="flex-1 glass-card p-4 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-indian-rupee-sign text-green-400 text-xs"></i>
+                            <span class="text-[10px] text-cosmic-light/50 uppercase tracking-wide">Today's Earnings</span>
+                        </div>
+                        <p class="text-xl font-bold text-white">₹<span id="today-earnings">0</span></p>
+                    </div>
+                    <div class="flex-1 glass-card p-4 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-clock text-blue-400 text-xs"></i>
+                            <span class="text-[10px] text-cosmic-light/50 uppercase tracking-wide">Sessions Today</span>
+                        </div>
+                        <p class="text-xl font-bold text-white"><span id="today-sessions">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Queue Section -->
+                <div>
+                    <h2 class="text-lg font-bold text-white mb-3">Live Queue</h2>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-queue" class="glass-card p-8 rounded-2xl text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
+                            <i class="fa-solid fa-satellite-dish text-2xl text-cosmic-light/30 animate-bounce-gentle"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">Waiting for clients...</h3>
+                        <p class="text-xs text-cosmic-light/50 max-w-[240px] mx-auto">Stay online and keep this app open to receive consultation requests.</p>
+                    </div>
+
+                    <!-- Offline State -->
+                    <div id="offline-state" class="glass-card p-8 rounded-2xl text-center hidden">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-moon text-2xl text-red-400/60"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">You're Offline</h3>
+                        <p class="text-xs text-cosmic-light/50 max-w-[240px] mx-auto">Toggle the switch above to go online and start receiving requests.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Sessions -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-lg font-bold text-white">Recent Sessions</h2>
+                        <button onclick="switchTab('earnings')" class="text-cosmic-accent text-xs font-medium">View All</button>
+                    </div>
+                    <div id="recent-sessions-list" class="space-y-2">
+                        <div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">
+                            No sessions yet today
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EARNINGS VIEW -->
+            <div id="view-earnings" class="view-section p-4 space-y-5 hidden">
+                <div class="mt-2">
+                    <h2 class="text-xl font-bold text-white mb-1">Earnings</h2>
+                    <p class="text-xs text-cosmic-light/50">Track your income and payouts</p>
+                </div>
+
+                <!-- Earnings Cards -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-card p-4 rounded-2xl border-l-4 border-green-500">
+                        <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wide mb-1">Net Earnings</p>
+                        <p class="text-2xl font-bold text-green-400">₹<span id="earn-net">0</span></p>
+                        <p class="text-[10px] text-cosmic-light/40 mt-1">After platform fee</p>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl">
+                        <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wide mb-1">Gross Billed</p>
+                        <p class="text-xl font-bold text-white">₹<span id="earn-gross">0</span></p>
+                        <p class="text-[10px] text-cosmic-light/40 mt-1">Total from clients</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] text-cosmic-light/50 uppercase tracking-wide mb-1">Available for Withdrawal</p>
+                        <p class="text-xl font-bold text-cosmic-accent">₹<span id="earn-available">0</span></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-cosmic-accent/20 flex items-center justify-center">
+                        <i class="fa-solid fa-wallet text-cosmic-accent"></i>
+                    </div>
+                </div>
+
+                <!-- Bank Details -->
+                <div class="glass-card p-5 rounded-2xl">
+                    <h3 class="font-semibold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns text-cosmic-accent"></i>
+                        Payout Details
+                    </h3>
+                    <form id="payout-form" onsubmit="savePayoutDetails(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">UPI ID</label>
+                            <input type="text" id="pay-upi" class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="yourname@upi" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Account No.</label>
+                                <input type="text" id="pay-acc" class="input-field w-full rounded-xl px-3 py-3 text-sm" placeholder="1234567890" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">IFSC</label>
+                                <input type="text" id="pay-ifsc" class="input-field w-full rounded-xl px-3 py-3 text-sm uppercase" placeholder="SBIN0001234" />
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-save-payout" class="btn-glass w-full py-3 rounded-xl text-white font-medium text-sm">
+                            <i class="fa-solid fa-check mr-2"></i>Save Details
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Settlements History -->
+                <div>
+                    <h3 class="font-semibold text-white mb-3">Payout History</h3>
+                    <div id="settlements-list" class="space-y-2">
+                        <div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">
+                            No payouts processed yet
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFILE VIEW -->
+            <div id="view-profile" class="view-section p-4 space-y-5 hidden">
+                <div class="mt-2">
+                    <h2 class="text-xl font-bold text-white mb-1">Profile</h2>
+                    <p class="text-xs text-cosmic-light/50">Manage your consultation settings</p>
+                </div>
+
+                <!-- Rate Card -->
+                <div class="glass-card p-5 rounded-2xl border border-cosmic-accent/30 bg-gradient-to-br from-cosmic-accent/10 to-transparent">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-cosmic-accent">Consultation Rate</h3>
+                            <p class="text-[10px] text-cosmic-light/50 mt-0.5">Per minute charge</p>
+                        </div>
+                        <div class="flex items-center gap-1 bg-cosmic-950/60 px-4 py-2 rounded-xl border border-cosmic-accent/30">
+                            <span class="text-cosmic-accent font-bold">₹</span>
+                            <input type="number" id="prof-price" required min="10" max="500" class="w-16 bg-transparent text-center text-white text-xl font-bold focus:outline-none" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Form -->
+                <div class="glass-card p-5 rounded-2xl">
+                    <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-4">
+                        <div>
+                            <label class="flex justify-between items-center mb-1.5">
+                                <span class="text-[10px] font-medium text-cosmic-light/60 uppercase tracking-wide">Display Name</span>
+                                <span class="text-[9px] text-cosmic-accent"><i class="fa-solid fa-lock text-[8px] mr-1"></i>Contact support to change</span>
+                            </label>
+                            <input type="text" id="prof-name" readonly class="input-field w-full rounded-xl px-4 py-3 text-sm text-cosmic-light/50 cursor-not-allowed bg-black/40" />
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Profile Image URL</label>
+                            <input type="url" id="prof-img" class="input-field w-full rounded-xl px-4 py-3 text-sm" placeholder="https://..." />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Experience (Years)</label>
+                                <input type="number" id="prof-exp" required class="input-field w-full rounded-xl px-4 py-3 text-sm" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Total Sessions</label>
+                                <input type="number" id="prof-orders" disabled class="input-field w-full rounded-xl px-4 py-3 text-sm text-cosmic-light/50 cursor-not-allowed bg-black/40" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Skills (comma separated)</label>
+                            <input type="text" id="prof-skills" required class="input-field w-full rounded-xl px-4 py-3 text-sm" />
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-cosmic-light/60 mb-1.5 uppercase tracking-wide">Languages (comma separated)</label>
+                            <input type="text" id="prof-langs" required class="input-field w-full rounded-xl px-4 py-3 text-sm" />
+                        </div>
+
+                        <button type="submit" id="btn-save-profile" class="btn-primary w-full py-4 rounded-xl text-sm mt-2">
+                            Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 w-full max-w-md mx-auto glass-dark border-t border-white/5 pb-safe z-30">
+            <div class="flex justify-around items-center h-16">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-item active flex flex-col items-center justify-center w-full h-full relative">
+                    <i class="fa-solid fa-house text-lg nav-icon mb-0.5 relative">
+                        <span id="queue-badge" class="hidden absolute -top-1 -right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-cosmic-800 animate-pulse"></span>
+                    </i>
+                    <span class="text-[10px] font-medium">Home</span>
+                </button>
+                <button onclick="switchTab('earnings')" id="nav-earnings" class="nav-item text-cosmic-light/40 flex flex-col items-center justify-center w-full h-full">
+                    <i class="fa-solid fa-wallet text-lg nav-icon mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Earnings</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="nav-item text-cosmic-light/40 flex flex-col items-center justify-center w-full h-full">
+                    <i class="fa-solid fa-user text-lg nav-icon mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Profile</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- ==================== INCOMING REQUEST MODAL ==================== -->
+    <div id="incoming-modal" class="fixed inset-0 bg-cosmic-950/98 z-[100] hidden flex-col items-center justify-center p-4">
+        <!-- Animated Rings -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <div class="ring-wave w-48 h-48" style="animation-delay: 0s;"></div>
+            <div class="ring-wave w-64 h-64" style="animation-delay: 0.5s;"></div>
+            <div class="ring-wave w-80 h-80" style="animation-delay: 1s;"></div>
+            <div class="ring-wave w-96 h-96" style="animation-delay: 1.5s;"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center w-full max-w-sm">
+            <!-- Icon -->
+            <div class="w-28 h-28 rounded-full gradient-gold flex items-center justify-center mb-6 shadow-lg shadow-cosmic-accent/40 animate-ring-pulse">
+                <i id="req-icon" class="fa-solid fa-phone-volume text-4xl text-cosmic-950 incoming-icon"></i>
+            </div>
+
+            <!-- Text -->
+            <h2 class="text-3xl font-bold text-white mb-2">Incoming <span id="req-type">Call</span></h2>
+            <p class="text-cosmic-light/70 mb-2">from</p>
+            <p id="req-user" class="text-xl font-semibold text-cosmic-accent mb-8">Client</p>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-6 w-full justify-center">
+                <button onclick="declineRequest()" class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-red-600/30 group-active:scale-90 transition-transform">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </div>
+                    <span class="text-xs text-cosmic-light/60 font-medium">Decline</span>
+                </button>
+
+                <button onclick="acceptRequest()" class="flex flex-col items-center gap-2 group">
+                    <div class="w-20 h-20 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl shadow-lg shadow-green-500/40 group-active:scale-90 transition-transform animate-pulse-glow">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span class="text-sm text-green-400 font-semibold">Accept</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LIVE SESSION ROOM ==================== -->
+    <div id="live-room" class="fixed inset-0 bg-cosmic-950 z-[110] hidden flex-col pt-safe transform translate-y-full transition-transform duration-300 ease-out">
+        
+        <!-- Room Header -->
+        <div class="glass-dark px-4 py-3 border-b border-white/5 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-3">
+                <div id="room-user-avatar" class="w-10 h-10 rounded-full bg-cosmic-accent/20 border border-cosmic-accent/50 text-cosmic-accent flex items-center justify-center font-bold text-lg">
+                    U
+                </div>
+                <div>
+                    <h3 id="room-user-name" class="font-semibold text-white text-sm leading-tight">User Name</h3>
+                    <p class="text-[10px] text-green-400 font-medium flex items-center gap-1.5 uppercase tracking-wide">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                        <span id="room-type-label">Live Session</span>
+                    </p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div id="room-timer" class="text-xl font-mono font-bold text-white tabular-nums">00:00</div>
+                <div class="text-[10px] text-cosmic-accent font-medium">₹<span id="room-live-earn">0</span> earned</div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="room-chat-area" class="flex-1 flex flex-col overflow-hidden hidden">
+            <!-- Messages Container -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 chat-scroll flex flex-col">
+                <div class="text-center py-2">
+                    <span class="bg-white/5 text-[10px] px-4 py-1.5 rounded-full text-cosmic-light/40 uppercase tracking-wide inline-block">
+                        <i class="fa-solid fa-shield-halved mr-1.5"></i>End-to-end encrypted
+                    </span>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <form onsubmit="sendChatMessage(event)" class="p-3 glass-dark border-t border-white/5 flex gap-2 shrink-0 pb-safe">
+                <input 
+                    type="text" 
+                    id="chat-input" 
+                    class="flex-1 input-field rounded-full px-5 py-3 text-sm" 
+                    placeholder="Type a message..." 
+                    autocomplete="off"
+                >
+                <button type="submit" class="w-12 h-12 rounded-full gradient-gold flex items-center justify-center text-cosmic-950 shrink-0 active:scale-95 transition-transform shadow-lg shadow-cosmic-accent/30">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Call Area -->
+        <div id="room-call-area" class="flex-1 flex flex-col items-center justify-center relative hidden pb-32">
+            <!-- Background Animation -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-30">
+                <div class="ring-wave w-48 h-48 border-green-500/30" style="animation-delay: 0s;"></div>
+                <div class="ring-wave w-64 h-64 border-green-500/20" style="animation-delay: 0.7s;"></div>
+                <div class="ring-wave w-80 h-80 border-green-500/10" style="animation-delay: 1.4s;"></div>
+            </div>
+
+            <!-- Mic Icon -->
+            <div class="relative z-10 mb-8">
+                <div class="w-32 h-32 rounded-full bg-cosmic-800 border-4 border-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
+                    <i id="call-mic-icon" class="fa-solid fa-microphone text-5xl text-white"></i>
+                </div>
+                <div id="mute-overlay" class="hidden absolute inset-0 bg-red-600/90 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-microphone-slash text-3xl text-white"></i>
+                </div>
+            </div>
+
+            <h2 id="call-status-text" class="text-2xl font-bold text-white relative z-10 mb-1">Connected</h2>
+            <p class="text-green-400 text-sm font-mono relative z-10">Voice Channel Active</p>
+
+            <!-- Call Controls -->
+            <div class="flex items-center gap-6 mt-12 relative z-10">
+                <button onclick="toggleMute()" id="mute-btn" class="w-14 h-14 rounded-full btn-glass flex items-center justify-center text-white text-xl">
+                    <i id="mute-btn-icon" class="fa-solid fa-microphone"></i>
+                </button>
+                <button onclick="endSession()" class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-red-600/40 active:scale-90 transition-transform">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat End Bar -->
+        <div id="chat-end-bar" class="hidden p-4 glass-dark border-t border-white/5 pb-safe">
+            <button onclick="endSession()" class="w-full bg-red-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 active:scale-98 transition-transform">
+                <i class="fa-solid fa-xmark"></i>
+                End Consultation
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST CONTAINER ==================== -->
+    <div id="toast-container" class="fixed top-4 pt-safe right-4 left-4 z-[200] flex flex-col gap-2 pointer-events-none items-center"></div>
+
+    <!-- ==================== FIREBASE & CORE LOGIC ==================== -->
+    <script type="module">
+        import { initializeApp } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js)";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js)";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            onSnapshot, 
+            updateDoc, 
+            collection, 
+            query, 
+            where, 
+            orderBy, 
+            addDoc, 
+            serverTimestamp,
+            limit
+        } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js)";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
+            authDomain: "designsnap-f3309.firebaseapp.com",
+            databaseURL: "[designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app](https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app)",
+            projectId: "designsnap-f3309",
+            storageBucket: "designsnap-f3309.firebasestorage.app",
+            messagingSenderId: "741888249963",
+            appId: "1:741888249963:web:9540c9f68d6f0d5da9a12e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ==================== STATE MANAGEMENT ====================
+        let currentUser = null;
+        let myProfile = null;
+        let activeView = 'home';
+        let isOnline = false;
+        let PLATFORM_FEE_PERCENTAGE = 0.30;
+
+        // Session State
+        let pendingRequest = null;
+        let activeSession = null;
+        let sessionTimerInterval = null;
+        let sessionSeconds = 0;
+        let chatUnsubscribe = null;
+        let requestUnsubscribe = null;
+        let sessionDocUnsubscribe = null;
+
+        // WebRTC State
+        let peerConnection = null;
+        let localStream = null;
+        let isMuted = false;
+
+        // Audio State
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isRinging = false;
+
+        // ==================== WEB AUDIO API RINGTONE ====================
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function playRingtone() {
+            if (isRinging) return;
+            
+            try {
+                const ctx = initAudioContext();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+
+                isRinging = true;
+                
+                // Create a more pleasant but attention-grabbing ring pattern
+                function playRingPattern() {
+                    if (!isRinging) return;
+
+                    const now = ctx.currentTime;
+                    
+                    // First tone
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(880, now); // A5
+                    gain1.gain.setValueAtTime(0, now);
+                    gain1.gain.linearRampToValueAtTime(0.4, now + 0.05);
+                    gain1.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.3);
+
+                    // Second tone (higher)
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(1108.73, now + 0.35); // C#6
+                    gain2.gain.setValueAtTime(0, now + 0.35);
+                    gain2.gain.linearRampToValueAtTime(0.4, now + 0.4);
+                    gain2.gain.linearRampToValueAtTime(0, now + 0.7);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.35);
+                    osc2.stop(now + 0.7);
+
+                    // Repeat pattern
+                    setTimeout(() => {
+                        if (isRinging) playRingPattern();
+                    }, 1500);
+                }
+
+                playRingPattern();
+            } catch (e) {
+                console.warn("Audio playback failed:", e);
+            }
+        }
+
+        function stopRingtone() {
+            isRinging = false;
+        }
+
+        // Unlock audio context on first user interaction
+        function unlockAudio() {
+            initAudioContext();
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            document.removeEventListener('touchstart', unlockAudio);
+            document.removeEventListener('click', unlockAudio);
+        }
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('click', unlockAudio, { once: true });
+
+        // ==================== TOAST NOTIFICATIONS ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colors = 'bg-cosmic-800/95 border-white/10 text-white';
+            let icon = 'fa-circle-info text-blue-400';
+            
+            if (type === 'success') {
+                colors = 'bg-green-900/95 border-green-500/30 text-green-100';
+                icon = 'fa-circle-check text-green-400';
+            } else if (type === 'error') {
+                colors = 'bg-red-900/95 border-red-500/30 text-red-100';
+                icon = 'fa-circle-exclamation text-red-400';
+            } else if (type === 'warning') {
+                colors = 'bg-yellow-900/95 border-yellow-500/30 text-yellow-100';
+                icon = 'fa-triangle-exclamation text-yellow-400';
+            }
+
+            toast.className = `${colors} border backdrop-blur-lg px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 -translate-y-4 opacity-0 text-sm max-w-sm w-full pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span class="flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('-translate-y-4', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('-translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function toArray(str) {
+            return str.split(',').map(s => s.trim()).filter(s => s !== '');
+        }
+
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        // ==================== AUTHENTICATION ====================
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('apply-screen').classList.add('hidden');
+                document.getElementById('apply-screen').classList.remove('flex');
+                checkAndLoadProfile();
+            } else {
+                // Reset to auth screen
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('flex');
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                document.getElementById('onboarding-screen').classList.remove('flex');
+                document.getElementById('pending-screen').classList.add('hidden');
+                document.getElementById('pending-screen').classList.remove('flex');
+                
+                stopRingtone();
+                if (requestUnsubscribe) {
+                    requestUnsubscribe();
+                    requestUnsubscribe = null;
+                }
+            }
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errEl = document.getElementById('login-error');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Signing in...';
+            errEl.classList.add('hidden');
+
+            try {
+                await signInWithEmailAndPassword(
+                    auth,
+                    document.getElementById('login-email').value.trim(),
+                    document.getElementById('login-password').value
+                );
+            } catch (error) {
+                let msg = 'Invalid email or password.';
+                if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
+                if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+                
+                errEl.textContent = msg;
+                errEl.classList.remove('hidden');
+                btn.textContent = 'Sign In';
+            }
+        }
+
+        async function handleLogout() {
+            if (isOnline && currentUser) {
+                try {
+                    await updateDoc(doc(db, "astrologers", currentUser.uid), { isOnline: false });
+                } catch (e) {}
+            }
+            await signOut(auth);
+        }
+
+        function showApplyScreen() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('apply-screen').classList.remove('hidden');
+            document.getElementById('apply-screen').classList.add('flex');
+        }
+
+        function hideApplyScreen() {
+            document.getElementById('apply-screen').classList.add('hidden');
+            document.getElementById('apply-screen').classList.remove('flex');
+            document.getElementById('auth-screen').classList.remove('hidden');
+        }
+
+        async function handleApply(e) {
+            e.preventDefault();
+            const btn = document.getElementById('apply-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Submitting...';
+
+            const email = document.getElementById('apply-email').value.trim();
+            const password = document.getElementById('apply-password').value;
+            const name = document.getElementById('apply-name').value.trim();
+            const phone = document.getElementById('apply-phone').value.trim();
+            const exp = parseInt(document.getElementById('apply-exp').value);
+            const skills = toArray(document.getElementById('apply-skills').value);
+
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                
+                await setDoc(doc(db, "astrologers", userCred.user.uid), {
+                    uid: userCred.user.uid,
+                    email: email,
+                    name: name,
+                    phone: phone,
+                    experience: exp,
+                    skills: skills,
+                    languages: ["English", "Hindi"],
+                    status: 'pending',
+                    price: 20,
+                    rating: 5.0,
+                    orders: 0,
+                    isOnline: false,
+                    isVerified: false,
+                    image: `[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D4AF37&color=050510&bold=true)`,
+                    createdAt: serverTimestamp()
+                });
+
+                showToast("Application submitted successfully!", "success");
+            } catch (error) {
+                let msg = error.message.replace('Firebase: ', '');
+                if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
+                showToast(msg, "error");
+                btn.textContent = 'Submit Application';
+            }
+        }
+
+        // ==================== PROFILE MANAGEMENT ====================
+        async function checkAndLoadProfile() {
+            const docRef = doc(db, "astrologers", currentUser.uid);
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    myProfile = { id: docSnap.id, ...docSnap.data() };
+                    
+                    document.getElementById('apply-screen').classList.add('hidden');
+                    document.getElementById('apply-screen').classList.remove('flex');
+
+                    if (myProfile.status === 'pending') {
+                        showScreen('pending');
+                    } else if (myProfile.status === 'rejected') {
+                        showToast("Your application was not approved.", "error");
+                        handleLogout();
+                    } else {
+                        showScreen('app');
+                        updateUIWithProfile();
+                        
+                        if (isOnline !== myProfile.isOnline) {
+                            isOnline = myProfile.isOnline;
+                            updateOnlineUI();
+                            
+                            if (isOnline) {
+                                listenForRequests();
+                            } else {
+                                if (requestUnsubscribe) requestUnsubscribe();
+                                hideIncomingRequest();
+                            }
+                        }
+                    }
+                } else {
+                    showScreen('onboarding');
+                }
+            });
+
+            // Load global settings
+            onSnapshot(doc(db, "settings", "global"), (snap) => {
+                if (snap.exists() && snap.data().commissionPercent !== undefined) {
+                    PLATFORM_FEE_PERCENTAGE = snap.data().commissionPercent / 100;
+                }
+            });
+
+            loadEarningsData();
+        }
+
+        function showScreen(screen) {
+            const screens = ['auth', 'apply', 'pending', 'onboarding', 'app'];
+            screens.forEach(s => {
+                const el = document.getElementById(`${s}-screen`);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+            
+            const target = document.getElementById(`${screen}-screen`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('flex');
+            }
+        }
+
+        function updateUIWithProfile() {
+            document.getElementById('header-name').textContent = myProfile.name || 'Astrologer';
+            document.getElementById('header-avatar').src = myProfile.image || `[ui-avatars.com](https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name) || 'A')}&background=D4AF37&color=050510&bold=true`;
+            
+            document.getElementById('prof-price').value = myProfile.price || 20;
+            document.getElementById('prof-name').value = myProfile.name || '';
+            document.getElementById('prof-img').value = myProfile.image || '';
+            document.getElementById('prof-exp').value = myProfile.experience || '';
+            document.getElementById('prof-skills').value = (myProfile.skills || []).join(', ');
+            document.getElementById('prof-langs').value = (myProfile.languages || []).join(', ');
+            document.getElementById('prof-orders').value = myProfile.orders || 0;
+        }
+
+        function updateOnlineUI() {
+            const toggle = document.getElementById('status-toggle-btn');
+            const text = document.getElementById('status-text');
+            const dot = document.getElementById('header-online-dot');
+            const emptyQueue = document.getElementById('empty-queue');
+            const offlineState = document.getElementById('offline-state');
+            
+            if (isOnline) {
+                toggle.classList.add('active');
+                text.textContent = 'Online';
+                text.className = 'text-[10px] font-semibold text-green-400 uppercase tracking-wider';
+                dot.className = 'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-cosmic-800';
+                emptyQueue.classList.remove('hidden');
+                offlineState.classList.add('hidden');
+            } else {
+                toggle.classList.remove('active');
+                text.textContent = 'Offline';
+                text.className = 'text-[10px] font-medium text-gray-400 uppercase tracking-wider';
+                dot.className = 'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-gray-500 border-2 border-cosmic-800';
+                emptyQueue.classList.add('hidden');
+                offlineState.classList.remove('hidden');
+            }
+        }
+
+        async function toggleOnlineStatus() {
+            const newState = !isOnline;
+            
+            try {
+                await updateDoc(doc(db, "astrologers", currentUser.uid), { isOnline: newState });
+                showToast(newState ? "You're now online!" : "You're now offline", newState ? "success" : "info");
+            } catch (e) {
+                showToast("Failed to update status", "error");
+            }
+        }
+
+        async function updateProfile(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-profile');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Updating...';
+
+            const updates = {
+                price: parseFloat(document.getElementById('prof-price').value) || 20,
+                image: document.getElementById('prof-img').value.trim() || myProfile.image,
+                experience: parseInt(document.getElementById('prof-exp').value) || 1,
+                skills: toArray(document.getElementById('prof-skills').value),
+                languages: toArray(document.getElementById('prof-langs').value)
+            };
+
+            try {
+                await updateDoc(doc(db, "astrologers", currentUser.uid), updates);
+                showToast("Profile updated successfully", "success");
+            } catch (err) {
+                showToast("Failed to update profile", "error");
+            }
+            
+            btn.textContent = 'Update Profile';
+        }
+
+        async function saveNewProfile(e) {
+            e.preventDefault();
+            const btn = document.getElementById('onb-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Saving...';
+
+            const data = {
+                price: parseFloat(document.getElementById('onb-price').value) || 20,
+                experience: parseInt(document.getElementById('onb-exp').value) || 1,
+                skills: toArray(document.getElementById('onb-skills').value),
+                languages: toArray(document.getElementById('onb-langs').value),
+                status: 'approved',
+                isVerified: true
+            };
+
+            try {
+                await updateDoc(doc(db, "astrologers", currentUser.uid), data);
+                showToast("Setup complete!", "success");
+            } catch (err) {
+                showToast("Failed to save settings", "error");
+            }
+            
+            btn.textContent = 'Save & Continue';
+        }
+
+        // ==================== EARNINGS & SETTLEMENTS ====================
+        function loadEarningsData() {
+            // Payout details
+            onSnapshot(doc(db, "payout_details", currentUser.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('pay-upi').value = data.upiId || '';
+                    document.getElementById('pay-acc').value = data.accountNumber || '';
+                    document.getElementById('pay-ifsc').value = data.ifsc || '';
+                }
+            });
+
+            // Sessions earnings
+            const sessionsQuery = query(
+                collection(db, "sessions"),
+                where("astroId", "==", currentUser.uid),
+                where("status", "==", "completed")
+            );
+            
+            onSnapshot(sessionsQuery, (snapshot) => {
+                let grossTotal = 0;
+                let todayGross = 0;
+                let todaySessionCount = 0;
+                const today = new Date().toDateString();
+                const recentSessions = [];
+
+                snapshot.forEach(d => {
+                    const data = d.data();
+                    const cost = data.cost || 0;
+                    grossTotal += cost;
+
+                    let sessionDate;
+                    if (data.endedAt?.toDate) {
+                        sessionDate = data.endedAt.toDate();
+                    } else if (data.timestamp) {
+                        sessionDate = new Date(data.timestamp);
+                    } else {
+                        sessionDate = new Date();
+                    }
+
+                    if (sessionDate.toDateString() === today) {
+                        todayGross += cost;
+                        todaySessionCount++;
+                    }
+
+                    recentSessions.push({
+                        ...data,
+                        id: d.id,
+                        date: sessionDate
+                    });
+                });
+
+                // Sort by date descending
+                recentSessions.sort((a, b) => b.date - a.date);
+
+                const netTotal = grossTotal * (1 - PLATFORM_FEE_PERCENTAGE);
+                const todayNet = todayGross * (1 - PLATFORM_FEE_PERCENTAGE);
+
+                document.getElementById('earn-gross').textContent = Math.floor(grossTotal);
+                document.getElementById('earn-net').textContent = Math.floor(netTotal);
+                document.getElementById('today-earnings').textContent = Math.floor(todayNet);
+                document.getElementById('today-sessions').textContent = todaySessionCount;
+
+                // Update recent sessions list
+                updateRecentSessionsList(recentSessions.slice(0, 5));
+
+                // Calculate available for withdrawal (net - settled)
+                calculateAvailableBalance(netTotal);
+            });
+
+            // Settlements
+            const settlementsQuery = query(
+                collection(db, "settlements"),
+                where("astroId", "==", currentUser.uid)
+            );
+            
+            onSnapshot(settlementsQuery, (snapshot) => {
+                const list = document.getElementById('settlements-list');
+                const settlements = [];
+                
+                snapshot.forEach(d => {
+                    settlements.push({ id: d.id, ...d.data() });
+                });
+
+                // Sort by timestamp descending
+                settlements.sort((a, b) => {
+                    const timeA = a.timestamp?.toDate?.() || new Date(a.timestamp || 0);
+                    const timeB = b.timestamp?.toDate?.() || new Date(b.timestamp || 0);
+                    return timeB - timeA;
+                });
+
+                if (settlements.length === 0) {
+                    list.innerHTML = '<div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">No payouts processed yet</div>';
+                    return;
+                }
+
+                list.innerHTML = settlements.map(s => {
+                    const date = s.timestamp?.toDate?.() || new Date(s.timestamp || Date.now());
+                    const dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const isCompleted = s.status === 'completed';
+                    
+                    return `
+                        <div class="glass-card p-4 rounded-xl flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-medium text-white">₹${s.amount}</p>
+                                <p class="text-[10px] text-cosmic-light/50 mt-0.5">${dateStr}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-medium ${isCompleted ? 'text-green-400' : 'text-yellow-400'}">
+                                    <i class="fa-solid ${isCompleted ? 'fa-check-circle' : 'fa-clock'}"></i>
+                                    ${isCompleted ? 'Paid' : 'Processing'}
+                                </span>
+                                ${s.utr ? `<p class="text-[9px] text-cosmic-light/40 mt-0.5">UTR: ${s.utr}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Recalculate available balance
+                const totalSettled = settlements
+                    .filter(s => s.status === 'completed')
+                    .reduce((sum, s) => sum + (s.amount || 0), 0);
+                
+                window.totalSettledAmount = totalSettled;
+            });
+        }
+
+        function calculateAvailableBalance(netEarnings) {
+            const settled = window.totalSettledAmount || 0;
+            const available = Math.max(0, netEarnings - settled);
+            document.getElementById('earn-available').textContent = Math.floor(available);
+        }
+
+        function updateRecentSessionsList(sessions) {
+            const list = document.getElementById('recent-sessions-list');
+            
+            if (sessions.length === 0) {
+                list.innerHTML = '<div class="glass-card p-4 rounded-xl text-center text-cosmic-light/40 text-xs">No sessions yet today</div>';
+                return;
+            }
+
+            list.innerHTML = sessions.map(s => {
+                const duration = s.durationSeconds ? formatDuration(s.durationSeconds) : '--:--';
+                const earned = Math.floor((s.cost || 0) * (1 - PLATFORM_FEE_PERCENTAGE));
+                const type = s.type === 'call' ? 'Voice' : 'Chat';
+                const icon = s.type === 'call' ? 'fa-phone' : 'fa-comment';
+                
+                return `
+                    <div class="glass-card p-3 rounded-xl flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cosmic-accent/20 flex items-center justify-center">
+                            <i class="fa-solid ${icon} text-cosmic-accent text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-white truncate">${s.userName || 'Client'}</p>
+                            <p class="text-[10px] text-cosmic-light/50">${type} • ${duration}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-green-400">+₹${earned}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function savePayoutDetails(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-payout');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Saving...';
+
+            try {
+                await setDoc(doc(db, "payout_details", currentUser.uid), {
+                    upiId: document.getElementById('pay-upi').value.trim(),
+                    accountNumber: document.getElementById('pay-acc').value.trim(),
+                    ifsc: document.getElementById('pay-ifsc').value.trim().toUpperCase(),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                showToast("Payout details saved", "success");
+            } catch (err) {
+                showToast("Failed to save details", "error");
+            }
+            
+            btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Save Details';
+        }
+
+        // ==================== INCOMING REQUEST HANDLING ====================
+        function listenForRequests() {
+            if (requestUnsubscribe) requestUnsubscribe();
+
+            const q = query(
+                collection(db, "sessions"),
+                where("astroId", "==", currentUser.uid),
+                where("status", "==", "requested")
+            );
+
+            requestUnsubscribe = onSnapshot(q, (snapshot) => {
+                let hasPending = false;
+                
+                snapshot.forEach(docSnap => {
+                    if (!activeSession) {
+                        pendingRequest = { id: docSnap.id, ...docSnap.data() };
+                        hasPending = true;
+                    }
+                });
+
+                if (hasPending && !activeSession) {
+                    showIncomingRequest();
+                } else if (!hasPending) {
+                    pendingRequest = null;
+                    hideIncomingRequest();
+                }
+            });
+        }
+
+        function showIncomingRequest() {
+            if (!isOnline || activeSession || !pendingRequest) {
+                stopRingtone();
+                return;
+            }
+
+            const modal = document.getElementById('incoming-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.getElementById('req-type').textContent = pendingRequest.type === 'call' ? 'Call' : 'Chat';
+            document.getElementById('req-user').textContent = pendingRequest.userName || 'Client';
+            
+            const icon = document.getElementById('req-icon');
+            if (pendingRequest.type === 'call') {
+                icon.className = 'fa-solid fa-phone-volume text-4xl text-cosmic-950 incoming-icon';
+            } else {
+                icon.className = 'fa-solid fa-comment-dots text-4xl text-cosmic-950 incoming-icon';
+            }
+
+            document.getElementById('queue-badge').classList.remove('hidden');
+            
+            playRingtone();
+            showToast(`Incoming ${pendingRequest.type} request!`, 'info');
+        }
+
+        function hideIncomingRequest() {
+            const modal = document.getElementById('incoming-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            if (!activeSession) {
+                if (isOnline) {
+                    document.getElementById('empty-queue').classList.remove('hidden');
+                }
+            }
+            
+            document.getElementById('queue-badge').classList.add('hidden');
+            stopRingtone();
+        }
+
+        async function declineRequest() {
+            if (!pendingRequest) return;
+            stopRingtone();
+
+            try {
+                await updateDoc(doc(db, "sessions", pendingRequest.id), { 
+                    status: 'declined',
+                    declinedAt: serverTimestamp()
+                });
+                showToast("Request declined", "info");
+            } catch (e) {
+                console.error("Decline error:", e);
+            }
+
+            pendingRequest = null;
+            hideIncomingRequest();
+        }
+
+        async function acceptRequest() {
+            if (!pendingRequest) return;
+            stopRingtone();
+
+            const reqData = { ...pendingRequest };
+
+            try {
+                await updateDoc(doc(db, "sessions", reqData.id), {
+                    status: 'active',
+                    startedAt: serverTimestamp()
+                });
+
+                activeSession = reqData;
+                pendingRequest = null;
+                hideIncomingRequest();
+                
+                startLiveRoom();
+            } catch (e) {
+                console.error("Accept error:", e);
+                
+                if (e.message?.includes('permission')) {
+                    showToast("Permission denied. Check Firestore rules.", "error");
+                } else {
+                    showToast("Failed to accept: " + e.message, "error");
+                }
+            }
+        }
+
+        // ==================== LIVE SESSION ROOM ====================
+        function startLiveRoom() {
+            const room = document.getElementById('live-room');
+            room.classList.remove('hidden');
+            room.classList.add('flex');
+            
+            requestAnimationFrame(() => {
+                room.classList.remove('translate-y-full');
+            });
+
+            document.getElementById('room-user-name').textContent = activeSession.userName || 'Client';
+            document.getElementById('room-user-avatar').textContent = (activeSession.userName || 'C').charAt(0).toUpperCase();
+
+            const chatArea = document.getElementById('room-chat-area');
+            const callArea = document.getElementById('room-call-area');
+            const chatEndBar = document.getElementById('chat-end-bar');
+
+            if (activeSession.type === 'chat') {
+                document.getElementById('room-type-label').textContent = 'Live Chat';
+                chatArea.classList.remove('hidden');
+                chatArea.classList.add('flex');
+                chatEndBar.classList.remove('hidden');
+                callArea.classList.add('hidden');
+                callArea.classList.remove('flex');
+                initChatSync();
+            } else {
+                document.getElementById('room-type-label').textContent = 'Voice Call';
+                chatArea.classList.add('hidden');
+                chatArea.classList.remove('flex');
+                chatEndBar.classList.add('hidden');
+                callArea.classList.remove('hidden');
+                callArea.classList.add('flex');
+                document.getElementById('call-status-text').textContent = 'Connecting...';
+                initWebRTC();
+            }
+
+            // Start timer
+            sessionSeconds = 0;
+            document.getElementById('room-timer').textContent = '00:00';
+            document.getElementById('room-live-earn').textContent = '0';
+
+            sessionTimerInterval = setInterval(() => {
+                sessionSeconds++;
+                document.getElementById('room-timer').textContent = formatDuration(sessionSeconds);
+
+                const billedMins = Math.ceil(sessionSeconds / 60);
+                const pricePerMin = activeSession.pricePerMin || activeSession.price || myProfile?.price || 20;
+                const gross = billedMins * pricePerMin;
+                const net = gross * (1 - PLATFORM_FEE_PERCENTAGE);
+                document.getElementById('room-live-earn').textContent = Math.floor(net);
+            }, 1000);
+
+            // Listen for session status changes (user ending the call)
+            sessionDocUnsubscribe = onSnapshot(doc(db, "sessions", activeSession.id), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.status === 'completed' && activeSession) {
+                        handleSessionEndUI();
+                        showToast("Session ended by client", "info");
+                    }
+                }
+            });
+        }
+
+        // ==================== CHAT FUNCTIONALITY ====================
+        function initChatSync() {
+            const msgContainer = document.getElementById('chat-messages');
+            msgContainer.innerHTML = `
+                <div class="text-center py-2">
+                    <span class="bg-white/5 text-[10px] px-4 py-1.5 rounded-full text-cosmic-light/40 uppercase tracking-wide inline-block">
+                        <i class="fa-solid fa-shield-halved mr-1.5"></i>End-to-end encrypted
+                    </span>
+                </div>
+            `;
+
+            const q = query(
+                collection(db, "sessions", activeSession.id, "messages"),
+                orderBy("timestamp", "asc")
+            );
+
+            chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const msg = change.doc.data();
+                        const isMe = msg.senderId === currentUser.uid;
+
+                        const msgHTML = `
+                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'} w-full animate-fade-in">
+                                <div class="message-bubble ${isMe ? 'message-sent' : 'message-received'} px-4 py-2.5">
+                                    <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        msgContainer.insertAdjacentHTML('beforeend', msgHTML);
+                        msgContainer.scrollTop = msgContainer.scrollHeight;
+                    }
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function sendChatMessage(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            
+            if (!text || !activeSession) return;
+
+            input.value = '';
+
+            try {
+                await addDoc(collection(db, "sessions", activeSession.id, "messages"), {
+                    text: text,
+                    senderId: currentUser.uid,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) {
+                console.error("Chat error:", e);
+                showToast("Failed to send message", "error");
+            }
+        }
+
+        // ==================== WEBRTC FUNCTIONALITY ====================
+        async function initWebRTC() {
+            const servers = {
+                iceServers: [
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' }
+                ]
+            };
+
+            peerConnection = new RTCPeerConnection(servers);
+
+            // Set up remote audio
+            const remoteAudio = document.getElementById('remote-audio-player');
+            const remoteStream = new MediaStream();
+            remoteAudio.srcObject = remoteStream;
+
+            peerConnection.ontrack = (event) => {
+                event.streams[0].getTracks().forEach((track) => {
+                    remoteStream.addTrack(track);
+                });
+                document.getElementById('call-status-text').textContent = 'Connected';
+            };
+
+            // Get local audio
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+            } catch (e) {
+                console.warn("Microphone access denied:", e);
+                showToast("Microphone access denied", "warning");
+            }
+
+            // Set up Firestore references
+            const sessionDoc = doc(db, "sessions", activeSession.id);
+            const callerCandidates = collection(sessionDoc, "callerCandidates");
+            const calleeCandidates = collection(sessionDoc, "calleeCandidates");
+
+            // Send ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    addDoc(calleeCandidates, event.candidate.toJSON());
+                }
+            };
+
+            peerConnection.onconnectionstatechange = () => {
+                if (peerConnection.connectionState === 'connected') {
+                    document.getElementById('call-status-text').textContent = 'Connected';
+                } else if (peerConnection.connectionState === 'disconnected' || peerConnection.connectionState === 'failed') {
+                    document.getElementById('call-status-text').textContent = 'Disconnected';
+                }
+            };
+
+            // Listen for the offer from caller
+            onSnapshot(sessionDoc, async (docSnap) => {
+                const data = docSnap.data();
+                
+                if (data && data.offer && !peerConnection.currentRemoteDescription) {
+                    try {
+                        const offerDescription = new RTCSessionDescription(data.offer);
+                        await peerConnection.setRemoteDescription(offerDescription);
+
+                        const answerDescription = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answerDescription);
+
+                        const answer = {
+                            type: answerDescription.type,
+                            sdp: answerDescription.sdp
+                        };
+
+                        await updateDoc(sessionDoc, { answer });
+                        document.getElementById('call-status-text').textContent = 'Connected';
+                    } catch (e) {
+                        console.error("WebRTC answer error:", e);
+                    }
+                }
+            });
+
+            // Listen for caller ICE candidates
+            onSnapshot(callerCandidates, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const candidate = new RTCIceCandidate(change.doc.data());
+                        peerConnection.addIceCandidate(candidate).catch(console.error);
+                    }
+                });
+            });
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            
+            const btnIcon = document.getElementById('mute-btn-icon');
+            const muteOverlay = document.getElementById('mute-overlay');
+            const muteBtn = document.getElementById('mute-btn');
+
+            if (isMuted) {
+                btnIcon.className = 'fa-solid fa-microphone-slash text-red-400';
+                muteOverlay.classList.remove('hidden');
+                muteOverlay.classList.add('flex');
+                muteBtn.classList.add('bg-red-600/20', 'border-red-500/50');
+            } else {
+                btnIcon.className = 'fa-solid fa-microphone';
+                muteOverlay.classList.add('hidden');
+                muteOverlay.classList.remove('flex');
+                muteBtn.classList.remove('bg-red-600/20', 'border-red-500/50');
+            }
+
+            // Actually mute the track
+            if (localStream && localStream.getAudioTracks().length > 0) {
+                localStream.getAudioTracks()[0].enabled = !isMuted;
+            }
+        }
+
+        async function endSession() {
+            if (!activeSession) return;
+
+            const billedMins = Math.ceil(sessionSeconds / 60);
+            const pricePerMin = activeSession.pricePerMin || activeSession.price || myProfile?.price || 20;
+            const totalCost = billedMins * pricePerMin;
+
+            try {
+                await updateDoc(doc(db, "sessions", activeSession.id), {
+                    status: 'completed',
+                    durationSeconds: sessionSeconds,
+                    cost: totalCost,
+                    endedAt: serverTimestamp()
+                });
+
+                // Increment orders count
+                await updateDoc(doc(db, "astrologers", currentUser.uid), {
+                    orders: (myProfile?.orders || 0) + 1
+                });
+
+                const netEarned = Math.floor(totalCost * (1 - PLATFORM_FEE_PERCENTAGE));
+                showToast(`Session complete! Earned ₹${netEarned}`, "success");
+            } catch (e) {
+                console.error("End session error:", e);
+            }
+
+            handleSessionEndUI();
+        }
+
+        function handleSessionEndUI() {
+            // Clear intervals and subscriptions
+            if (sessionTimerInterval) {
+                clearInterval(sessionTimerInterval);
+                sessionTimerInterval = null;
+            }
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+                chatUnsubscribe = null;
+            }
+            if (sessionDocUnsubscribe) {
+                sessionDocUnsubscribe();
+                sessionDocUnsubscribe = null;
+            }
+
+            // Clean up WebRTC
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+
+            // Reset mute state
+            isMuted = false;
+
+            // Animate room out
+            const room = document.getElementById('live-room');
+            room.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                room.classList.add('hidden');
+                room.classList.remove('flex');
+                
+                document.getElementById('room-chat-area').classList.add('hidden');
+                document.getElementById('room-chat-area').classList.remove('flex');
+                document.getElementById('room-call-area').classList.add('hidden');
+                document.getElementById('room-call-area').classList.remove('flex');
+                document.getElementById('chat-end-bar').classList.add('hidden');
+            }, 300);
+
+            activeSession = null;
+        }
+
+        // ==================== TAB NAVIGATION ====================
+        function switchTab(tabId) {
+            activeView = tabId;
+
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden');
+            });
+
+            // Show selected view
+            const targetView = document.getElementById(`view-${tabId}`);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
+
+            // Update nav buttons
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active', 'text-cosmic-accent');
+                btn.classList.add('text-cosmic-light/40');
+            });
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('active', 'text-cosmic-accent');
+                activeNav.classList.remove('text-cosmic-light/40');
+            }
+        }
+
+        // ==================== GLOBAL EXPORTS ====================
+        window.handleLogin = handleLogin;
+        window.handleLogout = handleLogout;
+        window.showApplyScreen = showApplyScreen;
+        window.hideApplyScreen = hideApplyScreen;
+        window.handleApply = handleApply;
+        window.saveNewProfile = saveNewProfile;
+        window.updateProfile = updateProfile;
+        window.toggleOnlineStatus = toggleOnlineStatus;
+        window.switchTab = switchTab;
+        window.savePayoutDetails = savePayoutDetails;
+        window.declineRequest = declineRequest;
+        window.acceptRequest = acceptRequest;
+        window.endSession = endSession;
+        window.sendChatMessage = sendChatMessage;
+        window.toggleMute = toggleMute;
+    </script>
+</body>
+</html>
