@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AstroPath | Admin Command Center</title>
+    <title>AstroPath | Advanced Admin Command</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,15 +11,10 @@
             theme: {
                 extend: {
                     colors: {
-                        cosmic: {
-                            900: '#0B0A1A',
-                            800: '#1A1832',
-                            700: '#2A274A',
-                            light: '#E2E8F0',
-                            accent: '#D4AF37'
-                        }
+                        cosmic: { 900: '#0B0A1A', 800: '#1A1832', 700: '#2A274A', light: '#E2E8F0', accent: '#D4AF37' }
                     },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
                 }
             }
         }
@@ -35,9 +30,18 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="antialiased h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="antialiased h-screen flex flex-col md:flex-row overflow-hidden relative">
 
-    <!-- Auth Screen -->
+    <!-- Loud Alarm for New UTRs -->
+    <audio id="admin-alarm" loop src="https://actions.google.com/sounds/v1/alarms/mechanical_clock_ring.ogg"></audio>
+
+    <!-- Floating Global Alarm Control -->
+    <div id="alarm-controller" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[150] hidden">
+        <button onclick="stopAdminAlarm()" class="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-full shadow-[0_0_30px_rgba(220,38,38,0.8)] flex items-center gap-3 animate-bounce">
+            <i class="fa-solid fa-bell-slash text-xl animate-pulse-fast"></i> SILENCE ALARM (NEW UTR)
+        </button>
+    </div>
+
     <div id="auth-screen" class="fixed inset-0 bg-cosmic-900 z-[100] flex items-center justify-center p-4">
         <div class="glass-card p-8 rounded-2xl w-full max-w-md shadow-[0_0_40px_rgba(212,175,55,0.15)] border-t-4 border-cosmic-accent">
             <div class="text-center mb-8">
@@ -65,13 +69,12 @@
         </div>
     </div>
 
-    <!-- Desktop Sidebar -->
     <aside class="hidden md:flex flex-col w-64 bg-cosmic-800 border-r border-white/10 h-full z-30 shrink-0">
         <div class="p-6 border-b border-white/10 flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-cosmic-accent flex items-center justify-center text-cosmic-900 font-bold"><i class="fa-solid fa-moon"></i></div>
             <span class="font-bold text-xl text-white tracking-wide">AstroPath</span>
         </div>
-        <div class="flex-1 p-4 space-y-2 overflow-y-auto">
+        <div class="flex-1 p-4 space-y-2 overflow-y-auto hide-scrollbar">
             <button onclick="switchTab('dashboard')" id="desk-nav-dashboard" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-cosmic-accent/10 text-cosmic-accent transition-colors text-left font-bold">
                 <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
             </button>
@@ -85,8 +88,15 @@
             <button onclick="switchTab('users')" id="desk-nav-users" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
                 <i class="fa-solid fa-users w-5"></i> Customers
             </button>
+            <button onclick="switchTab('support')" id="desk-nav-support" class="desk-nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <div class="flex items-center gap-3"><i class="fa-solid fa-headset w-5"></i> Support Desk</div>
+                <span id="desk-support-badge" class="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="switchTab('payouts')" id="desk-nav-payouts" class="desk-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
+                <i class="fa-solid fa-money-bill-transfer w-5"></i> Astro Payouts
+            </button>
             <button onclick="switchTab('finances')" id="desk-nav-finances" class="desk-nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-cosmic-light/70 hover:bg-white/5 transition-colors text-left font-medium">
-                <div class="flex items-center gap-3"><i class="fa-solid fa-wallet w-5"></i> Finances & Config</div>
+                <div class="flex items-center gap-3"><i class="fa-solid fa-wallet w-5"></i> UTRs & Config</div>
                 <span id="desk-pay-badge" class="bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
             </button>
         </div>
@@ -97,22 +107,25 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
     <div id="app-screen" class="hidden flex-1 flex-col h-full w-full relative bg-cosmic-900">
         
         <!-- Mobile Header -->
         <header class="md:hidden bg-cosmic-800 border-b border-white/10 h-16 flex-shrink-0 flex items-center justify-between px-4 z-20 shadow-md">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-cosmic-accent flex items-center justify-center text-cosmic-900"><i class="fa-solid fa-shield-halved"></i></div>
-                <span class="font-bold text-lg text-white">Admin</span>
+                <span class="font-bold text-lg text-white">Admin Hub</span>
             </div>
-            <button onclick="handleLogout()" class="text-cosmic-light/70 hover:text-white p-2"><i class="fa-solid fa-power-off"></i></button>
+            <div class="flex gap-4">
+                <button onclick="switchTab('support')" class="text-cosmic-light/70 relative">
+                    <i class="fa-solid fa-headset"></i>
+                    <span id="mob-support-badge" class="absolute -top-1 -right-2 w-2 h-2 bg-blue-500 rounded-full hidden"></span>
+                </button>
+                <button onclick="handleLogout()" class="text-cosmic-light/70 hover:text-white"><i class="fa-solid fa-power-off"></i></button>
+            </div>
         </header>
 
-        <!-- View Sections -->
         <main class="flex-1 overflow-y-auto pb-20 md:pb-0 hide-scrollbar relative">
             
-            <!-- Dashboard View -->
             <div id="view-dashboard" class="view-section p-4 md:p-8 max-w-7xl mx-auto block">
                 <h2 class="text-2xl font-bold text-white mb-6 pt-2">System Overview</h2>
                 
@@ -121,11 +134,14 @@
                         <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Total Customers</p>
                         <h3 class="text-3xl font-bold text-white" id="stat-users">0</h3>
                     </div>
-                    <div class="glass-card p-5 rounded-2xl border-l-4 border-purple-500">
-                        <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Active Astros</p>
-                        <h3 class="text-3xl font-bold text-white" id="stat-astros">0</h3>
-                    </div>
                     <div class="glass-card p-5 rounded-2xl border-l-4 border-green-500">
+                        <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Online Astros</p>
+                        <h3 class="text-3xl font-bold text-white flex items-center gap-2">
+                            <span id="stat-online-astros">0</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        </h3>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl border-l-4 border-purple-500">
                         <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Completed Sessions</p>
                         <h3 class="text-3xl font-bold text-white" id="stat-sessions">0</h3>
                     </div>
@@ -136,18 +152,15 @@
                 </div>
 
                 <div class="bg-cosmic-800 rounded-2xl p-6 border border-white/5">
-                    <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-chart-line text-cosmic-accent mr-2"></i>Recent Activity</h3>
-                    <div class="text-center py-10 text-cosmic-light/50 text-sm">
-                        <i class="fa-solid fa-satellite-dish text-4xl mb-3 opacity-30"></i><br>
-                        Activity feed listening for events...
-                    </div>
+                    <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-satellite-dish text-cosmic-accent mr-2"></i>Live System Status</h3>
+                    <p class="text-sm text-green-400 flex items-center gap-2 mb-2"><i class="fa-solid fa-check-circle"></i> Payments Gateway (Manual UTR) Active</p>
+                    <p class="text-sm text-green-400 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> Real-time WebRTC & Chat Servers Active</p>
                 </div>
             </div>
 
-            <!-- Astrologers View -->
             <div id="view-astrologers" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
                 <div class="flex justify-between items-center mb-6 pt-2">
-                    <h2 class="text-2xl font-bold text-white">Astrologers</h2>
+                    <h2 class="text-2xl font-bold text-white">Astrologers Directory</h2>
                     <button onclick="openAstroModal()" class="bg-cosmic-accent text-cosmic-900 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 active:scale-95 transition-transform shadow-lg shadow-cosmic-accent/20">
                         <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Add Astrologer</span>
                     </button>
@@ -157,17 +170,15 @@
                 </div>
             </div>
 
-            <!-- Applications View -->
             <div id="view-applications" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
-                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Pending Applications</h2>
+                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Pending Partner Applications</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="admin-applications-grid">
                     <!-- Populated by JS -->
                 </div>
             </div>
 
-            <!-- Users View -->
             <div id="view-users" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
-                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Customers & Users</h2>
+                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Customer Database</h2>
                 <div class="bg-cosmic-800 border border-white/5 rounded-2xl overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
@@ -188,9 +199,41 @@
                 </div>
             </div>
 
-            <!-- Finances & Settings View -->
+            <div id="view-support" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-center mb-6 pt-2">
+                    <h2 class="text-2xl font-bold text-white">Support Helpdesk</h2>
+                    <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30" id="support-count-header">0 Open Tickets</span>
+                </div>
+                
+                <div class="space-y-4" id="admin-support-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="view-payouts" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
+                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Astrologer Payouts</h2>
+                <div class="bg-cosmic-800 rounded-2xl border border-white/5 p-6 mb-6">
+                    <p class="text-sm text-cosmic-light/70 mb-4">Manage bank transfers and log settlements for your partners. The net owed amount automatically subtracts your platform commission and previously logged settlements.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-black/20 text-cosmic-light/60 text-xs uppercase border-b border-white/10">
+                                <tr>
+                                    <th class="px-4 py-3">Astrologer</th>
+                                    <th class="px-4 py-3">Bank / UPI Details</th>
+                                    <th class="px-4 py-3 text-right">Net Owed</th>
+                                    <th class="px-4 py-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-payouts-list" class="divide-y divide-white/5">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="view-finances" class="view-section p-4 md:p-8 max-w-7xl mx-auto hidden">
-                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Finances & Configuration</h2>
+                <h2 class="text-2xl font-bold text-white mb-6 pt-2">Config & UTR Verifications</h2>
 
                 <!-- Settings Engine -->
                 <div class="bg-gradient-to-br from-cosmic-800 to-cosmic-900 border border-cosmic-accent/30 rounded-2xl p-6 mb-8 shadow-[0_0_30px_rgba(212,175,55,0.1)]">
@@ -216,63 +259,27 @@
                     </form>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Earnings Overview -->
-                    <div class="lg:col-span-1 space-y-4">
-                        <h3 class="text-lg font-bold text-white mb-4">Live Earnings</h3>
-                        
-                        <div class="glass-card p-5 rounded-2xl border-l-4 border-yellow-500">
-                            <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Total Gross Processed</p>
-                            <h3 class="text-2xl font-bold text-white">₹<span id="earn-gross">0</span></h3>
-                        </div>
-                        
-                        <div class="bg-green-500/10 p-5 rounded-2xl border border-green-500/30">
-                            <p class="text-xs text-green-400 uppercase tracking-wider font-bold mb-1">Your Platform Earnings (<span id="earn-percent-display">30</span>%)</p>
-                            <h3 class="text-3xl font-bold text-green-400">₹<span id="earn-platform">0</span></h3>
-                            <p class="text-[10px] text-green-200 mt-1">Revenue kept by AstroPath.</p>
-                        </div>
-
-                        <div class="glass-card p-5 rounded-2xl border-l-4 border-blue-500">
-                            <p class="text-xs text-cosmic-light/60 uppercase tracking-wider mb-1">Astrologer Payouts Due</p>
-                            <h3 class="text-2xl font-bold text-white">₹<span id="earn-astros">0</span></h3>
-                            <p class="text-[10px] text-cosmic-light/50 mt-1">To be paid out on the 3rd.</p>
-                        </div>
-                    </div>
-
-                    <!-- Payment Verifications Hub -->
-                    <div class="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col h-full">
-                        <h3 class="text-lg font-bold text-white mb-4 flex items-center justify-between">
-                            <span>Pending UTR Verifications</span>
-                            <span class="bg-yellow-500/20 text-yellow-500 text-xs px-2 py-1 rounded-md" id="utr-count-badge">0 Pending</span>
-                        </h3>
-                        
-                        <div class="flex-1 overflow-y-auto pr-2 space-y-3" id="admin-payments-list">
-                            <!-- Populated by JS -->
-                        </div>
+                <!-- Payment Verifications Hub -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center justify-between">
+                        <span>Pending UTR Verifications</span>
+                        <span class="bg-yellow-500/20 text-yellow-500 text-xs px-2 py-1 rounded-md" id="utr-count-badge">0 Pending</span>
+                    </h3>
+                    
+                    <div class="flex-1 overflow-y-auto pr-2 space-y-3 max-h-[500px]" id="admin-payments-list">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
 
         </main>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="md:hidden fixed bottom-0 w-full bg-cosmic-800 border-t border-white/10 pb-safe z-30">
-            <div class="flex justify-around items-center h-16">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-accent">
-                    <i class="fa-solid fa-chart-pie text-lg mb-1"></i><span class="text-[10px] font-medium">Home</span>
-                </button>
-                <button onclick="switchTab('astrologers')" id="nav-astrologers" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50">
-                    <i class="fa-solid fa-user-astronaut text-lg mb-1"></i><span class="text-[10px] font-medium">Astros</span>
-                </button>
-                <button onclick="switchTab('applications')" id="nav-applications" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50 relative">
-                    <i class="fa-solid fa-file-signature text-lg mb-1"></i><span class="text-[10px] font-medium">Apps</span>
-                    <span id="nav-app-badge" class="absolute top-1 right-1/4 w-2 h-2 bg-red-500 rounded-full hidden"></span>
-                </button>
-                <button onclick="switchTab('finances')" id="nav-finances" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cosmic-light/50 relative">
-                    <i class="fa-solid fa-wallet text-lg mb-1"></i><span class="text-[10px] font-medium">Finance</span>
-                    <span id="nav-pay-badge" class="absolute top-1 right-1/4 w-2 h-2 bg-yellow-500 rounded-full hidden"></span>
-                </button>
-            </div>
+        <nav class="md:hidden fixed bottom-0 w-full bg-cosmic-800 border-t border-white/10 pb-safe z-30 flex justify-around items-center h-16">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center w-full text-cosmic-accent"><i class="fa-solid fa-chart-pie mb-1"></i><span class="text-[9px]">Home</span></button>
+            <button onclick="switchTab('astrologers')" id="nav-astrologers" class="nav-btn flex flex-col items-center w-full text-cosmic-light/50"><i class="fa-solid fa-user-astronaut mb-1"></i><span class="text-[9px]">Astros</span></button>
+            <button onclick="switchTab('applications')" id="nav-applications" class="nav-btn flex flex-col items-center w-full text-cosmic-light/50 relative"><i class="fa-solid fa-file-signature mb-1"></i><span class="text-[9px]">Apps</span><span id="nav-app-badge" class="absolute top-1 right-1/4 w-2 h-2 bg-red-500 rounded-full hidden"></span></button>
+            <button onclick="switchTab('payouts')" id="nav-payouts" class="nav-btn flex flex-col items-center w-full text-cosmic-light/50"><i class="fa-solid fa-money-bill-transfer mb-1"></i><span class="text-[9px]">Payouts</span></button>
+            <button onclick="switchTab('finances')" id="nav-finances" class="nav-btn flex flex-col items-center w-full text-cosmic-light/50 relative"><i class="fa-solid fa-wallet mb-1"></i><span class="text-[9px]">UTRs</span><span id="nav-pay-badge" class="absolute top-1 right-1/4 w-2 h-2 bg-yellow-500 rounded-full hidden"></span></button>
         </nav>
     </div>
 
@@ -280,104 +287,108 @@
     <div id="astro-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] hidden backdrop-blur-sm p-4">
         <div class="bg-cosmic-800 border border-cosmic-accent/50 rounded-2xl w-full max-w-xl shadow-2xl relative max-h-[90vh] flex flex-col">
             <button onclick="closeAstroModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
-            
-            <div class="p-6 border-b border-white/10 shrink-0">
-                <h2 class="text-xl font-bold text-white" id="astro-modal-title">Add/Edit Astrologer</h2>
-            </div>
-            
+            <div class="p-6 border-b border-white/10 shrink-0"><h2 class="text-xl font-bold text-white" id="astro-modal-title">Add/Edit Astrologer</h2></div>
             <form id="astro-form" onsubmit="saveAstro(event)" class="p-6 overflow-y-auto space-y-4">
                 <input type="hidden" id="astro-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Name</label>
-                        <input type="text" id="astro-name" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Image URL</label>
-                        <input type="url" id="astro-img" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" placeholder="https://" />
-                    </div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Name</label><input type="text" id="astro-name" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Image URL</label><input type="url" id="astro-img" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" placeholder="https://" /></div>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Price (₹/min)</label>
-                        <input type="number" id="astro-price" required min="1" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1 text-red-400">Compare Price</label>
-                        <input type="number" id="astro-compare" min="1" class="w-full bg-cosmic-900 border border-red-500/30 rounded-xl px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none" placeholder="Slashed Price" />
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Experience (Yrs)</label>
-                        <input type="number" id="astro-exp" required min="0" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                    </div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Price (₹/min)</label><input type="number" id="astro-price" required min="1" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
+                    <div><label class="block text-xs text-red-400 mb-1">Compare Price</label><input type="number" id="astro-compare" min="1" class="w-full bg-cosmic-900 border border-red-500/30 rounded-xl px-3 py-2 text-white text-sm" placeholder="Slashed Price" /></div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Experience (Yrs)</label><input type="number" id="astro-exp" required min="0" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Total Orders</label>
-                        <input type="number" id="astro-orders" required min="0" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Rating</label>
-                        <input type="number" id="astro-rating" required min="1" max="5" step="0.1" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                    </div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Total Orders</label><input type="number" id="astro-orders" required min="0" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
+                    <div><label class="block text-xs text-cosmic-light/80 mb-1">Rating</label><input type="number" id="astro-rating" required min="1" max="5" step="0.1" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Skills (Comma separated)</label>
-                    <input type="text" id="astro-skills" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Languages (Comma separated)</label>
-                    <input type="text" id="astro-langs" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-cosmic-accent focus:outline-none" />
-                </div>
+                <div><label class="block text-xs text-cosmic-light/80 mb-1">Skills (Comma separated)</label><input type="text" id="astro-skills" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
+                <div><label class="block text-xs text-cosmic-light/80 mb-1">Languages (Comma separated)</label><input type="text" id="astro-langs" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm" /></div>
                 <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
-                    <button type="button" onclick="closeAstroModal()" class="px-5 py-2 rounded-xl text-white hover:bg-white/10 transition-colors font-medium text-sm">Cancel</button>
-                    <button type="submit" id="btn-save-astro" class="bg-cosmic-accent text-cosmic-900 px-6 py-2 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-sm">Save Astrologer</button>
+                    <button type="button" onclick="closeAstroModal()" class="px-5 py-2 rounded-xl text-white hover:bg-white/10 text-sm">Cancel</button>
+                    <button type="submit" id="btn-save-astro" class="bg-cosmic-accent text-cosmic-900 px-6 py-2 rounded-xl font-bold text-sm">Save Astrologer</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Add Balance Modal -->
+    <!-- Manage Wallet Modal -->
     <div id="balance-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] hidden backdrop-blur-sm p-4">
-        <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl relative">
+        <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-sm p-6 relative">
             <button onclick="closeBalanceModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-white mb-1">Manage Wallet</h2>
-                <p class="text-xs text-cosmic-light/60 mb-6" id="bal-user-email">user@email.com</p>
-                <form onsubmit="handleManualBalance(event)">
-                    <input type="hidden" id="bal-user-id">
-                    <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Add or Deduct Amount (₹)</label>
-                    <div class="flex gap-2 mb-6">
-                        <input type="number" id="bal-amount" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none" placeholder="e.g. 100 or -50" />
-                    </div>
-                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-colors active:scale-95">Confirm Adjustment</button>
-                </form>
+            <h2 class="text-xl font-bold text-white mb-1">Manage Wallet</h2>
+            <p class="text-xs text-cosmic-light/60 mb-6" id="bal-user-email">user@email.com</p>
+            <form onsubmit="handleManualBalance(event)">
+                <input type="hidden" id="bal-user-id">
+                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Add or Deduct (₹)</label>
+                <input type="number" id="bal-amount" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 mb-6 text-white focus:border-green-500 outline-none" placeholder="e.g. 100 or -50" />
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl">Confirm Adjustment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Process Payout Modal -->
+    <div id="payout-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] hidden backdrop-blur-sm p-4">
+        <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-sm p-6 relative">
+            <button onclick="closePayoutModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-xl font-bold text-white mb-1">Log Payout</h2>
+            <p class="text-xs text-cosmic-light/60 mb-6">Record a bank transfer sent to <span id="payout-astro-name" class="font-bold text-white">Astrologer</span>.</p>
+            <form onsubmit="handleProcessPayout(event)">
+                <input type="hidden" id="payout-astro-id">
+                <div class="bg-black/30 p-4 rounded-xl border border-white/5 mb-4 text-sm text-cosmic-light/70" id="payout-bank-details">Loading bank info...</div>
+                
+                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Amount Paid (₹)</label>
+                <input type="number" id="payout-amount" required min="1" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 mb-4 text-white focus:border-blue-500 outline-none" />
+                
+                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Transfer UTR / Ref Number</label>
+                <input type="text" id="payout-utr" required class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 mb-6 text-white focus:border-blue-500 outline-none" placeholder="Bank transaction ID" />
+                
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)]">Save Settlement Record</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Support Reply Modal -->
+    <div id="support-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] hidden backdrop-blur-sm p-4">
+        <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-md p-6 relative flex flex-col max-h-[80vh]">
+            <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-cosmic-light/50 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-xl font-bold text-white mb-4">Reply to Ticket</h2>
+            
+            <div class="bg-black/30 p-4 rounded-xl mb-4 border border-white/5 shrink-0">
+                <p class="text-xs text-cosmic-light/50 uppercase tracking-wider mb-1">Message from <span id="sup-sender">User</span></p>
+                <p class="text-sm text-white" id="sup-msg">Hello I need help...</p>
             </div>
+
+            <form onsubmit="handleSupportReply(event)" class="flex flex-col flex-1 min-h-0">
+                <input type="hidden" id="sup-ticket-id">
+                <label class="block text-xs font-medium text-cosmic-light/80 mb-1">Your Admin Reply</label>
+                <textarea id="sup-reply" required rows="4" class="w-full bg-cosmic-900 border border-white/10 rounded-xl px-4 py-3 mb-4 text-white focus:border-blue-500 outline-none resize-none flex-1"></textarea>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl shrink-0">Send Reply & Resolve</button>
+            </form>
         </div>
     </div>
 
     <!-- Confirm Dialog -->
     <div id="confirm-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[120] hidden backdrop-blur-sm p-4">
         <div class="bg-cosmic-800 border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-            <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2" id="confirm-icon">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
+            <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2" id="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <h2 class="text-xl font-bold text-white mb-2" id="confirm-title">Are you sure?</h2>
             <p class="text-sm text-cosmic-light/70 mb-6" id="confirm-msg">This action cannot be undone.</p>
             <div class="flex gap-3">
-                <button onclick="closeConfirm()" class="flex-1 px-4 py-2.5 rounded-xl text-white bg-white/10 hover:bg-white/20 transition-colors font-medium">Cancel</button>
-                <button id="confirm-action-btn" class="flex-1 px-4 py-2.5 rounded-xl text-white font-bold transition-colors">Confirm</button>
+                <button onclick="closeConfirm()" class="flex-1 px-4 py-2.5 rounded-xl text-white bg-white/10 hover:bg-white/20 font-medium">Cancel</button>
+                <button id="confirm-action-btn" class="flex-1 px-4 py-2.5 rounded-xl text-white font-bold">Confirm</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 left-4 md:left-auto z-[130] flex flex-col gap-2 pointer-events-none items-center md:items-end"></div>
+    <div id="toast-container" class="fixed top-4 right-4 left-4 md:left-auto z-[140] flex flex-col gap-2 pointer-events-none items-center md:items-end"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, increment, addDoc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
@@ -403,6 +414,14 @@
         let pendingPayments = [];
         let completedSessions = [];
         let globalSettings = { commissionPercent: 30, adminUpiId: '', adminName: '' };
+        
+        let allPayoutDetails = {}; // Maps astroId to their bank details
+        let allSettlements = []; // Historical payouts
+        let supportTickets = [];
+        
+        // Alarm State
+        let lastPendingUtrCount = -1; // Starts at -1 to prevent ringing on first load
+        let isAlarmRinging = false;
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -423,24 +442,17 @@
             e.preventDefault();
             const btn = document.getElementById('login-btn');
             const err = document.getElementById('login-error');
-            btn.innerText = "Authenticating...";
-            err.classList.add('hidden');
-            
+            btn.innerText = "Authenticating..."; err.classList.add('hidden');
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
                 showToast("Admin access granted.", "success");
             } catch (error) {
                 err.innerText = "Invalid credentials. Access Denied.";
-                err.classList.remove('hidden');
-                err.classList.add('block');
+                err.classList.remove('hidden'); err.classList.add('block');
                 btn.innerText = "Authenticate";
             }
         }
-
-        function handleLogout() {
-            signOut(auth);
-            showToast("Logged out.", "info");
-        }
+        function handleLogout() { signOut(auth); showToast("Logged out.", "info"); }
 
         function initAdminData() {
             // 1. Settings
@@ -450,23 +462,26 @@
                     document.getElementById('set-commission').value = globalSettings.commissionPercent;
                     document.getElementById('set-upi').value = globalSettings.adminUpiId || '';
                     document.getElementById('set-name').value = globalSettings.adminName || '';
-                    document.getElementById('earn-percent-display').innerText = globalSettings.commissionPercent;
-                    calculateFinances(); // Recalculate if percent changes
+                    calculateFinances();
                 }
             });
 
             // 2. Astrologers & Applications
             onSnapshot(collection(db, "astrologers"), (snapshot) => {
-                activeAstros = []; pendingApps = [];
+                activeAstros = []; pendingApps = []; let onlineCount = 0;
                 snapshot.forEach(doc => {
                     const d = doc.data();
                     if (d.status === 'pending') pendingApps.push({id: doc.id, ...d});
-                    else if (d.status !== 'rejected') activeAstros.push({id: doc.id, ...d});
+                    else if (d.status !== 'rejected') {
+                        activeAstros.push({id: doc.id, ...d});
+                        if(d.isOnline) onlineCount++;
+                    }
                 });
                 updateBadges();
+                document.getElementById('stat-online-astros').innerText = onlineCount;
                 if(currentView === 'astrologers') renderAstrologers();
                 if(currentView === 'applications') renderApplications();
-                document.getElementById('stat-astros').innerText = activeAstros.length;
+                if(currentView === 'payouts') renderPayouts(); // Depends on astros
             });
 
             // 3. Users
@@ -477,18 +492,25 @@
                 document.getElementById('stat-users').innerText = allUsers.length;
             });
 
-            // 4. Payments (UTRs)
-            onSnapshot(collection(db, "payment_verifications"), (snapshot) => {
+            // 4. Payments (UTRs) & The Loud Alarm
+            onSnapshot(query(collection(db, "payment_verifications"), orderBy("timestamp", "desc")), (snapshot) => {
                 pendingPayments = [];
                 snapshot.forEach(doc => {
                     const d = doc.data();
                     if(d.status === 'pending_verification') pendingPayments.push({id: doc.id, ...d});
                 });
+                
+                // Ringing Logic: Check if new UTRs arrived
+                if (lastPendingUtrCount !== -1 && pendingPayments.length > lastPendingUtrCount) {
+                    playAdminAlarm();
+                }
+                lastPendingUtrCount = pendingPayments.length;
+                
                 updateBadges();
                 if(currentView === 'finances') renderPayments();
             });
 
-            // 5. Sessions (For Earnings)
+            // 5. Sessions (For Earnings/Payouts)
             onSnapshot(collection(db, "sessions"), (snapshot) => {
                 completedSessions = [];
                 snapshot.forEach(doc => {
@@ -497,56 +519,71 @@
                 });
                 document.getElementById('stat-sessions').innerText = completedSessions.length;
                 calculateFinances();
+                if(currentView === 'payouts') renderPayouts();
             });
+
+            // 6. Support Tickets
+            onSnapshot(query(collection(db, "support_tickets"), orderBy("timestamp", "desc")), (snapshot) => {
+                supportTickets = [];
+                snapshot.forEach(doc => supportTickets.push({id: doc.id, ...doc.data()}));
+                updateBadges();
+                if(currentView === 'support') renderSupport();
+            });
+
+            // 7. Payout Details & Settlements
+            onSnapshot(collection(db, "payout_details"), (snapshot) => {
+                allPayoutDetails = {};
+                snapshot.forEach(doc => allPayoutDetails[doc.id] = doc.data());
+                if(currentView === 'payouts') renderPayouts();
+            });
+            onSnapshot(collection(db, "settlements"), (snapshot) => {
+                allSettlements = [];
+                snapshot.forEach(doc => allSettlements.push({id: doc.id, ...doc.data()}));
+                if(currentView === 'payouts') renderPayouts();
+            });
+        }
+
+        function playAdminAlarm() {
+            if(isAlarmRinging) return;
+            isAlarmRinging = true;
+            const audio = document.getElementById('admin-alarm');
+            audio.play().catch(e => console.warn("Audio autoplay blocked by browser."));
+            document.getElementById('alarm-controller').classList.remove('hidden');
+        }
+        function stopAdminAlarm() {
+            isAlarmRinging = false;
+            const audio = document.getElementById('admin-alarm');
+            audio.pause(); audio.currentTime = 0;
+            document.getElementById('alarm-controller').classList.add('hidden');
         }
 
         function calculateFinances() {
             let totalGross = 0;
             completedSessions.forEach(s => { totalGross += (s.cost || 0); });
-            
             const platformPercent = globalSettings.commissionPercent / 100;
             const totalPlatform = totalGross * platformPercent;
-            const totalAstros = totalGross - totalPlatform;
-
             document.getElementById('stat-revenue').innerText = Math.floor(totalPlatform);
-            document.getElementById('earn-gross').innerText = Math.floor(totalGross);
-            document.getElementById('earn-platform').innerText = Math.floor(totalPlatform);
-            document.getElementById('earn-astros').innerText = Math.floor(totalAstros);
-        }
-
-        async function saveGlobalSettings(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-settings');
-            btn.innerText = "Saving...";
-            
-            try {
-                await setDoc(doc(db, "settings", "global"), {
-                    commissionPercent: parseFloat(document.getElementById('set-commission').value),
-                    adminUpiId: document.getElementById('set-upi').value.trim(),
-                    adminName: document.getElementById('set-name').value.trim(),
-                    minMinutes: 5
-                }, { merge: true });
-                showToast("Global Settings Updated!", "success");
-            } catch (err) {
-                showToast("Failed to save settings.", "error");
-            }
-            btn.innerText = "Save Settings";
         }
 
         function updateBadges() {
-            const ab = document.getElementById('nav-app-badge');
-            const db = document.getElementById('desk-app-badge');
-            if(pendingApps.length > 0) {
-                ab.classList.remove('hidden'); db.classList.remove('hidden'); db.innerText = pendingApps.length;
-            } else { ab.classList.add('hidden'); db.classList.add('hidden'); }
+            // Apps
+            const ab = document.getElementById('nav-app-badge'); const db_app = document.getElementById('desk-app-badge');
+            if(pendingApps.length > 0) { ab.classList.remove('hidden'); db_app.classList.remove('hidden'); db_app.innerText = pendingApps.length; } 
+            else { ab.classList.add('hidden'); db_app.classList.add('hidden'); }
 
-            const pb = document.getElementById('nav-pay-badge');
-            const dpb = document.getElementById('desk-pay-badge');
-            if(pendingPayments.length > 0) {
-                pb.classList.remove('hidden'); dpb.classList.remove('hidden'); dpb.innerText = pendingPayments.length;
-            } else { pb.classList.add('hidden'); dpb.classList.add('hidden'); }
-            
+            // Payments (UTRs)
+            const pb = document.getElementById('nav-pay-badge'); const dpb = document.getElementById('desk-pay-badge');
+            if(pendingPayments.length > 0) { pb.classList.remove('hidden'); dpb.classList.remove('hidden'); dpb.innerText = pendingPayments.length; } 
+            else { pb.classList.add('hidden'); dpb.classList.add('hidden'); }
             document.getElementById('utr-count-badge').innerText = `${pendingPayments.length} Pending`;
+
+            // Support
+            const openSupport = supportTickets.filter(t => t.status !== 'resolved').length;
+            const mb_sup = document.getElementById('mob-support-badge'); const db_sup = document.getElementById('desk-support-badge');
+            const sup_head = document.getElementById('support-count-header');
+            sup_head.innerText = `${openSupport} Open Tickets`;
+            if(openSupport > 0) { mb_sup.classList.remove('hidden'); db_sup.classList.remove('hidden'); db_sup.innerText = openSupport; }
+            else { mb_sup.classList.add('hidden'); db_sup.classList.add('hidden'); }
         }
 
         function switchTab(tabId) {
@@ -556,43 +593,31 @@
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             document.getElementById(`view-${tabId}`).classList.add('block');
 
-            // Mobile style reset
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-cosmic-accent'); el.classList.add('text-cosmic-light/50');
-            });
-            if(document.getElementById(`nav-${tabId}`)) {
-                document.getElementById(`nav-${tabId}`).classList.add('text-cosmic-accent');
-                document.getElementById(`nav-${tabId}`).classList.remove('text-cosmic-light/50');
-            }
+            // Nav Highlighting
+            document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-cosmic-accent'); el.classList.add('text-cosmic-light/50'); });
+            if(document.getElementById(`nav-${tabId}`)) { document.getElementById(`nav-${tabId}`).classList.add('text-cosmic-accent'); document.getElementById(`nav-${tabId}`).classList.remove('text-cosmic-light/50'); }
+            document.querySelectorAll('.desk-nav-btn').forEach(el => { el.classList.remove('bg-cosmic-accent/10', 'text-cosmic-accent', 'font-bold'); el.classList.add('text-cosmic-light/70', 'hover:bg-white/5'); });
+            if(document.getElementById(`desk-nav-${tabId}`)) { document.getElementById(`desk-nav-${tabId}`).classList.add('bg-cosmic-accent/10', 'text-cosmic-accent', 'font-bold'); document.getElementById(`desk-nav-${tabId}`).classList.remove('text-cosmic-light/70', 'hover:bg-white/5'); }
 
-            // Desktop style reset
-            document.querySelectorAll('.desk-nav-btn').forEach(el => {
-                el.classList.remove('bg-cosmic-accent/10', 'text-cosmic-accent', 'font-bold');
-                el.classList.add('text-cosmic-light/70', 'hover:bg-white/5');
-            });
-            if(document.getElementById(`desk-nav-${tabId}`)) {
-                document.getElementById(`desk-nav-${tabId}`).classList.add('bg-cosmic-accent/10', 'text-cosmic-accent', 'font-bold');
-                document.getElementById(`desk-nav-${tabId}`).classList.remove('text-cosmic-light/70', 'hover:bg-white/5');
-            }
-
-            // Trigger specific renders
             if(tabId === 'astrologers') renderAstrologers();
             if(tabId === 'applications') renderApplications();
             if(tabId === 'users') renderUsers();
             if(tabId === 'finances') renderPayments();
+            if(tabId === 'support') renderSupport();
+            if(tabId === 'payouts') renderPayouts();
         }
 
         function renderAstrologers() {
-            const grid = document.getElementById('admin-astrologers-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('admin-astrologers-grid'); grid.innerHTML = '';
             if(activeAstros.length === 0) { grid.innerHTML = '<div class="col-span-full text-center py-10 text-cosmic-light/50">No active astrologers.</div>'; return; }
 
             activeAstros.forEach(astro => {
                 grid.innerHTML += `
                     <div class="glass-card rounded-2xl p-5 relative border border-white/5 hover:border-cosmic-accent/30 transition-colors group">
                         ${astro.comparePrice ? `<div class="absolute top-3 left-3 bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full border border-red-500/50">Discounted</div>` : ''}
+                        ${astro.isOnline ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-500/50"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Online</div>` : '<div class="absolute top-3 right-3 bg-gray-500/20 text-gray-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-500/50">Offline</div>'}
                         
-                        <div class="flex items-center gap-4 mb-4 mt-2">
+                        <div class="flex items-center gap-4 mb-4 mt-4">
                             <img src="${astro.image}" class="w-14 h-14 rounded-full object-cover border-2 border-cosmic-800">
                             <div>
                                 <h3 class="font-bold text-white text-lg">${astro.name}</h3>
@@ -600,22 +625,20 @@
                             </div>
                         </div>
                         <div class="bg-black/30 rounded-xl p-3 mb-4 text-xs space-y-1 text-cosmic-light/70">
-                            <p><span class="text-cosmic-light/40 w-16 inline-block">Exp:</span> <span class="text-white">${astro.experience} Yrs</span></p>
                             <p><span class="text-cosmic-light/40 w-16 inline-block">Orders:</span> <span class="text-white">${astro.orders || 0}</span></p>
-                            <p><span class="text-cosmic-light/40 w-16 inline-block">Rating:</span> <span class="text-yellow-400"><i class="fa-solid fa-star text-[10px]"></i> ${astro.rating || 5.0}</span></p>
-                            <p class="truncate"><span class="text-cosmic-light/40 w-16 inline-block">Skills:</span> <span class="text-white" title="${(astro.skills||[]).join(', ')}">${(astro.skills||[]).join(', ')}</span></p>
+                            <p class="truncate"><span class="text-cosmic-light/40 w-16 inline-block">Skills:</span> <span class="text-white">${(astro.skills||[]).join(', ')}</span></p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="editAstro('${astro.id}')" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 rounded-lg text-sm font-medium transition-colors">Edit</button>
-                            <button onclick="deleteAstro('${astro.id}')" class="w-10 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors flex items-center justify-center"><i class="fa-solid fa-trash text-sm"></i></button>
+                            <button onclick="suspendAstro('${astro.id}')" class="w-10 bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black rounded-lg transition-colors flex items-center justify-center" title="Suspend"><i class="fa-solid fa-ban text-sm"></i></button>
+                            <button onclick="deleteAstro('${astro.id}')" class="w-10 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                         </div>
                     </div>`;
             });
         }
 
         function renderApplications() {
-            const grid = document.getElementById('admin-applications-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('admin-applications-grid'); grid.innerHTML = '';
             if(pendingApps.length === 0) { grid.innerHTML = '<div class="col-span-full text-center py-10 text-cosmic-light/50">No pending applications.</div>'; return; }
 
             pendingApps.forEach(app => {
@@ -624,253 +647,293 @@
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex gap-3">
                                 <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl uppercase">${app.name.charAt(0)}</div>
-                                <div>
-                                    <h3 class="font-bold text-white">${app.name}</h3>
-                                    <p class="text-xs text-cosmic-light/70"><i class="fa-solid fa-envelope w-3"></i> ${app.email}</p>
-                                    <p class="text-xs text-cosmic-light/70"><i class="fa-solid fa-phone w-3"></i> ${app.phone}</p>
-                                </div>
+                                <div><h3 class="font-bold text-white">${app.name}</h3><p class="text-xs text-cosmic-light/70">${app.email} • ${app.phone}</p></div>
                             </div>
                         </div>
                         <div class="bg-black/30 rounded-lg p-3 space-y-2 mb-4 text-sm">
                             <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-cosmic-light/50">Experience</span><span class="font-bold text-white">${app.experience} Years</span></div>
                             <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-cosmic-light/50">Skills</span><span class="font-medium text-white truncate max-w-[60%]">${(app.skills || []).join(', ')}</span></div>
-                            <div class="pt-1"><span class="text-cosmic-light/50 block mb-1">Resume Link</span><a href="${app.resumeLink}" target="_blank" class="text-cosmic-accent hover:underline text-xs break-all">${app.resumeLink}</a></div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="approveApplication('${app.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg text-sm shadow-lg shadow-green-500/20 transition-colors">Approve & Hire</button>
-                            <button onclick="rejectApplication('${app.id}')" class="w-12 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-lg transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                            <button onclick="approveApplication('${app.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg text-sm shadow-lg shadow-green-500/20">Approve & Hire</button>
+                            <button onclick="rejectApplication('${app.id}')" class="w-12 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold rounded-lg"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>`;
             });
         }
 
         function renderUsers() {
-            const list = document.getElementById('admin-users-list');
-            list.innerHTML = '';
+            const list = document.getElementById('admin-users-list'); list.innerHTML = '';
             if(allUsers.length === 0) { list.innerHTML = '<tr><td colSpan="5" class="px-6 py-10 text-center text-cosmic-light/50">No users found.</td></tr>'; return; }
-
             allUsers.forEach(u => {
                 list.innerHTML += `
                     <tr class="hover:bg-white/5 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-white text-sm">${u.email}</div>
-                            <div class="text-[10px] text-cosmic-light/50 font-mono mt-0.5">ID: ${u.id.slice(0,8)}...</div>
-                        </td>
+                        <td class="px-6 py-4"><div class="font-bold text-white text-sm">${u.email}</div><div class="text-[10px] text-cosmic-light/50 font-mono mt-0.5">ID: ${u.id.slice(0,8)}...</div></td>
                         <td class="px-6 py-4 text-sm text-cosmic-light/70">${u.phone || 'N/A'}</td>
                         <td class="px-6 py-4 text-sm text-cosmic-light/70 text-right">${u.totalSessionMinutes || 0} mins</td>
                         <td class="px-6 py-4 text-right font-bold text-green-400">₹${u.balance || 0}</td>
                         <td class="px-6 py-4 text-center">
-                            <button onclick="openBalanceModal('${u.id}', '${u.email}')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-white/10">Manage Bal</button>
+                            <button onclick="openBalanceModal('${u.id}', '${u.email}')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10">Manage Bal</button>
                         </td>
                     </tr>`;
             });
         }
 
         function renderPayments() {
-            const list = document.getElementById('admin-payments-list');
-            list.innerHTML = '';
-            if(pendingPayments.length === 0) { list.innerHTML = '<div class="text-center py-10 text-cosmic-light/50"><i class="fa-solid fa-check-circle text-3xl mb-2 opacity-30"></i><br>All caught up!</div>'; return; }
-
+            const list = document.getElementById('admin-payments-list'); list.innerHTML = '';
+            if(pendingPayments.length === 0) { list.innerHTML = '<div class="text-center py-10 text-cosmic-light/50">All caught up!</div>'; return; }
             pendingPayments.forEach(p => {
-                const date = new Date(p.timestamp).toLocaleString();
+                const date = p.timestamp ? new Date(p.timestamp).toLocaleString() : 'Just now';
                 list.innerHTML += `
                     <div class="bg-black/30 border border-white/10 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-cosmic-accent/30 transition-colors">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-md border border-yellow-500/30">UTR: ${p.utrNumber}</span>
-                                <span class="text-xs text-cosmic-light/50">${date}</span>
-                            </div>
+                            <div class="flex items-center gap-2 mb-1"><span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded-md border border-yellow-500/30">UTR: ${p.utrNumber}</span><span class="text-xs text-cosmic-light/50">${date}</span></div>
                             <p class="font-bold text-white text-sm">${p.userEmail}</p>
-                            <p class="text-xs text-cosmic-light/70 mt-1">Requested to pay <span class="text-white font-medium">₹${p.amount}</span> for ${p.type} with ${p.name}</p>
+                            <p class="text-xs text-cosmic-light/70 mt-1">Requested to pay <span class="text-white font-medium">₹${p.amount}</span></p>
                         </div>
                         <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
-                            <button onclick="verifyPayment('${p.id}', '${p.userId}', ${p.amount})" class="flex-1 md:flex-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"><i class="fa-solid fa-check"></i> Verify & Credit</button>
-                            <button onclick="rejectPayment('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 py-2 rounded-lg transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                            <button onclick="verifyPayment('${p.id}', '${p.userId}', ${p.amount})" class="flex-1 md:flex-none bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-green-500/20"><i class="fa-solid fa-check"></i> Verify</button>
+                            <button onclick="rejectPayment('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-3 py-2 rounded-lg"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>`;
             });
         }
 
-        // Astrologer Application Handlers
-        async function approveApplication(id) {
+        function renderSupport() {
+            const list = document.getElementById('admin-support-list'); list.innerHTML = '';
+            if(supportTickets.length === 0) { list.innerHTML = '<div class="text-center py-10 text-cosmic-light/50">No support tickets.</div>'; return; }
+            
+            supportTickets.forEach(t => {
+                const isOpen = t.status !== 'resolved';
+                const date = t.timestamp ? new Date(t.timestamp).toLocaleString() : 'Recent';
+                list.innerHTML += `
+                    <div class="glass-card p-4 rounded-xl border ${isOpen ? 'border-blue-500/50' : 'border-white/10'}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div><span class="text-[10px] uppercase font-bold ${t.senderRole==='astrologer'?'text-purple-400':'text-green-400'}">${t.senderRole}</span><span class="text-xs text-cosmic-light/50 ml-2">${date}</span></div>
+                            ${isOpen ? `<span class="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">OPEN</span>` : `<span class="bg-gray-600 text-white text-[10px] px-2 py-0.5 rounded-full">RESOLVED</span>`}
+                        </div>
+                        <p class="text-sm text-white mb-3">"${t.message}"</p>
+                        ${isOpen ? `<button onclick="openSupportModal('${t.id}', '${t.senderRole}')" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs font-medium border border-white/10">Write Reply</button>` : `<div class="bg-black/30 p-3 rounded-lg border border-white/5"><p class="text-[10px] text-blue-400 uppercase tracking-wider mb-1">Admin Reply</p><p class="text-xs text-cosmic-light/80">${t.adminReply}</p></div>`}
+                    </div>`;
+            });
+        }
+
+        function renderPayouts() {
+            const list = document.getElementById('admin-payouts-list'); list.innerHTML = '';
+            const platformPercent = globalSettings.commissionPercent / 100;
+
+            activeAstros.forEach(astro => {
+                // Calculate Gross
+                let astroGross = 0;
+                completedSessions.filter(s => s.astroId === astro.id).forEach(s => astroGross += (s.cost || 0));
+                
+                // Calculate Net
+                const astroNetEarnings = astroGross * (1 - platformPercent);
+                
+                // Deduct already settled
+                let settledAmount = 0;
+                allSettlements.filter(s => s.astroId === astro.id && s.status === 'completed').forEach(s => settledAmount += s.amount);
+                
+                const pendingPayout = Math.floor(astroNetEarnings - settledAmount);
+                const bankInfo = allPayoutDetails[astro.id];
+                const bankStr = bankInfo ? `UPI: <span class="text-white">${bankInfo.upiId || 'N/A'}</span><br>A/C: <span class="text-white">${bankInfo.accountNumber || 'N/A'}</span>` : '<span class="text-red-400">Not Provided</span>';
+
+                list.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-4 py-4"><div class="font-bold text-white text-sm">${astro.name}</div><div class="text-[10px] text-cosmic-light/50">Gross: ₹${Math.floor(astroGross)}</div></td>
+                        <td class="px-4 py-4 text-xs text-cosmic-light/70">${bankStr}</td>
+                        <td class="px-4 py-4 text-right"><div class="font-bold text-yellow-400 text-lg">₹${pendingPayout}</div></td>
+                        <td class="px-4 py-4 text-center">
+                            <button onclick="openPayoutModal('${astro.id}', '${astro.name.replace(/'/g, "\\'")}', ${pendingPayout})" ${pendingPayout <= 0 ? 'disabled class="opacity-50 cursor-not-allowed bg-gray-600 px-4 py-2 rounded-lg text-xs font-bold"' : 'class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-transform active:scale-95"'}>Process Payout</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function saveGlobalSettings(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-settings'); btn.innerText = "Saving...";
             try {
-                await updateDoc(doc(db, "astrologers", id), { status: 'approved', isVerified: true });
-                showToast("Application approved! Astrologer is now active.", "success");
-            } catch (error) { showToast("Error approving application.", "error"); }
+                await setDoc(doc(db, "settings", "global"), {
+                    commissionPercent: parseFloat(document.getElementById('set-commission').value),
+                    adminUpiId: document.getElementById('set-upi').value.trim(),
+                    adminName: document.getElementById('set-name').value.trim()
+                }, { merge: true });
+                showToast("Global Settings Updated!", "success");
+            } catch (err) { showToast("Failed to save settings.", "error"); }
+            btn.innerText = "Save Settings";
+        }
+
+        function openPayoutModal(astroId, name, amount) {
+            if(amount <= 0) return;
+            document.getElementById('payout-astro-id').value = astroId;
+            document.getElementById('payout-astro-name').innerText = name;
+            document.getElementById('payout-amount').value = amount;
+            document.getElementById('payout-utr').value = '';
+            
+            const bank = allPayoutDetails[astroId];
+            document.getElementById('payout-bank-details').innerHTML = bank ? `<strong>Transfer To:</strong><br>UPI: ${bank.upiId || 'N/A'}<br>A/C: ${bank.accountNumber || 'N/A'}<br>IFSC: ${bank.ifsc || 'N/A'}` : 'No bank details provided by astrologer.';
+            document.getElementById('payout-modal').classList.remove('hidden');
+        }
+        function closePayoutModal() { document.getElementById('payout-modal').classList.add('hidden'); }
+        async function handleProcessPayout(e) {
+            e.preventDefault();
+            const astroId = document.getElementById('payout-astro-id').value;
+            const amt = parseFloat(document.getElementById('payout-amount').value);
+            const utr = document.getElementById('payout-utr').value.trim();
+            
+            try {
+                await addDoc(collection(db, "settlements"), {
+                    astroId: astroId, amount: amt, utr: utr,
+                    status: 'completed', timestamp: new Date().toISOString()
+                });
+                showToast(`Settlement of ₹${amt} logged for Astrologer!`, "success");
+                closePayoutModal();
+            } catch (err) { showToast("Error logging payout.", "error"); }
+        }
+
+        function openSupportModal(ticketId, senderRole) {
+            const ticket = supportTickets.find(t => t.id === ticketId);
+            if(!ticket) return;
+            document.getElementById('sup-ticket-id').value = ticketId;
+            document.getElementById('sup-sender').innerText = senderRole;
+            document.getElementById('sup-msg').innerText = ticket.message;
+            document.getElementById('sup-reply').value = '';
+            document.getElementById('support-modal').classList.remove('hidden');
+        }
+        function closeSupportModal() { document.getElementById('support-modal').classList.add('hidden'); }
+        async function handleSupportReply(e) {
+            e.preventDefault();
+            const id = document.getElementById('sup-ticket-id').value;
+            const reply = document.getElementById('sup-reply').value.trim();
+            try {
+                await updateDoc(doc(db, "support_tickets", id), { adminReply: reply, status: 'resolved', resolvedAt: new Date().toISOString() });
+                showToast("Reply sent and ticket resolved.", "success");
+                closeSupportModal();
+            } catch(e) { showToast("Failed to send reply.", "error"); }
+        }
+
+        // Astrologer Application & Status
+        async function approveApplication(id) {
+            try { await updateDoc(doc(db, "astrologers", id), { status: 'approved', isVerified: true }); showToast("Application approved!", "success"); } 
+            catch (e) { showToast("Error approving.", "error"); }
         }
         function rejectApplication(id) {
-            showConfirmDialog("Reject Application?", "Are you sure you want to reject this applicant?", "danger", async () => {
-                try { await updateDoc(doc(db, "astrologers", id), { status: 'rejected' }); showToast("Application rejected.", "info"); } 
-                catch (e) { showToast("Error rejecting.", "error"); }
+            showConfirmDialog("Reject Application?", "Are you sure?", "danger", async () => {
+                try { await updateDoc(doc(db, "astrologers", id), { status: 'rejected' }); showToast("Rejected.", "info"); } catch (e) { showToast("Error", "error"); }
+            });
+        }
+        function suspendAstro(id) {
+            showConfirmDialog("Suspend Astrologer?", "They will be moved back to 'pending' state and removed from the website.", "danger", async () => {
+                try { await updateDoc(doc(db, "astrologers", id), { status: 'pending', isOnline: false }); showToast("Astrologer suspended.", "info"); } catch (e) { showToast("Error", "error"); }
             });
         }
 
         // Payment Verifications
         async function verifyPayment(docId, userId, amount) {
-            showConfirmDialog("Verify Payment?", `This will add ₹${amount} to the user's wallet immediately. Ensure you have received the money.`, "success", async () => {
+            stopAdminAlarm(); // Silence alarm if clicking verify
+            showConfirmDialog("Verify Payment?", `Credit ₹${amount} to user wallet?`, "success", async () => {
                 try {
                     await updateDoc(doc(db, "payment_verifications", docId), { status: 'verified', verifiedAt: new Date().toISOString() });
                     await updateDoc(doc(db, "users", userId), { balance: increment(amount) });
-                    showToast(`₹${amount} credited successfully!`, "success");
-                } catch (e) { showToast("Failed to verify payment.", "error"); }
+                    showToast(`₹${amount} credited!`, "success");
+                } catch (e) { showToast("Failed to verify.", "error"); }
             });
         }
         function rejectPayment(docId) {
-            showConfirmDialog("Reject Payment?", "Rejecting this means the UTR was invalid or money was not received.", "danger", async () => {
-                try { await updateDoc(doc(db, "payment_verifications", docId), { status: 'rejected', rejectedAt: new Date().toISOString() }); showToast("Payment rejected.", "info"); } 
-                catch (e) { showToast("Failed to reject.", "error"); }
+            stopAdminAlarm(); // Silence alarm if clicking reject
+            showConfirmDialog("Reject Payment?", "Rejecting means UTR was invalid.", "danger", async () => {
+                try { await updateDoc(doc(db, "payment_verifications", docId), { status: 'rejected' }); showToast("Rejected.", "info"); } catch (e) { showToast("Failed.", "error"); }
             });
         }
 
-        // Manual Balance Add/Deduct
+        // Manual Balance
         function openBalanceModal(userId, email) {
-            document.getElementById('bal-user-id').value = userId;
-            document.getElementById('bal-user-email').innerText = email;
-            document.getElementById('bal-amount').value = '';
+            document.getElementById('bal-user-id').value = userId; document.getElementById('bal-user-email').innerText = email; document.getElementById('bal-amount').value = '';
             document.getElementById('balance-modal').classList.remove('hidden');
         }
         function closeBalanceModal() { document.getElementById('balance-modal').classList.add('hidden'); }
         async function handleManualBalance(e) {
             e.preventDefault();
-            const userId = document.getElementById('bal-user-id').value;
-            const amt = parseFloat(document.getElementById('bal-amount').value);
-            try {
-                await updateDoc(doc(db, "users", userId), { balance: increment(amt) });
-                showToast(`Wallet adjusted by ₹${amt}.`, "success");
-                closeBalanceModal();
-            } catch (e) { showToast("Failed to update wallet.", "error"); }
+            const userId = document.getElementById('bal-user-id').value; const amt = parseFloat(document.getElementById('bal-amount').value);
+            try { await updateDoc(doc(db, "users", userId), { balance: increment(amt) }); showToast(`Wallet adjusted by ₹${amt}.`, "success"); closeBalanceModal(); } 
+            catch (e) { showToast("Failed.", "error"); }
         }
 
-        // Astrologer CRUD Handlers
+        // Astro Modal CRUD
         function openAstroModal(astroId = null) {
-            const form = document.getElementById('astro-form');
-            form.reset();
-            document.getElementById('astro-id').value = '';
-            document.getElementById('astro-modal-title').innerText = 'Add New Astrologer';
-            
+            const form = document.getElementById('astro-form'); form.reset(); document.getElementById('astro-id').value = ''; document.getElementById('astro-modal-title').innerText = 'Add New Astrologer';
             if (astroId) {
                 const a = activeAstros.find(x => x.id === astroId);
                 if (a) {
-                    document.getElementById('astro-modal-title').innerText = 'Edit Astrologer';
-                    document.getElementById('astro-id').value = a.id;
-                    document.getElementById('astro-name').value = a.name;
-                    document.getElementById('astro-img').value = a.image || '';
-                    document.getElementById('astro-price').value = a.price;
-                    document.getElementById('astro-compare').value = a.comparePrice || '';
-                    document.getElementById('astro-exp').value = a.experience;
-                    document.getElementById('astro-orders').value = a.orders || 0;
-                    document.getElementById('astro-rating').value = a.rating || 5.0;
-                    document.getElementById('astro-skills').value = (a.skills || []).join(', ');
+                    document.getElementById('astro-modal-title').innerText = 'Edit Astrologer'; document.getElementById('astro-id').value = a.id;
+                    document.getElementById('astro-name').value = a.name; document.getElementById('astro-img').value = a.image || '';
+                    document.getElementById('astro-price').value = a.price; document.getElementById('astro-compare').value = a.comparePrice || '';
+                    document.getElementById('astro-exp').value = a.experience; document.getElementById('astro-orders').value = a.orders || 0;
+                    document.getElementById('astro-rating').value = a.rating || 5.0; document.getElementById('astro-skills').value = (a.skills || []).join(', ');
                     document.getElementById('astro-langs').value = (a.languages || []).join(', ');
                 }
             }
             document.getElementById('astro-modal').classList.remove('hidden');
         }
         function closeAstroModal() { document.getElementById('astro-modal').classList.add('hidden'); }
-        
         async function saveAstro(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-astro');
-            btn.innerText = "Saving...";
-            
-            const id = document.getElementById('astro-id').value;
-            const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== '');
-            const comparePriceVal = document.getElementById('astro-compare').value;
-            
+            e.preventDefault(); const btn = document.getElementById('btn-save-astro'); btn.innerText = "Saving...";
+            const id = document.getElementById('astro-id').value; const toArray = (str) => str.split(',').map(s => s.trim()).filter(s => s !== ''); const comparePriceVal = document.getElementById('astro-compare').value;
             const data = {
                 name: document.getElementById('astro-name').value.trim(),
                 image: document.getElementById('astro-img').value.trim() || `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('astro-name').value)}&background=D4AF37`,
-                price: parseFloat(document.getElementById('astro-price').value),
-                comparePrice: comparePriceVal ? parseFloat(comparePriceVal) : null,
-                experience: parseInt(document.getElementById('astro-exp').value),
-                orders: parseInt(document.getElementById('astro-orders').value),
-                rating: parseFloat(document.getElementById('astro-rating').value),
-                skills: toArray(document.getElementById('astro-skills').value),
-                languages: toArray(document.getElementById('astro-langs').value),
-                status: 'approved',
-                isVerified: true
+                price: parseFloat(document.getElementById('astro-price').value), comparePrice: comparePriceVal ? parseFloat(comparePriceVal) : null,
+                experience: parseInt(document.getElementById('astro-exp').value), orders: parseInt(document.getElementById('astro-orders').value),
+                rating: parseFloat(document.getElementById('astro-rating').value), skills: toArray(document.getElementById('astro-skills').value), languages: toArray(document.getElementById('astro-langs').value),
+                status: 'approved', isVerified: true
             };
-
             try {
-                if (id) { await updateDoc(doc(db, "astrologers", id), data); showToast("Astrologer updated.", "success"); } 
-                else { await setDoc(doc(collection(db, "astrologers")), data); showToast("Astrologer added.", "success"); }
+                if (id) { await updateDoc(doc(db, "astrologers", id), data); showToast("Updated.", "success"); } 
+                else { await addDoc(collection(db, "astrologers"), data); showToast("Added.", "success"); }
                 closeAstroModal();
             } catch (err) { showToast("Failed to save.", "error"); }
             btn.innerText = "Save Astrologer";
         }
-        
         function deleteAstro(id) {
-            showConfirmDialog("Delete Astrologer?", "Are you sure? This removes them from the website immediately.", "danger", async () => {
-                try { await deleteDoc(doc(db, "astrologers", id)); showToast("Deleted successfully.", "info"); } 
-                catch (e) { showToast("Delete failed.", "error"); }
+            showConfirmDialog("Delete Astrologer?", "Are you sure?", "danger", async () => {
+                try { await deleteDoc(doc(db, "astrologers", id)); showToast("Deleted.", "info"); } catch (e) { showToast("Failed.", "error"); }
             });
         }
 
-        // UI Utilities
         let confirmCallback = null;
         function showConfirmDialog(title, message, type, callback) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-msg').innerText = message;
-            
-            const btn = document.getElementById('confirm-action-btn');
-            const icon = document.getElementById('confirm-icon');
-            
-            if (type === "danger") {
-                btn.className = "flex-1 px-4 py-2.5 rounded-xl text-white font-bold transition-colors bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20";
-                icon.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-red-500/50 bg-red-500/20 text-red-500";
-            } else {
-                btn.className = "flex-1 px-4 py-2.5 rounded-xl text-white font-bold transition-colors bg-green-500 hover:bg-green-600 shadow-lg shadow-green-500/20";
-                icon.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-green-500/50 bg-green-500/20 text-green-500";
-            }
-            
-            confirmCallback = callback;
-            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = message;
+            const btn = document.getElementById('confirm-action-btn'); const icon = document.getElementById('confirm-icon');
+            if (type === "danger") { btn.className = "flex-1 px-4 py-2.5 rounded-xl text-white font-bold bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20"; icon.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-red-500/50 bg-red-500/20 text-red-500"; } 
+            else { btn.className = "flex-1 px-4 py-2.5 rounded-xl text-white font-bold bg-green-500 hover:bg-green-600 shadow-lg shadow-green-500/20"; icon.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-green-500/50 bg-green-500/20 text-green-500"; }
+            confirmCallback = callback; document.getElementById('confirm-modal').classList.remove('hidden');
         }
-        
-        function closeConfirm() {
-            document.getElementById('confirm-modal').classList.add('hidden');
-            confirmCallback = null;
-        }
-
-        document.getElementById('confirm-action-btn').addEventListener('click', () => {
-            if(confirmCallback) confirmCallback();
-            closeConfirm();
-        });
+        function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); confirmCallback = null; }
+        document.getElementById('confirm-action-btn').addEventListener('click', () => { if(confirmCallback) confirmCallback(); closeConfirm(); });
 
         function showToast(message, type = "info") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let colors = "bg-cosmic-800 border-white/10 text-white";
-            let icon = "fa-circle-info text-blue-400";
+            const container = document.getElementById('toast-container'); const toast = document.createElement('div');
+            let colors = "bg-cosmic-800 border-white/10 text-white"; let icon = "fa-circle-info text-blue-400";
             if (type === "success") { colors = "bg-green-500/10 border-green-500/50 text-green-100"; icon = "fa-circle-check text-green-400"; }
             if (type === "error") { colors = "bg-red-500/10 border-red-500/50 text-red-100"; icon = "fa-circle-exclamation text-red-400"; }
-
             toast.className = `${colors} border px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 -translate-y-full md:translate-y-0 md:translate-x-full opacity-0 text-sm backdrop-blur-md`;
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${message}</span>`;
-            
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('-translate-y-full', 'md:translate-x-full', 'opacity-0'), 10);
             setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // Expose to window for inline HTML onclicks
-        window.handleLogin = handleLogin;
-        window.handleLogout = handleLogout;
-        window.switchTab = switchTab;
-        window.openAstroModal = openAstroModal;
-        window.closeAstroModal = closeAstroModal;
-        window.saveAstro = saveAstro;
-        window.deleteAstro = deleteAstro;
-        window.approveApplication = approveApplication;
-        window.rejectApplication = rejectApplication;
-        window.openBalanceModal = openBalanceModal;
-        window.closeBalanceModal = closeBalanceModal;
-        window.handleManualBalance = handleManualBalance;
-        window.saveGlobalSettings = saveGlobalSettings;
-        window.verifyPayment = verifyPayment;
-        window.rejectPayment = rejectPayment;
-        window.closeConfirm = closeConfirm;
-        window.editAstro = openAstroModal; // Alias
+        window.handleLogin = handleLogin; window.handleLogout = handleLogout; window.switchTab = switchTab;
+        window.openAstroModal = openAstroModal; window.closeAstroModal = closeAstroModal; window.saveAstro = saveAstro;
+        window.deleteAstro = deleteAstro; window.suspendAstro = suspendAstro;
+        window.approveApplication = approveApplication; window.rejectApplication = rejectApplication;
+        window.openBalanceModal = openBalanceModal; window.closeBalanceModal = closeBalanceModal; window.handleManualBalance = handleManualBalance;
+        window.saveGlobalSettings = saveGlobalSettings; window.verifyPayment = verifyPayment; window.rejectPayment = rejectPayment;
+        window.closeConfirm = closeConfirm; window.editAstro = openAstroModal;
+        window.stopAdminAlarm = stopAdminAlarm;
+        window.openPayoutModal = openPayoutModal; window.closePayoutModal = closePayoutModal; window.handleProcessPayout = handleProcessPayout;
+        window.openSupportModal = openSupportModal; window.closeSupportModal = closeSupportModal; window.handleSupportReply = handleSupportReply;
     </script>
 </body>
 </html>
