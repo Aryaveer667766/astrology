@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin & Operations HQ | Vaidika Ranchi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-slate-950 border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+    <div class="flex items-center space-x-3">
+      <span class="text-2xl">⚡</span>
+      <h1 class="font-black text-base text-amber-400">Vaidika HQ Operations Center <span class="text-xs text-slate-500 font-normal">Ranchi</span></h1>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="index.html" class="text-xs text-slate-400 hover:text-white">&larr; Customer Portal</a>
+      <button id="btn-admin-logout" class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl hover:bg-red-900 transition">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Login Card for Admin (Passcode: ranchi@admin) -->
+  <div id="admin-login-overlay" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 max-w-sm w-full p-6 rounded-3xl space-y-4 text-center">
+      <span class="text-3xl">🔐</span>
+      <h3 class="font-black text-lg text-white">Operations HQ Login</h3>
+      <p class="text-xs text-slate-400">Authorized personnel only</p>
+      <input type="password" id="admin-passcode" placeholder="Master Key (ranchi@admin)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:ring-2 focus:ring-amber-500 text-center font-mono" />
+      <button id="btn-unlock-admin" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3 rounded-xl text-xs transition">
+        Unlock Dashboard
+      </button>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+    
+    <!-- Top KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+        <span class="text-[11px] font-bold text-slate-400 uppercase">Gross Platform GMV</span>
+        <p id="kpi-gmv" class="text-2xl font-black text-white mt-1">₹0</p>
+      </div>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+        <span class="text-[11px] font-bold text-slate-400 uppercase">Pending Payment Approvals</span>
+        <p id="kpi-pending-pay" class="text-2xl font-black text-amber-400 mt-1">0</p>
+      </div>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+        <span class="text-[11px] font-bold text-slate-400 uppercase">Online Purohits</span>
+        <p id="kpi-online-pandits" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+      </div>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+        <span class="text-[11px] font-bold text-slate-400 uppercase">Pending KYC</span>
+        <p id="kpi-pending-kyc" class="text-2xl font-black text-red-400 mt-1">0</p>
+      </div>
+    </div>
+
+    <!-- Section 1: Platform Payment & Dakshina Configurator -->
+    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800 space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="font-black text-base text-white">Dynamic Payment Gateway Configuration</h2>
+          <p class="text-xs text-slate-400">Controls how customers pay on the frontend (UPI QR, Link, or WhatsApp)</p>
+        </div>
+        <button id="btn-save-settings" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition">
+          Update Settings
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div>
+          <label class="font-bold text-slate-400">Active Payment Gateway Mode</label>
+          <select id="cfg-pay-mode" class="w-full mt-1.5 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+            <option value="upi">Direct Dynamic UPI QR</option>
+            <option value="link">Payment Link (Razorpay / Stripe)</option>
+            <option value="whatsapp">WhatsApp Order Verification</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">Admin UPI ID (for QR)</label>
+          <input type="text" id="cfg-upi-id" placeholder="vaidika@okaxis" class="w-full mt-1.5 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">WhatsApp Business Number</label>
+          <input type="text" id="cfg-wa-num" placeholder="919123456780" class="w-full mt-1.5 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+        </div>
+      </div>
+
+      <div class="text-xs">
+        <label class="font-bold text-slate-400">Custom Payment Gateway URL (used if Mode = Link)</label>
+        <input type="url" id="cfg-pay-link" placeholder="https://pages.razorpay.com/sample-dakshina" class="w-full mt-1.5 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+      </div>
+    </div>
+
+    <!-- Section 2: Leaflet Live Ranchi Map -->
+    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800 space-y-3">
+      <h3 class="font-black text-base text-white flex items-center gap-2">
+        <i class="fa-solid fa-radar text-amber-400"></i> Ranchi Live Dispatch & Radar Map
+      </h3>
+      <div id="admin-map" class="h-72 w-full rounded-2xl border border-slate-800 z-10"></div>
+    </div>
+
+    <!-- Section 3: Pending Order Verification & Confirmation -->
+    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800 space-y-4">
+      <h3 class="font-black text-base text-white">Live Bookings & Payment Verification Queue</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900 text-slate-400 uppercase font-bold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Booking ID</th>
+              <th class="px-4 py-3">Customer</th>
+              <th class="px-4 py-3">Puja Ritual</th>
+              <th class="px-4 py-3">UTR / Payment Ref</th>
+              <th class="px-4 py-3">Total Amount</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-bookings" class="divide-y divide-slate-800">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 4: Purohit KYC Approvals -->
+    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800 space-y-4">
+      <h3 class="font-black text-base text-white">Purohit KYC Verification</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900 text-slate-400 uppercase font-bold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Acharya Name</th>
+              <th class="px-4 py-3">Phone</th>
+              <th class="px-4 py-3">Languages</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-kyc" class="divide-y divide-slate-800">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Admin Module Script -->
+  <script type="module">
+    import {
+      db,
+      getPlatformSettings,
+      RANCHI_CENTER,
+      doc,
+      setDoc,
+      updateDoc,
+      collection,
+      onSnapshot
+    } from "./shared.js";
+
+    let adminMap = null;
+    const mapMarkers = [];
+
+    // Admin Passcode Lock
+    document.getElementById("btn-unlock-admin").onclick = () => {
+      const pass = document.getElementById("admin-passcode").value;
+      if (pass === "ranchi@admin") {
+        document.getElementById("admin-login-overlay").classList.add("hidden");
+        initAdminMap();
+        loadSettings();
+        streamBookings();
+        streamPandits();
+      } else {
+        alert("Invalid Master Passcode.");
+      }
+    };
+
+    // Load Settings
+    async function loadSettings() {
+      const settings = await getPlatformSettings();
+      document.getElementById("cfg-pay-mode").value = settings.paymentMethod || "upi";
+      document.getElementById("cfg-upi-id").value = settings.upiId || "";
+      document.getElementById("cfg-wa-num").value = settings.whatsappNumber || "";
+      document.getElementById("cfg-pay-link").value = settings.paymentLinkUrl || "";
+    }
+
+    document.getElementById("btn-save-settings").onclick = async () => {
+      await updateDoc(doc(db, "settings", "platform"), {
+        paymentMethod: document.getElementById("cfg-pay-mode").value,
+        upiId: document.getElementById("cfg-upi-id").value,
+        whatsappNumber: document.getElementById("cfg-wa-num").value,
+        paymentLinkUrl: document.getElementById("cfg-pay-link").value
+      });
+      alert("✅ Platform Payment Configuration Updated!");
+    };
+
+    // Init Admin Map
+    function initAdminMap() {
+      adminMap = L.map("admin-map").setView([RANCHI_CENTER.lat, RANCHI_CENTER.lng], 12);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(adminMap);
+    }
+
+    // Stream Bookings & Confirm Payments
+    function streamBookings() {
+      onSnapshot(collection(db, "bookings"), (snap) => {
+        let gmv = 0;
+        let pendingCount = 0;
+        const tbody = document.getElementById("table-bookings");
+        tbody.innerHTML = "";
+
+        snap.forEach((d) => {
+          const b = d.data();
+          gmv += b.pricing?.totalAmount || 0;
+          if (b.status === "pending_verification") pendingCount++;
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-slate-900/60";
+          row.innerHTML = `
+            <td class="px-4 py-3 font-mono font-bold">${d.id.slice(0, 8)}...</td>
+            <td class="px-4 py-3 font-medium">${b.customerName || "Devotee"}</td>
+            <td class="px-4 py-3">${b.serviceName}</td>
+            <td class="px-4 py-3 font-mono text-amber-400">${b.paymentUtr || "N/A"}</td>
+            <td class="px-4 py-3 font-bold text-white">₹${b.pricing?.totalAmount}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                b.status === "confirmed" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
+              }">${b.status}</span>
+            </td>
+            <td class="px-4 py-3 space-x-1">
+              ${b.status !== "confirmed" ? `
+                <button data-id="${d.id}" class="btn-confirm-pay bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">
+                  Confirm & Dispatch
+                </button>
+              ` : `<span class="text-xs text-slate-500">Confirmed ✓</span>`}
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById("kpi-gmv").textContent = `₹${gmv.toLocaleString()}`;
+        document.getElementById("kpi-pending-pay").textContent = pendingCount;
+
+        document.querySelectorAll(".btn-confirm-pay").forEach((btn) => {
+          btn.onclick = async (e) => {
+            const id = e.target.getAttribute("data-id");
+            await updateDoc(doc(db, "bookings", id), {
+              status: "confirmed",
+              paymentStatus: "verified"
+            });
+            alert("✅ Booking & Payment Confirmed!");
+          };
+        });
+      });
+    }
+
+    // Stream Pandits for KYC
+    function streamPandits() {
+      onSnapshot(collection(db, "pandits"), (snap) => {
+        let onlineCount = 0;
+        let pendingKyc = 0;
+        const tbody = document.getElementById("table-kyc");
+        tbody.innerHTML = "";
+
+        snap.forEach((d) => {
+          const p = d.data();
+          if (p.status === "online") onlineCount++;
+          if (!p.isVerified) pendingKyc++;
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-slate-900/60";
+          row.innerHTML = `
+            <td class="px-4 py-3 font-bold">${p.name}</td>
+            <td class="px-4 py-3 text-slate-400">${p.phone}</td>
+            <td class="px-4 py-3 text-slate-400">${p.languages?.join(", ")}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                p.isVerified ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
+              }">${p.isVerified ? "Verified" : "Pending KYC"}</span>
+            </td>
+            <td class="px-4 py-3">
+              ${!p.isVerified ? `
+                <button data-id="${d.id}" class="btn-approve-kyc bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[10px]">
+                  Approve KYC
+                </button>
+              ` : `<span class="text-xs text-slate-500">Active Purohit</span>`}
+            </td>
+          `;
+          tbody.appendChild(row);
+
+          // Add to map
+          if (adminMap && p.location) {
+            L.marker([p.location.latitude, p.location.longitude])
+              .addTo(adminMap)
+              .bindPopup(`<b>${p.name}</b><br>${p.status === "online" ? "🟢 Online" : "🔴 Offline"}`);
+          }
+        });
+
+        document.getElementById("kpi-online-pandits").textContent = onlineCount;
+        document.getElementById("kpi-pending-kyc").textContent = pendingKyc;
+
+        document.querySelectorAll(".btn-approve-kyc").forEach((btn) => {
+          btn.onclick = async (e) => {
+            const id = e.target.getAttribute("data-id");
+            await updateDoc(doc(db, "pandits", id), { isVerified: true });
+            alert("✅ Purohit KYC Approved!");
+          };
+        });
+      });
+    }
+  </script>
+</body>
+</html>
