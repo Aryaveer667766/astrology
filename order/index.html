@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vaidika Ranchi - Spiritual Service Marketplace</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.5; }
+      100% { transform: scale(0.95); opacity: 1; }
+    }
+    .radar-pulse { animation: pulse-ring 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+  <!-- ================= MASTER TOP NAVBAR & PERSONA SWITCHER ================= -->
+  <header class="bg-slate-950 text-slate-300 text-xs px-4 py-2.5 flex flex-wrap justify-between items-center border-b border-slate-800 sticky top-0 z-50 shadow-md">
+    <div class="flex items-center space-x-2 sm:space-x-4">
+      <span class="font-bold text-amber-400 text-sm flex items-center gap-1.5">
+        <span>🪔</span> Vaidika Ranchi
+      </span>
+      <div class="h-4 w-px bg-slate-800 hidden sm:block"></div>
+      <div class="flex items-center space-x-1 font-mono">
+        <button id="tab-btn-customer" class="px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold transition">Customer Portal</button>
+        <button id="tab-btn-provider" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition">Pandit App</button>
+        <button id="tab-btn-admin" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition">Admin / Ops</button>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2 mt-2 sm:mt-0">
+      <span id="firebase-status" class="inline-flex items-center text-[10px] text-emerald-400 font-mono">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Firebase Live
+      </span>
+      <button id="btn-seed-database" class="text-[11px] bg-slate-800 border border-slate-700 px-2.5 py-1 rounded hover:bg-slate-700 text-amber-300 font-medium transition">
+        ⚡ Seed Ranchi Data
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= 1. CUSTOMER PORTAL ================= -->
+  <section id="view-customer" class="block">
+    <!-- Hero Banner -->
+    <div class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 text-white py-12 px-4 shadow-inner">
+      <div class="max-w-4xl mx-auto text-center space-y-4">
+        <span class="text-xs uppercase tracking-widest font-black bg-white/20 px-3 py-1 rounded-full">Doorstep Purohit Booking</span>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight">Vedic Rituals & Pujas in Ranchi</h1>
+        <p class="text-orange-100 text-sm max-w-xl mx-auto">Instant verified Purohit dispatch across Lalpur, Harmu, Doranda, Morabadi and Main Road.</p>
+        
+        <!-- Search & Dropdown selectors -->
+        <div class="bg-white text-slate-800 p-4 sm:p-6 rounded-2xl shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-left border border-orange-100">
+          <div>
+            <label for="cust-service-select" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Select Puja Service</label>
+            <select id="cust-service-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-orange-500">
+              <option value="griha_pravesh" data-fare="3100">Griha Pravesh Puja (₹3,100)</option>
+              <option value="satyanarayan_katha" data-fare="1500">Shree Satyanarayan Katha (₹1,500)</option>
+              <option value="rudrabhishek" data-fare="2500">Maha Rudrabhishek (₹2,500)</option>
+              <option value="marriage" data-fare="11000">Vivah Sanskar / Marriage (₹11,000)</option>
+              <option value="vastu_shanti" data-fare="2100">Vastu Shanti Puja (₹2,100)</option>
+            </select>
+          </div>
+          <div>
+            <label for="cust-location-select" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Your Ranchi Locality</label>
+            <select id="cust-location-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-orange-500">
+              <option value="mainRoad" data-lat="23.3441" data-lng="85.3096">📍 Main Road, Ranchi</option>
+              <option value="lalpur" data-lat="23.3700" data-lng="85.3250">📍 Lalpur Chowk</option>
+              <option value="harmu" data-lat="23.3533" data-lng="85.3021">📍 Harmu Housing Colony</option>
+              <option value="doranda" data-lat="23.3280" data-lng="85.3210">📍 Doranda</option>
+              <option value="morabadi" data-lat="23.3900" data-lng="85.3180">📍 Morabadi Ground</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Dashboard Content -->
+    <div class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Real-time Purohits List -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+            <span>Available Verified Pandits</span>
+            <span id="cust-online-badge" class="bg-orange-100 text-orange-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Online</span>
+          </h2>
+          <span class="text-xs text-slate-400 font-mono">Synced via Firestore</span>
+        </div>
+
+        <div id="cust-pandits-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Dynamic real-time pandit cards render here -->
+        </div>
+      </div>
+
+      <!-- Checkout & Price Summary Card -->
+      <div class="lg:col-span-1">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl sticky top-20 space-y-4">
+          <h3 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-3">Price Breakdown</h3>
+          <div class="space-y-2.5 text-sm text-slate-600">
+            <div class="flex justify-between">
+              <span id="summary-service-title">Griha Pravesh Dakshina</span>
+              <span id="summary-base-fare" class="font-bold text-slate-900">₹3,100</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Pure Vedic Samagri Kit</span>
+              <span class="font-bold text-slate-900">₹850</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Platform & Facilitation Fee</span>
+              <span class="font-bold text-slate-900">₹150</span>
+            </div>
+            <div class="flex justify-between border-t border-slate-100 pt-3 text-lg font-black text-orange-600">
+              <span>Total Payable</span>
+              <span id="summary-total-amount">₹4,100</span>
+            </div>
+          </div>
+
+          <button id="btn-create-booking" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition disabled:opacity-50 text-sm">
+            Instant Request Puja
+          </button>
+          
+          <div id="booking-success-alert" class="hidden text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-xl space-y-1">
+            <p class="font-bold">✨ Booking Placed Successfully!</p>
+            <p id="booking-id-text" class="font-mono text-[11px] text-emerald-700"></p>
+            <p class="text-[11px] text-emerald-600">Dispatched to nearby Purohits. Switch to <b>Pandit App</b> to accept!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. PANDIT / PROVIDER APP ================= -->
+  <section id="view-provider" class="hidden max-w-md mx-auto p-4 py-8">
+    <div class="bg-slate-900 text-white rounded-3xl p-6 shadow-2xl border border-slate-800 space-y-6">
+      
+      <!-- Provider Header & Toggle -->
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <div>
+          <h2 id="provider-profile-name" class="font-bold text-base text-slate-100">Acharya Ramakant Mishra</h2>
+          <p class="text-xs text-slate-400">Ranchi Zone Purohit (ID: pandit_001)</p>
+        </div>
+        <button id="btn-toggle-online" class="text-xs font-bold px-3 py-1.5 rounded-lg border transition bg-emerald-500/20 text-emerald-400 border-emerald-500/40">
+          ONLINE
+        </button>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/50">
+          <span class="text-[11px] font-semibold text-slate-400">Dakshina Rating</span>
+          <p class="text-xl font-black text-amber-400 mt-1">★ 4.9</p>
+        </div>
+        <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/50">
+          <span class="text-[11px] font-semibold text-slate-400">KYC Status</span>
+          <p class="text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1">
+            ✓ Verified Purohit
+          </p>
+        </div>
+      </div>
+
+      <!-- Standby Radar -->
+      <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 text-center space-y-3">
+        <div class="inline-block p-3 bg-orange-500/10 rounded-full radar-pulse">
+          <span class="text-3xl">📡</span>
+        </div>
+        <h3 class="font-bold text-sm text-slate-200">Ranchi Radar Active</h3>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto">
+          Incoming puja requests dispatched in your vicinity will trigger an immediate alert modal here.
+        </p>
+      </div>
+    </div>
+
+    <!-- Incoming Puja Alert Modal -->
+    <div id="incoming-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-slate-800 border-2 border-orange-500 text-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+        <span class="bg-orange-500 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-wider">
+          New Puja Request
+        </span>
+        
+        <h3 id="modal-service-name" class="text-lg font-black text-slate-100">Griha Pravesh Puja</h3>
+        <p id="modal-service-address" class="text-xs text-slate-400">Main Road, Ranchi</p>
+        
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl text-left text-xs space-y-1.5 border border-slate-700">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Customer:</span>
+            <span id="modal-customer-name" class="font-bold text-slate-200">Amitabh Verma</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Total Dakshina:</span>
+            <span id="modal-total-fare" class="text-emerald-400 font-extrabold text-sm">₹4,100</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button id="btn-modal-reject" class="py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-xs font-bold transition">Pass</button>
+          <button id="btn-modal-accept" class="py-2.5 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-xs font-bold text-white shadow-lg shadow-emerald-500/30 transition">ACCEPT PUJA</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. ADMIN / OPERATIONS PORTAL ================= -->
+  <section id="view-admin" class="hidden max-w-6xl mx-auto p-4 sm:p-6 py-8 space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="font-black text-2xl text-slate-900">Operations Command Center</h2>
+        <p class="text-xs text-slate-500">Live platform management for Ranchi spiritual services.</p>
+      </div>
+    </div>
+
+    <!-- Platform KPI Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Gross Platform GMV</span>
+        <p id="admin-gmv-metric" class="text-2xl font-black text-slate-900 mt-1">₹0</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Bookings</span>
+        <p id="admin-active-metric" class="text-2xl font-black text-orange-600 mt-1">0</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Online Purohits</span>
+        <p id="admin-online-metric" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pending KYC</span>
+        <p id="admin-kyc-metric" class="text-2xl font-black text-red-500 mt-1">0</p>
+      </div>
+    </div>
+
+    <!-- Active Real-Time Bookings Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-sm text-slate-800">Real-Time Bookings Ledger</h3>
+        <span class="text-xs text-slate-400 font-mono">Live Firestore Feed</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-400 uppercase font-bold border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3.5">Booking ID</th>
+              <th class="px-6 py-3.5">Customer</th>
+              <th class="px-6 py-3.5">Puja Service</th>
+              <th class="px-6 py-3.5">Location</th>
+              <th class="px-6 py-3.5">Status</th>
+              <th class="px-6 py-3.5">Dakshina</th>
+            </tr>
+          </thead>
+          <tbody id="admin-bookings-rows" class="divide-y divide-slate-100">
+            <!-- Dynamic rows render here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pending Purohit KYC Approval Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100">
+        <h3 class="font-bold text-sm text-slate-800">Pending Purohit KYC Approvals</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-400 uppercase font-bold border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3.5">Purohit Name</th>
+              <th class="px-6 py-3.5">Phone Number</th>
+              <th class="px-6 py-3.5">Languages</th>
+              <th class="px-6 py-3.5">Services Offered</th>
+              <th class="px-6 py-3.5">Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-kyc-rows" class="divide-y divide-slate-100">
+            <!-- Dynamic KYC rows render here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MASTER JAVASCRIPT ES MODULE ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      addDoc,
+      updateDoc,
+      onSnapshot,
+      query,
+      where,
+      GeoPoint,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 1. Initialize Firebase with provided configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZ_c3EaDxSZ6RrNrwQjR_TauJHrPfk_lk",
+      authDomain: "designsnap-f3309.firebaseapp.com",
+      databaseURL: "https://designsnap-f3309-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "designsnap-f3309",
+      storageBucket: "designsnap-f3309.firebasestorage.app",
+      messagingSenderId: "741888249963",
+      appId: "1:741888249963:web:9540c9f68d6f0d5da9a12e",
+      measurementId: "G-YC8TDQF1MM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Global State
+    const SIMULATED_PANDIT_ID = "pandit_001";
+    let activeIncomingBooking = null;
+    let unsubscribePanditsListener = null;
+
+    // ========================================================
+    // TAB SWITCHER CONTROLLER
+    // ========================================================
+    const tabs = {
+      customer: { btn: document.getElementById("tab-btn-customer"), view: document.getElementById("view-customer") },
+      provider: { btn: document.getElementById("tab-btn-provider"), view: document.getElementById("view-provider") },
+      admin: { btn: document.getElementById("tab-btn-admin"), view: document.getElementById("view-admin") }
+    };
+
+    function setActiveTab(selectedKey) {
+      Object.keys(tabs).forEach((k) => {
+        const isMatch = k === selectedKey;
+        tabs[k].view.classList.toggle("hidden", !isMatch);
+        tabs[k].view.classList.toggle("block", isMatch);
+
+        if (isMatch) {
+          tabs[k].btn.className = "px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold transition";
+        } else {
+          tabs[k].btn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition";
+        }
+      });
+    }
+
+    tabs.customer.btn.onclick = () => setActiveTab("customer");
+    tabs.provider.btn.onclick = () => setActiveTab("provider");
+    tabs.admin.btn.onclick = () => setActiveTab("admin");
+
+    // ========================================================
+    // SEED DATABASE SCRIPT (Ranchi Coords)
+    // ========================================================
+    document.getElementById("btn-seed-database").onclick = async () => {
+      try {
+        // Seed Pandits
+        await setDoc(doc(db, "pandits", "pandit_001"), {
+          name: "Acharya Ramakant Mishra",
+          phone: "+919123456780",
+          isVerified: true,
+          status: "online",
+          location: new GeoPoint(23.3441, 85.3096),
+          languages: ["Hindi", "Sanskrit", "Bhojpuri"],
+          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "marriage"],
+          experienceYears: 18,
+          rating: 4.9,
+          updatedAt: serverTimestamp()
+        });
+
+        await setDoc(doc(db, "pandits", "pandit_002"), {
+          name: "Pandit Suresh Jha",
+          phone: "+919123456781",
+          isVerified: true,
+          status: "online",
+          location: new GeoPoint(23.3700, 85.3250),
+          languages: ["Hindi", "Maithili", "Sanskrit"],
+          servicesOffered: ["griha_pravesh", "rudrabhishek", "vastu_shanti"],
+          experienceYears: 12,
+          rating: 4.8,
+          updatedAt: serverTimestamp()
+        });
+
+        await setDoc(doc(db, "pandits", "pandit_003"), {
+          name: "Pandit Dhirendra Shastri",
+          phone: "+919123456782",
+          isVerified: false, // Pending KYC
+          status: "offline",
+          location: new GeoPoint(23.3280, 85.3210),
+          languages: ["Hindi", "Sanskrit"],
+          servicesOffered: ["griha_pravesh", "marriage"],
+          experienceYears: 6,
+          rating: 0,
+          updatedAt: serverTimestamp()
+        });
+
+        alert("✅ Ranchi Database seeded with 3 Purohits (2 Verified, 1 Pending KYC)!");
+      } catch (err) {
+        alert("Seed error: " + err.message);
+      }
+    };
+
+    // ========================================================
+    // 1. CUSTOMER PORTAL LOGIC
+    // ========================================================
+    const serviceSelect = document.getElementById("cust-service-select");
+    const locationSelect = document.getElementById("cust-location-select");
+    const panditsContainer = document.getElementById("cust-pandits-container");
+    const onlineBadge = document.getElementById("cust-online-badge");
+    const summaryBaseFare = document.getElementById("summary-base-fare");
+    const summaryTotalAmount = document.getElementById("summary-total-amount");
+    const summaryTitle = document.getElementById("summary-service-title");
+    const btnCreateBooking = document.getElementById("btn-create-booking");
+    const successAlert = document.getElementById("booking-success-alert");
+    const bookingIdText = document.getElementById("booking-id-text");
+
+    function calculateFare() {
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      const fare = parseInt(selectedOption.getAttribute("data-fare"), 10);
+      const total = fare + 850 + 150;
+
+      summaryTitle.textContent = `${selectedOption.text.split(" (")[0]} Dakshina`;
+      summaryBaseFare.textContent = `₹${fare.toLocaleString()}`;
+      summaryTotalAmount.textContent = `₹${total.toLocaleString()}`;
+    }
+
+    function subscribeNearbyPandits() {
+      if (unsubscribePanditsListener) unsubscribePanditsListener();
+
+      const chosenService = serviceSelect.value;
+      const q = query(
+        collection(db, "pandits"),
+        where("isVerified", "==", true),
+        where("status", "==", "online"),
+        where("servicesOffered", "array-contains", chosenService)
+      );
+
+      unsubscribePanditsListener = onSnapshot(q, (snap) => {
+        panditsContainer.innerHTML = "";
+        onlineBadge.textContent = `${snap.size} Online`;
+
+        if (snap.empty) {
+          panditsContainer.innerHTML = `
+            <div class="col-span-2 bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400 text-sm">
+              No Purohit currently online for this puja in Ranchi. Try changing the service.
+            </div>
+          `;
+          return;
+        }
+
+        snap.forEach((docSnap) => {
+          const p = docSnap.data();
+          const card = document.createElement("div");
+          card.className = "bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-3";
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">${p.name}</h4>
+                <p class="text-[11px] text-slate-500">${p.experienceYears}+ yrs exp • ${p.languages?.join(", ")}</p>
+              </div>
+              <span class="bg-green-50 text-green-700 text-xs font-bold px-2 py-0.5 rounded-md">★ ${p.rating || "5.0"}</span>
+            </div>
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-emerald-600 font-semibold">
+              <span>● Online in Ranchi</span>
+              <span class="text-slate-400 text-[11px]">Vedic Verified</span>
+            </div>
+          `;
+          panditsContainer.appendChild(card);
+        });
+      });
+    }
+
+    serviceSelect.onchange = () => {
+      calculateFare();
+      subscribeNearbyPandits();
+    };
+
+    btnCreateBooking.onclick = async () => {
+      btnCreateBooking.disabled = true;
+      btnCreateBooking.textContent = "Broadcasting to Purohits...";
+
+      const locOption = locationSelect.options[locationSelect.selectedIndex];
+      const lat = parseFloat(locOption.getAttribute("data-lat"));
+      const lng = parseFloat(locOption.getAttribute("data-lng"));
+
+      const servOption = serviceSelect.options[serviceSelect.selectedIndex];
+      const fare = parseInt(servOption.getAttribute("data-fare"), 10);
+      const total = fare + 850 + 150;
+
+      try {
+        const newBookingRef = await addDoc(collection(db, "bookings"), {
+          customerId: "cust_001",
+          customerName: "Amitabh Verma",
+          customerPhone: "+919876543210",
+          panditId: null,
+          serviceId: serviceSelect.value,
+          serviceName: servOption.text.split(" (")[0],
+          status: "pending",
+          notifiedPandits: [SIMULATED_PANDIT_ID], // Simulating dispatch to current test pandit
+          location: new GeoPoint(lat, lng),
+          address: `${locOption.text.replace("📍 ", "")}, Ranchi`,
+          pricing: { baseFare: fare, samagriFee: 850, platformFee: 150, totalAmount: total },
+          createdAt: serverTimestamp()
+        });
+
+        bookingIdText.textContent = `ID: ${newBookingRef.id}`;
+        successAlert.classList.remove("hidden");
+      } catch (err) {
+        alert("Booking failed: " + err.message);
+      } finally {
+        btnCreateBooking.disabled = false;
+        btnCreateBooking.textContent = "Instant Request Puja";
+      }
+    };
+
+    // ========================================================
+    // 2. PANDIT / PROVIDER LOGIC
+    // ========================================================
+    const btnToggleOnline = document.getElementById("btn-toggle-online");
+    const incomingModal = document.getElementById("incoming-modal");
+    const btnModalAccept = document.getElementById("btn-modal-accept");
+    const btnModalReject = document.getElementById("btn-modal-reject");
+
+    // Listen to Pandit Status
+    onSnapshot(doc(db, "pandits", SIMULATED_PANDIT_ID), (docSnap) => {
+      if (docSnap.exists()) {
+        const isOnline = docSnap.data().status === "online";
+        btnToggleOnline.textContent = isOnline ? "ONLINE" : "OFFLINE";
+        btnToggleOnline.className = isOnline
+          ? "text-xs font-bold px-3 py-1.5 rounded-lg border transition bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+          : "text-xs font-bold px-3 py-1.5 rounded-lg border transition bg-slate-800 text-slate-400 border-slate-700";
+      }
+    });
+
+    btnToggleOnline.onclick = async () => {
+      const next = btnToggleOnline.textContent.trim() === "ONLINE" ? "offline" : "online";
+      await updateDoc(doc(db, "pandits", SIMULATED_PANDIT_ID), { status: next });
+    };
+
+    // Listen for Pending Bookings Dispatched to Pandit
+    const qIncoming = query(
+      collection(db, "bookings"),
+      where("status", "==", "pending"),
+      where("notifiedPandits", "array-contains", SIMULATED_PANDIT_ID)
+    );
+
+    onSnapshot(qIncoming, (snap) => {
+      if (!snap.empty) {
+        const b = snap.docs[0];
+        activeIncomingBooking = { id: b.id, ...b.data() };
+
+        document.getElementById("modal-service-name").textContent = activeIncomingBooking.serviceName;
+        document.getElementById("modal-service-address").textContent = activeIncomingBooking.address;
+        document.getElementById("modal-customer-name").textContent = activeIncomingBooking.customerName;
+        document.getElementById("modal-total-fare").textContent = `₹${activeIncomingBooking.pricing?.totalAmount}`;
+
+        incomingModal.classList.remove("hidden");
+      } else {
+        incomingModal.classList.add("hidden");
+        activeIncomingBooking = null;
+      }
+    });
+
+    btnModalAccept.onclick = async () => {
+      if (!activeIncomingBooking) return;
+      await updateDoc(doc(db, "bookings", activeIncomingBooking.id), {
+        status: "accepted",
+        panditId: SIMULATED_PANDIT_ID
+      });
+      incomingModal.classList.add("hidden");
+    };
+
+    btnModalReject.onclick = async () => {
+      if (!activeIncomingBooking) return;
+      const updated = (activeIncomingBooking.notifiedPandits || []).filter((id) => id !== SIMULATED_PANDIT_ID);
+      await updateDoc(doc(db, "bookings", activeIncomingBooking.id), { notifiedPandits: updated });
+      incomingModal.classList.add("hidden");
+    };
+
+    // ========================================================
+    // 3. ADMIN OPS DASHBOARD LOGIC
+    // ========================================================
+    const bookingsTableBody = document.getElementById("admin-bookings-rows");
+    const kycTableBody = document.getElementById("admin-kyc-rows");
+
+    // Live Stream Bookings
+    onSnapshot(collection(db, "bookings"), (snap) => {
+      let gmv = 0;
+      let activeCount = 0;
+      bookingsTableBody.innerHTML = "";
+
+      snap.forEach((d) => {
+        const b = d.data();
+        gmv += b.pricing?.totalAmount || 0;
+        if (b.status === "pending" || b.status === "accepted") activeCount++;
+
+        const row = document.createElement("tr");
+        row.className = "hover:bg-slate-50";
+        row.innerHTML = `
+          <td class="px-6 py-3.5 font-mono font-bold text-slate-600">${d.id.slice(0, 8)}...</td>
+          <td class="px-6 py-3.5 font-medium text-slate-900">${b.customerName || "Customer"}</td>
+          <td class="px-6 py-3.5">${b.serviceName}</td>
+          <td class="px-6 py-3.5 text-slate-500 text-[11px]">${b.address || "Ranchi"}</td>
+          <td class="px-6 py-3.5">
+            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+              b.status === "accepted" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
+            }">
+              ${b.status?.toUpperCase()}
+            </span>
+          </td>
+          <td class="px-6 py-3.5 font-bold text-slate-900">₹${b.pricing?.totalAmount || 0}</td>
+        `;
+        bookingsTableBody.appendChild(row);
+      });
+
+      document.getElementById("admin-gmv-metric").textContent = `₹${gmv.toLocaleString()}`;
+      document.getElementById("admin-active-metric").textContent = activeCount;
+    });
+
+    // Live Stream Pandits (KYC & Stats)
+    onSnapshot(collection(db, "pandits"), (snap) => {
+      let onlineCount = 0;
+      let pendingKyc = 0;
+      kycTableBody.innerHTML = "";
+
+      snap.forEach((d) => {
+        const p = d.data();
+        if (p.status === "online") onlineCount++;
+        if (!p.isVerified) {
+          pendingKyc++;
+          const row = document.createElement("tr");
+          row.className = "hover:bg-slate-50";
+          row.innerHTML = `
+            <td class="px-6 py-3.5 font-bold text-slate-800">${p.name}</td>
+            <td class="px-6 py-3.5 text-slate-500">${p.phone}</td>
+            <td class="px-6 py-3.5 text-slate-500 text-[11px]">${p.languages?.join(", ")}</td>
+            <td class="px-6 py-3.5 text-slate-500 text-[11px]">${p.servicesOffered?.join(", ")}</td>
+            <td class="px-6 py-3.5">
+              <button data-id="${d.id}" class="btn-approve bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded-lg shadow-sm transition">
+                Approve Purohit
+              </button>
+            </td>
+          `;
+          kycTableBody.appendChild(row);
+        }
+      });
+
+      document.getElementById("admin-online-metric").textContent = onlineCount;
+      document.getElementById("admin-kyc-metric").textContent = pendingKyc;
+
+      document.querySelectorAll(".btn-approve").forEach((btn) => {
+        btn.onclick = async (e) => {
+          const id = e.target.getAttribute("data-id");
+          await updateDoc(doc(db, "pandits", id), { isVerified: true });
+        };
+      });
+    });
+
+    // Initial calculations & listeners
+    calculateFare();
+    subscribeNearbyPandits();
+  </script>
+</body>
+</html>
